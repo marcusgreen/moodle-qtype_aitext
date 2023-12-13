@@ -80,7 +80,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     }
 
     public function grade_response(array $response) {
-        xdebug_break();
         global $PAGE;
 
         $renderer = $this->get_renderer($PAGE);
