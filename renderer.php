@@ -184,7 +184,6 @@ class qtype_aitext_renderer extends qtype_renderer {
      *      not be displayed. Used to get the context.
      */
     public function files_read_only(question_attempt $qa, question_display_options $options) {
-       return false;
         global $CFG;
         $files = $qa->get_last_qt_files('attachments', $options->context->id);
         $filelist = [];
@@ -229,7 +228,6 @@ class qtype_aitext_renderer extends qtype_renderer {
      */
     public function files_input(question_attempt $qa, $numallowed,
             question_display_options $options) {
-                return false;
         global $CFG, $COURSE;
         require_once($CFG->dirroot . '/lib/form/filemanager.php');
 
@@ -379,7 +377,6 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
 
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
          $labelbyid = $qa->get_qt_field_name($name) . '_label';
-return false;
         $responselabel = $this->displayoptions->add_question_identifier_to_label(get_string('answertext', 'qtype_aitext'));
         $output = html_writer::tag('h4', $responselabel, ['id' => $labelbyid, 'class' => 'sr-only']);
         $output .= html_writer::tag('div', $this->prepare_response($name, $qa, $step, $context), [
