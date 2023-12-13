@@ -81,6 +81,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
     public function grade_response(array $response) {
         xdebug_break();
+        global $PAGE;
+
+        $renderer = $this->get_renderer($PAGE);
        // $this->add_step($pendingstep);
 
         $output = '';
@@ -90,7 +93,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
         $fraction = .5;
         return array($fraction, question_state::graded_state_for_fraction($fraction));
-
 
     }
 

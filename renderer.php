@@ -97,34 +97,84 @@ class qtype_aitext_renderer extends qtype_renderer {
         }
         $result .= html_writer::tag('div', $files, array('class' => 'attachments'));
         $result .= html_writer::end_tag('div');
+        //$this->comment($qa, '<h2>Good!</h2>', 1, FORMAT_HTML, time(), 2);
+
+        // $this->ai_comment($qa);
+        // $comment = $qa->get_current_manual_comment();
+
 
         return $result;
     }
 
+    public function ai_comment($qa) {
+        global $USER, $DB;
+        $state = $qa->get_state();
+        if (!$state->is_finished()) {
+            return null;
+        }
+        $step = $qa->get_step(1);
 
-
-    public function feedback(question_attempt $qa, question_display_options $options) {
-        $output = '';
-        $hint = null;
+        $comment = $qa->get_current_manual_comment();
+        if ($comment[0] > '') {
+            return;
+        }
         $question = $qa->get_question();
         $response = $qa->get_last_qt_var('answer', -1);
         xdebug_break();
-        // $ai = new ai\ai();
+        $ai = new ai\ai();
 
-        // $prompt = $question->aiprompt;
-        $generalfeedback = '';
-        // if (is_object($response)) {
-        //     $prompt .= '"'.strip_tags($response->__toString()).'"';
-        //     $gptresult = $ai->prompt_completion($prompt);
-        //     $generalfeedback = $gptresult['response']['choices'][0]['message']['content'];
-        // }
-
-
-        if ($options->generalfeedback) {
-            $output .= html_writer::nonempty_tag('div', $generalfeedback,
-                    array('class' => 'generalfeedback'));
+        $prompt = $question->aiprompt;
+        $comment = '';
+        if (is_object($response)) {
+            $prompt .= '"' . strip_tags($response->__toString()) . '"';
+            $gptresult = $ai->prompt_completion($prompt);
+            $comment = $gptresult['response']['choices'][0]['message']['content'];
         }
-        return $output;
+
+        // This code should be done by $qa->process_action but I could not get it to work.
+        $data = [
+            'attemptstepid' => $step->get_id(),
+            'name' => '-comment',
+            'value' => $comment
+        ];
+        $DB->insert_record('question_attempt_step_data', $data);
+        $data = [
+            'attemptstepid' => $step->get_id(),
+            'name' => '-commentformat',
+            'value' => 1
+        ];
+        $DB->insert_record('question_attempt_step_data', $data);
+
+        $data['name'] = '-mark';
+        $data['value'] = 1;
+        $DB->insert_record('question_attempt_step_data', $data);
+
+        $data['name'] = '-maxmark';
+        $data['value'] = 1;
+        $DB->insert_record('question_attempt_step_data', $data);
+
+        return $comment;
+
+    }
+
+
+    public function feedback(question_attempt $qa, question_display_options $options) {
+
+        $newcomment = $this->ai_comment($qa);
+        $storedcomment = $qa->get_current_manual_comment();
+        $comment = '';
+        if (!$newcomment) {
+            $comment = $storedcomment[0];
+        } else {
+            $comment = $newcomment;
+        }
+
+
+        $pagetype = $this->page->pagetype;
+        if ($pagetype == 'mod-quiz-attempt' || $pagetype == 'question-bank-previewquestion-preview') {
+            return $comment;
+            // return $qa->get_last_qt_var('-comment');
+        }
     }
 
     /**
@@ -227,6 +277,7 @@ class qtype_aitext_renderer extends qtype_renderer {
     }
 
     public function manual_comment(question_attempt $qa, question_display_options $options) {
+        return '';
         if ($options->manualcomment != question_display_options::EDITABLE) {
             return '';
         }
@@ -397,7 +448,8 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
     /**
      * Prepare the response for read-only display.
      * @param string $name the variable name this input edits.
-     * @param question_attempt $qa the question attempt being display.
+     * @param question_attempt $qa the question
+     *  being display.
      * @param question_attempt_step $step the current step.
      * @param object $context the context the attempt belongs to.
      * @return string the response prepared for display.
