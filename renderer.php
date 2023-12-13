@@ -184,6 +184,7 @@ class qtype_aitext_renderer extends qtype_renderer {
      *      not be displayed. Used to get the context.
      */
     public function files_read_only(question_attempt $qa, question_display_options $options) {
+       return false;
         global $CFG;
         $files = $qa->get_last_qt_files('attachments', $options->context->id);
         $filelist = [];
