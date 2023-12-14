@@ -160,18 +160,19 @@ class qtype_aitext_renderer extends qtype_renderer {
 
     public function feedback(question_attempt $qa, question_display_options $options) {
         xdebug_break();
-        $newcomment = $this->ai_comment($qa);
-        $storedcomment = $qa->get_current_manual_comment();
-            $comment = '';
-        if (!$newcomment) {
-          //  $comment = $storedcomment[0];
-        } else {
-            $comment = $newcomment;
-        }
-        $ro = $storedcomment[2];
+       // $newcomment = $this->ai_comment($qa);
+       $comment = '';
+        $comment = $qa->get_current_manual_comment();
+        // $comment = '';
+        // if (!$newcomment) {
+        //   //  $comment = $storedcomment[0];
+        // } else {
+        //     $comment = $newcomment;
+        // }
+        // $ro = $storedcomment[2];
         $pagetype = $this->page->pagetype;
         if ($pagetype == 'mod-quiz-attempt' || $pagetype == 'question-bank-previewquestion-preview') {
-            return $comment;
+            return $comment[0];
         }
     }
 

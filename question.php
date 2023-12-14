@@ -27,6 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/questionbase.php');
+use local_ai_connector\ai;
 
 /**
  * Represents an aitext question.
@@ -62,6 +63,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     public $responsetemplate;
     public $responsetemplateformat;
 
+    public $aiprompt;
+
+    public $step;
+
     /** @var array The string array of file types accepted upon file submission. */
     public $filetypeslist;
     /**
@@ -78,20 +83,47 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         return 1;
     }
+    public function apply_attempt_state(question_attempt_step $step) {
+        $this->step = $step;
+
+    }
 
     public function grade_response(array $response) {
-        global $PAGE;
+        global $DB;
 
-        $renderer = $this->get_renderer($PAGE);
-       // $this->add_step($pendingstep);
+        $ai = new ai\ai();
 
-        $output = '';
-        if (isset($response['answer'])) {
-            $output .= question_utils::to_plain_text($response['answer'],
-                $response['answerformat'], array('para' => false));
+        $prompt = $this->aiprompt;
+        $comment = '';
+        if (is_array($response)) {
+            $prompt .= '"' . strip_tags($response['answer']) . '"';
+            $gptresult = $ai->prompt_completion($prompt);
+            $json = $gptresult['response']['choices'][0]['message']['content'];
         }
-        $fraction = .5;
-        return array($fraction, question_state::graded_state_for_fraction($fraction));
+
+        $answer = json_decode($json);
+        $fraction = $answer['marks'];
+        // $output = '';
+        // if (isset($response['answer'])) {
+        //     $output .= question_utils::to_plain_text($response['answer'],
+        //         $response['answerformat'], array('para' => false));
+        // }
+
+        $grade = array($fraction, question_state::graded_state_for_fraction($fraction));
+        $data = [
+            'attemptstepid' => $this->step->get_id(),
+            'name' => '-comment',
+            'value' => $comment
+        ];
+        $DB->insert_record('question_attempt_step_data', $data);
+        $data = [
+            'attemptstepid' => $this->step->get_id(),
+            'name' => '-commentformat',
+            'value' => 1
+        ];
+        $DB->insert_record('question_attempt_step_data', $data);
+        return $grade;
+
 
     }
 
