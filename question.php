@@ -89,31 +89,27 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     }
 
     public function grade_response(array $response) {
-        global $DB;
+        global $DB, $USER;
 
         $ai = new ai\ai();
 
         $prompt = $this->aiprompt;
-        $comment = '';
+        $prompt .= 'respond in the language '.$USER->lang. ' ';
         if (is_array($response)) {
             $prompt .= '"' . strip_tags($response['answer']) . '"';
             $gptresult = $ai->prompt_completion($prompt);
             $json = $gptresult['response']['choices'][0]['message']['content'];
         }
 
-        $answer = json_decode($json);
-        $fraction = $answer['marks'];
-        // $output = '';
-        // if (isset($response['answer'])) {
-        //     $output .= question_utils::to_plain_text($response['answer'],
-        //         $response['answerformat'], array('para' => false));
-        // }
+        $content = json_decode($json);
+        $response = $content->response;
+        $fraction = $content->marks / 10;
 
         $grade = array($fraction, question_state::graded_state_for_fraction($fraction));
         $data = [
             'attemptstepid' => $this->step->get_id(),
             'name' => '-comment',
-            'value' => $comment
+            'value' => $response
         ];
         $DB->insert_record('question_attempt_step_data', $data);
         $data = [
@@ -123,13 +119,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         ];
         $DB->insert_record('question_attempt_step_data', $data);
         return $grade;
-
-
     }
-
-// `    public function make_behaviour(question_attempt $qa, $preferredbehaviour) {
-//         return question_engine::make_behaviour('manualgraded', $qa, $preferredbehaviour);
-//     }`
 
     /**
      * @param moodle_page the page we are outputting to.

@@ -22,31 +22,28 @@
  */
 
 
-defined('MOODLE_INTERNAL') || die();
-
-
 /**
  * restore plugin class that provides the necessary information
- * needed to restore one essay qtype plugin
+ * needed to restore one aitext qtype plugin
  *
  * @copyright  2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class restore_qtype_essay_plugin extends restore_qtype_plugin {
+class restore_qtype_aitext_plugin extends restore_qtype_plugin {
 
     /**
      * Returns the paths to be handled by the plugin at question level
      */
     protected function define_question_plugin_structure() {
         return array(
-            new restore_path_element('essay', $this->get_pathfor('/essay'))
+            new restore_path_element('aitext', $this->get_pathfor('/aitext'))
         );
     }
 
     /**
-     * Process the qtype/essay element
+     * Process the qtype/aitext element
      */
-    public function process_essay($data) {
+    public function process_aitext($data) {
         global $DB;
 
         $data = (object)$data;
@@ -76,11 +73,11 @@ class restore_qtype_essay_plugin extends restore_qtype_plugin {
                 $this->get_old_parentid('question')) ? true : false;
 
         // If the question has been created by restore, we need to create its
-        // qtype_essay too.
+        // qtype_aitext too.
         if ($questioncreated) {
             $data->questionid = $this->get_new_parentid('question');
-            $newitemid = $DB->insert_record('qtype_essay_options', $data);
-            $this->set_mapping('qtype_essay', $oldid, $newitemid);
+            $newitemid = $DB->insert_record('qtype_aitext_options', $data);
+            $this->set_mapping('qtype_aitext', $oldid, $newitemid);
         }
     }
 
@@ -89,29 +86,29 @@ class restore_qtype_essay_plugin extends restore_qtype_plugin {
      */
     public static function define_decode_contents() {
         return array(
-            new restore_decode_content('qtype_essay_options', 'graderinfo', 'qtype_essay'),
+            new restore_decode_content('qtype_aitext_options', 'graderinfo', 'qtype_aitext'),
         );
     }
 
     /**
-     * When restoring old data, that does not have the essay options information
+     * When restoring old data, that does not have the aitext options information
      * in the XML, supply defaults.
      */
     protected function after_execute_question() {
         global $DB;
 
-        $essayswithoutoptions = $DB->get_records_sql("
+        $aitextswithoutoptions = $DB->get_records_sql("
                     SELECT q.*
                       FROM {question} q
                       JOIN {backup_ids_temp} bi ON bi.newitemid = q.id
-                 LEFT JOIN {qtype_essay_options} qeo ON qeo.questionid = q.id
+                 LEFT JOIN {qtype_aitext_options} qeo ON qeo.questionid = q.id
                      WHERE q.qtype = ?
                        AND qeo.id IS NULL
                        AND bi.backupid = ?
                        AND bi.itemname = ?
-                ", array('essay', $this->get_restoreid(), 'question_created'));
+                ", array('aitext', $this->get_restoreid(), 'question_created'));
 
-        foreach ($essayswithoutoptions as $q) {
+        foreach ($aitextswithoutoptions as $q) {
             $defaultoptions = new stdClass();
             $defaultoptions->questionid = $q->id;
             $defaultoptions->responseformat = 'editor';
@@ -125,7 +122,7 @@ class restore_qtype_essay_plugin extends restore_qtype_plugin {
             $defaultoptions->graderinfoformat = FORMAT_HTML;
             $defaultoptions->responsetemplate = '';
             $defaultoptions->responsetemplateformat = FORMAT_HTML;
-            $DB->insert_record('qtype_essay_options', $defaultoptions);
+            $DB->insert_record('qtype_aitext_options', $defaultoptions);
         }
     }
 }
