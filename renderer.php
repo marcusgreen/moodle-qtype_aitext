@@ -107,7 +107,7 @@ class qtype_aitext_renderer extends qtype_renderer {
     }
 
     public function ai_comment($qa) {
-        global $USER, $DB;
+        global $DB;
         $state = $qa->get_state();
         if (!$state->is_finished()) {
             return null;
@@ -120,7 +120,6 @@ class qtype_aitext_renderer extends qtype_renderer {
         }
         $question = $qa->get_question();
         $response = $qa->get_last_qt_var('answer', -1);
-        xdebug_break();
         $ai = new ai\ai();
 
         $prompt = $question->aiprompt;
@@ -163,10 +162,11 @@ class qtype_aitext_renderer extends qtype_renderer {
 
         $comment = '';
         $comment = $qa->get_current_manual_comment();
+        $question = $qa->get_question();
 
         $pagetype = $this->page->pagetype;
         if ($pagetype == 'mod-quiz-attempt' || $pagetype == 'question-bank-previewquestion-preview') {
-            return $comment[0];
+          //  return $comment[0];
         }
     }
 
@@ -280,7 +280,11 @@ class qtype_aitext_renderer extends qtype_renderer {
                 $question->graderinfo, $question->graderinfoformat, $qa, 'qtype_aitext',
                 'graderinfo', $question->id), array('class' => 'graderinfo'));
     }
+    // public function manual_comment_view(question_attempt $qa, question_display_options $options) {
+    //     return '';
+    // }
 }
+
 
 /**
  * A base class to abstract out the differences between different type of

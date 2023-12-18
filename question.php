@@ -103,7 +103,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         $content = json_decode($json);
         $response = $content->response;
-        $fraction = $content->marks / 10;
+        $fraction = $content->marks / $this->defaultmark;
 
         $grade = array($fraction, question_state::graded_state_for_fraction($fraction));
         $data = [

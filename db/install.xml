@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="question/type/aitext/db" VERSION="20231202" COMMENT="XMLDB file for Moodle question/type/essay"
+<XMLDB PATH="question/type/aitext/db" VERSION="20231217" COMMENT="XMLDB file for Moodle question/type/essay"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
@@ -22,6 +22,7 @@
         <FIELD NAME="maxbytes" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Maximum size of attached files in bytes."/>
         <FIELD NAME="filetypeslist" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="What attachment file type a student is allowed to include with their response. * or empty means unlimited."/>
         <FIELD NAME="aiprompt" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The prompt to be sent to the LLM for getting an answer/feedback"/>
+        <FIELD NAME="marking" TYPE="char" LENGTH="300" NOTNULL="false" SEQUENCE="false" COMMENT="Instructions on how responses are to be marked."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
