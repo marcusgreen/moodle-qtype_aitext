@@ -158,15 +158,12 @@ class qtype_aitext_renderer extends qtype_renderer {
 
 
     public function feedback(question_attempt $qa, question_display_options $options) {
-        xdebug_break();
 
-        $comment = '';
         $comment = $qa->get_current_manual_comment();
-        $question = $qa->get_question();
 
         $pagetype = $this->page->pagetype;
-        if ($pagetype == 'mod-quiz-attempt' || $pagetype == 'question-bank-previewquestion-preview') {
-          //  return $comment[0];
+        if ($pagetype == 'question-bank-previewquestion-preview') {
+            return $comment[0];
         }
     }
 
