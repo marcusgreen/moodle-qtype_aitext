@@ -90,15 +90,14 @@ class qtype_aitext extends question_type {
             $options->filetypeslist = $formdata->filetypeslist;
         }
         $options->maxbytes = $formdata->maxbytes ?? 0;
-        xdebug_break();
         if (is_array($formdata->graderinfo)) {
             // Today find out what it should save and ensure it is available as text not arrays.
             $formdata->graderinfo = [
                 'text' => '',
-                'format' => ''
+                'format' => 'html'
             ];
-            $formdata->responsetemplate['text'] ='';
-            $formdata->responsetemplate['format'] ='';
+            $formdata->responsetemplate['text'] = '';
+            $formdata->responsetemplate['format'] = 'html';
 
 
         }

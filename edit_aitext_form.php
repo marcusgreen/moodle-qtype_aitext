@@ -19,25 +19,29 @@
  *
  * @package    qtype
  * @subpackage aitext
- * @copyright  2007 Jamie Pratt me@jamiep.org
+ * @author  2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
-defined('MOODLE_INTERNAL') || die();
 
 
 /**
  * aitext question type editing form.
  *
- * @copyright  2007 Jamie Pratt me@jamiep.org
+ * @author  2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_edit_form extends question_edit_form {
 
     protected function definition_inner($mform) {
         $qtype = question_bank::get_qtype('aitext');
+        $mform->removeelement('generalfeedback');
 
+        $mform->addElement('textarea', 'aiprompt', 'AI Prompt', ['maxlen' => 50, 'rows' => 10, 'size' => 30]);
+        $mform->setType('aiprompt', PARAM_RAW);
+        $mform->addHelpButton('aiprompt', 'aiprompt', 'qtype_aitext');
+
+        $mform->addElement('editor', 'generalfeedback', get_string('generalfeedback', 'question')
+        , ['rows' => 10], $this->editoroptions);
         $mform->addElement('header', 'responseoptions', get_string('responseoptions', 'qtype_aitext'));
         $mform->setExpanded('responseoptions');
 
@@ -94,10 +98,6 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addElement('select', 'maxbytes', get_string('maxbytes', 'qtype_aitext'), $qtype->max_file_size_options());
         $mform->setDefault('maxbytes', $this->get_default_value('maxbytes', 0));
         $mform->hideIf('maxbytes', 'attachments', 'eq', 0);
-
-        $mform->addElement('textarea', 'aiprompt', 'AI Prompt', ['maxlen' => 50, 'size' => 10]);
-        $mform->setType('aiprompt', PARAM_RAW);
-        $mform->addHelpButton('aiprompt', 'aiprompt', 'qtype_aitext');
 
         $mform->addElement('header', 'responsetemplateheader', get_string('responsetemplateheader', 'qtype_aitext'));
         $mform->addElement('editor', 'responsetemplate', get_string('responsetemplate', 'qtype_aitext'),
