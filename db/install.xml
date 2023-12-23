@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="question/type/aitext/db" VERSION="20231217" COMMENT="XMLDB file for Moodle question/type/essay"
+<XMLDB PATH="question/type/aitext/db" VERSION="20231217" COMMENT="XMLDB file for Moodle question/type/aitext"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="qtype_aitext_options" COMMENT="Extra options for essay questions.">
+    <TABLE NAME="qtype_aitext" COMMENT="Extra options for aitext questions.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key linking to the question table."/>

@@ -54,7 +54,7 @@ class backup_qtype_aitext_plugin extends backup_qtype_plugin {
         $pluginwrapper->add_child($aitext);
 
         // Set source to populate the data.
-        $aitext->set_source_table('qtype_aitext_options',
+        $aitext->set_source_table('qtype_aitext',
                 array('questionid' => backup::VAR_PARENTID));
 
         // Don't need to annotate ids nor files.

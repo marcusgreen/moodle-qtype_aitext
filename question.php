@@ -77,11 +77,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return number
      */
     public function compute_final_grade($responses, $totaltries) {
-        xdebug_break();
-        var_dump($this);
-        exit();
 
-        return 1;
+        return true;
     }
     public function apply_attempt_state(question_attempt_step $step) {
         $this->step = $step;
@@ -92,7 +89,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         global $DB, $USER;
 
         $ai = new ai\ai();
-
+        xdebug_break();
         $prompt = $this->aiprompt;
         $prompt .= 'respond in the language '.$USER->lang. ' ';
         if (is_array($response)) {

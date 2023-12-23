@@ -46,7 +46,8 @@ class qtype_aitext extends question_type {
 
     public function get_question_options($question) {
         global $DB;
-        $question->options = $DB->get_record('qtype_aitext_options',
+        xdebug_break();
+        $question->options = $DB->get_record('qtype_aitext',
                 array('questionid' => $question->id), '*', MUST_EXIST);
         parent::get_question_options($question);
     }
@@ -65,12 +66,13 @@ class qtype_aitext extends question_type {
         global $DB;
         $context = $formdata->context;
 
-        $options = $DB->get_record('qtype_aitext_options', array('questionid' => $formdata->id));
+        $options = $DB->get_record('qtype_aitext', array('questionid' => $formdata->id));
         if (!$options) {
             $options = new stdClass();
             $options->questionid = $formdata->id;
-            $options->id = $DB->insert_record('qtype_aitext_options', $options);
+            $options->id = $DB->insert_record('qtype_aitext', $options);
         }
+        xdebug_break();
         $options->aiprompt = $formdata->aiprompt;
         $options->responseformat = $formdata->responseformat;
         $options->responserequired = $formdata->responserequired;
@@ -95,7 +97,7 @@ class qtype_aitext extends question_type {
         $options->graderinfoformat = $formdata->graderinfo['format'];
         $options->responsetemplate = $formdata->responsetemplate['text'];
         $options->responsetemplateformat = $formdata->responsetemplate['format'];
-        $DB->update_record('qtype_aitext_options', $options);
+        $DB->update_record('qtype_aitext', $options);
     }
 
     protected function initialise_question_instance(question_definition $question, $questiondata) {
@@ -121,7 +123,7 @@ class qtype_aitext extends question_type {
     public function delete_question($questionid, $contextid) {
         global $DB;
 
-        $DB->delete_records('qtype_aitext_options', array('questionid' => $questionid));
+        $DB->delete_records('qtype_aitext', array('questionid' => $questionid));
         parent::delete_question($questionid, $contextid);
     }
 
@@ -209,4 +211,32 @@ class qtype_aitext extends question_type {
         $fs = get_file_storage();
         $fs->delete_area_files($contextid, 'qtype_aitext', 'graderinfo', $questionid);
     }
+
+    /**
+     * data used by export_to_xml
+     * @return array
+     */
+    public function extra_question_fields() {
+        return [
+            'qtype_aitext',
+            'aiprompt',
+            'responseformat',
+            'responserequired',
+            'responsefieldlines',
+            'attachments',
+            'minwordlimit',
+            'maxwordlimit',
+            'attachments',
+            'attachmentsrequired',
+            'graderinfo',
+            'graderinfoformat',
+            'responsetemplate',
+            'responsetemplateformat',
+            'maxbytes',
+            'filetypeslist',
+            'aiprompt',
+            'marking'
+        ];
+    }
+
 }
