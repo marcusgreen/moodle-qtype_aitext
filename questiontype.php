@@ -46,7 +46,6 @@ class qtype_aitext extends question_type {
 
     public function get_question_options($question) {
         global $DB;
-        xdebug_break();
         $question->options = $DB->get_record('qtype_aitext',
                 array('questionid' => $question->id), '*', MUST_EXIST);
         parent::get_question_options($question);
@@ -72,7 +71,6 @@ class qtype_aitext extends question_type {
             $options->questionid = $formdata->id;
             $options->id = $DB->insert_record('qtype_aitext', $options);
         }
-        xdebug_break();
         $options->aiprompt = $formdata->aiprompt;
         $options->responseformat = $formdata->responseformat;
         $options->responserequired = $formdata->responserequired;
@@ -92,8 +90,22 @@ class qtype_aitext extends question_type {
             $options->filetypeslist = $formdata->filetypeslist;
         }
         $options->maxbytes = $formdata->maxbytes ?? 0;
+        xdebug_break();
+        if (is_array($formdata->graderinfo)) {
+            // Today find out what it should save and ensure it is available as text not arrays.
+            $formdata->graderinfo = [
+                'text' => '',
+                'format' => ''
+            ];
+            $formdata->responsetemplate['text'] ='';
+            $formdata->responsetemplate['format'] ='';
+
+
+        }
+
         $options->graderinfo = $this->import_or_save_files($formdata->graderinfo,
                 $context, 'qtype_aitext', 'graderinfo', $formdata->id);
+
         $options->graderinfoformat = $formdata->graderinfo['format'];
         $options->responsetemplate = $formdata->responsetemplate['text'];
         $options->responsetemplateformat = $formdata->responsetemplate['format'];
@@ -212,6 +224,7 @@ class qtype_aitext extends question_type {
         $fs->delete_area_files($contextid, 'qtype_aitext', 'graderinfo', $questionid);
     }
 
+
     /**
      * data used by export_to_xml
      * @return array
@@ -238,5 +251,81 @@ class qtype_aitext extends question_type {
             'marking'
         ];
     }
+    public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
+        $questiontype = $data['@']['type'];
+        if ($questiontype != $this->name()) {
+            return false;
+        }
+
+        $extraquestionfields = $this->extra_question_fields();
+        if (!is_array($extraquestionfields)) {
+            return false;
+        }
+
+        // Omit table name.
+        array_shift($extraquestionfields);
+        $qo = $format->import_headers($data);
+        $qo->qtype = $questiontype;
+
+        foreach ($extraquestionfields as $field) {
+            $qo->$field = $format->getpath($data, array('#', $field, 0, '#'), '');
+        }
+
+        $extraanswersfields = $this->extra_answer_fields();
+        if (is_array($extraanswersfields)) {
+            array_shift($extraanswersfields);
+        }
+
+        return $qo;
+    }
+    public function export_to_xml($question, qformat_xml $format, $extra = null) {
+        xdebug_break();
+        $fs = get_file_storage();
+        $textfields = $this->get_text_fields();;
+        $formatfield = '/^('.implode('|', $textfields).')format$/';
+        $fields = $this->extra_question_fields();
+        array_shift($fields); // Remove table name.
+
+        $output = '';
+        foreach ($fields as $field) {
+            if (preg_match($formatfield, $field)) {
+                continue;
+            }
+            if (in_array($field, $textfields)) {
+                $files = $fs->get_area_files($question->contextid, 'question', $field, $question->id);
+                $output .= "    <$field ".$format->format($question->options->{$field.'format'}).">\n";
+                $output .= '      '.$format->writetext($question->options->$field);
+                $output .= $format->write_files($files);
+                $output .= "    </$field>\n";
+            } else {
+                $value = $question->options->$field;
+                if ($field == 'errorcmid') {
+                    $value = $this->export_errorcmid($value);
+                }
+                $output .= "    <$field>".$format->xml_escape($value)."</$field>\n";
+            }
+        }
+
+        return $output;
+    }
+    public function get_text_fields() {
+        return array('graderinfo',
+                     'responsetemplate',
+                     'responsesample',
+                     'correctfeedback',
+                     'incorrectfeedback',
+                     'partiallycorrectfeedback');
+    }
+    protected function export_errorcmid($cmid) {
+        global $PAGE;
+        if ($PAGE && $PAGE->course && $cmid) {
+            $modinfo = get_fast_modinfo($PAGE->course->id);
+            if (isset($modinfo->cms[$cmid])) {
+                return $modinfo->cms[$cmid]->name;
+            }
+        }
+        return '';
+    }
+
 
 }
