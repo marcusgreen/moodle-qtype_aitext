@@ -32,7 +32,7 @@ require_once($CFG->libdir . '/questionlib.php');
 /**
  * The aitext question type.
  *
- * @copyright  2005 Mark Nielsen
+ * @copyright  2005 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext extends question_type {
@@ -94,10 +94,10 @@ class qtype_aitext extends question_type {
             // Today find out what it should save and ensure it is available as text not arrays.
             $formdata->graderinfo = [
                 'text' => '',
-                'format' => 'html'
+                'format' => 1
             ];
             $formdata->responsetemplate['text'] = '';
-            $formdata->responsetemplate['format'] = 'html';
+            $formdata->responsetemplate['format'] = 1;
 
 
         }
@@ -278,7 +278,6 @@ class qtype_aitext extends question_type {
         return $qo;
     }
     public function export_to_xml($question, qformat_xml $format, $extra = null) {
-        xdebug_break();
         $fs = get_file_storage();
         $textfields = $this->get_text_fields();;
         $formatfield = '/^('.implode('|', $textfields).')format$/';

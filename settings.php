@@ -15,20 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for the essay question type.
+ * TODO describe file settings
  *
- * @package    qtype
- * @subpackage essay
- * @copyright  2005 Mark Nielsen
+ * @package    qtype_aitext
+ * @copyright  2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die;
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'qtype_aitext';
-$plugin->version   = 2023042402;
-$plugin->requires  = 2020110900;
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->dependencies = [
-    'local_ai_connector' => ANY_VERSION
-];
+if ($ADMIN->fulltree) {
+    $settings->add(new admin_setting_configtext('qtype_aitext/disclaimer',
+            new lang_string('disclaimer', 'qtype_aitext'),
+            new lang_string('disclaimer_setting', 'qtype_aitext'),
+            '(Response provided by ChatGPT)');}

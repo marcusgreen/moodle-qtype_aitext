@@ -67,6 +67,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
     public $step;
 
+    /** @var int */
+    public $defaultmark;
+
     /** @var array The string array of file types accepted upon file submission. */
     public $filetypeslist;
     /**
@@ -89,20 +92,25 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         global $DB, $USER;
 
         $ai = new ai\ai();
-        xdebug_break();
         $prompt = $this->aiprompt;
         $prompt .= 'respond in the language '.$USER->lang. ' ';
         if (is_array($response)) {
             $prompt .= '"' . strip_tags($response['answer']) . '"';
-            $gptresult = $ai->prompt_completion($prompt);
-            $json = $gptresult['response']['choices'][0]['message']['content'];
+            $llmresponse = $ai->prompt_completion($prompt);
+            $content = $llmresponse['response']['choices'][0]['message']['content'];
         }
 
-        $content = json_decode($json);
-        $response = $content->response;
-        $fraction = $content->marks / $this->defaultmark;
+        $contentobject = json_decode($content);
+        if ($contentobject) {
+             $response = $contentobject->response;
+             $fraction = $contentobject->marks / $this->defaultmark;
+             $grade = array($fraction, question_state::graded_state_for_fraction($fraction));
+        } else {
+            $response = $content;
+            $grade = [0 => 0, question_state::$needsgrading];
+        }
+        $response .= ' '.get_config('qtype_aitext', 'disclaimer');
 
-        $grade = array($fraction, question_state::graded_state_for_fraction($fraction));
         $data = [
             'attemptstepid' => $this->step->get_id(),
             'name' => '-comment',
