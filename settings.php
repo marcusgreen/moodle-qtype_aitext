@@ -27,4 +27,6 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('qtype_aitext/disclaimer',
             new lang_string('disclaimer', 'qtype_aitext'),
             new lang_string('disclaimer_setting', 'qtype_aitext'),
-            '(Response provided by ChatGPT)');}
+            "(Response provided by ChatGPT)"));
+}
+
