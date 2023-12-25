@@ -90,7 +90,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
     public function grade_response(array $response) {
         global $DB, $USER;
-
+        xdebug_break();
         $ai = new ai\ai();
         $prompt = $this->aiprompt;
         $prompt .= 'respond in the language '.$USER->lang. ' ';
@@ -101,6 +101,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
 
         $contentobject = json_decode($content);
+        if (!is_string($contentobject->response)) {
+            $grade = [0 => 0, question_state::$needsgrading];
+            return $grade;
+        }
         if ($contentobject) {
              $response = $contentobject->response;
              $fraction = $contentobject->marks / $this->defaultmark;

@@ -12,3 +12,8 @@ It is currently limited to the immediate feedback quesiton behaviour. It require
 "Explain if there is anything wrong with the Grammar in this sentence.  Give 10 marks if there are no errors and all spelling is correct and it is in the past tense. Give 0 marks if the grammar is incorrect. Deduct one mark,  every word where the spelling is incorrect. Reply in json format with a response and marks fields."
 
 It may help to test prompts directly on the Chat GPT site to confirm they  work as expected.
+
+## Roadmap
+Support other LLM systems. Supporting a self hosted LLM will ensure data sovereignty
+
+Cron based evaluation. Allow for slow LLM systems by marking on a cron timer

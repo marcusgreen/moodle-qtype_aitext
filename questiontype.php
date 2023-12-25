@@ -19,7 +19,7 @@
  *
  * @package    qtype
  * @subpackage aitext
- * @copyright  2005 Mark Nielsen
+ * @author     Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,11 +28,10 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/questionlib.php');
 
-
 /**
  * The aitext question type.
  *
- * @copyright  2005 Marcus Green
+ * @copyright  2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext extends question_type {
