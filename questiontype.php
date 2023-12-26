@@ -93,10 +93,10 @@ class qtype_aitext extends question_type {
             // Today find out what it should save and ensure it is available as text not arrays.
             $formdata->graderinfo = [
                 'text' => '',
-                'format' => 1
+                'format' => FORMAT_HTML
             ];
             $formdata->responsetemplate['text'] = '';
-            $formdata->responsetemplate['format'] = 1;
+            $formdata->responsetemplate['format'] = FORMAT_HTML;
 
 
         }

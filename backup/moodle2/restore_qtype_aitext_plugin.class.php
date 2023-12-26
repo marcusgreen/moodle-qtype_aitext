@@ -76,7 +76,7 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
         // qtype_aitext too.
         if ($questioncreated) {
             $data->questionid = $this->get_new_parentid('question');
-            $newitemid = $DB->insert_record('qtype_aitext_options', $data);
+            $newitemid = $DB->insert_record('qtype_aitext', $data);
             $this->set_mapping('qtype_aitext', $oldid, $newitemid);
         }
     }
@@ -86,7 +86,7 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
      */
     public static function define_decode_contents() {
         return array(
-            new restore_decode_content('qtype_aitext_options', 'graderinfo', 'qtype_aitext'),
+            new restore_decode_content('qtype_aitext', 'graderinfo', 'qtype_aitext'),
         );
     }
 
@@ -101,7 +101,7 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
                     SELECT q.*
                       FROM {question} q
                       JOIN {backup_ids_temp} bi ON bi.newitemid = q.id
-                 LEFT JOIN {qtype_aitext_options} qeo ON qeo.questionid = q.id
+                 LEFT JOIN {qtype_aitext} qeo ON qeo.questionid = q.id
                      WHERE q.qtype = ?
                        AND qeo.id IS NULL
                        AND bi.backupid = ?
@@ -111,6 +111,7 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
         foreach ($aitextswithoutoptions as $q) {
             $defaultoptions = new stdClass();
             $defaultoptions->questionid = $q->id;
+            $defaultoptions->aimprompt = '';
             $defaultoptions->responseformat = 'editor';
             $defaultoptions->responserequired = 1;
             $defaultoptions->responsefieldlines = 15;
@@ -122,7 +123,7 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
             $defaultoptions->graderinfoformat = FORMAT_HTML;
             $defaultoptions->responsetemplate = '';
             $defaultoptions->responsetemplateformat = FORMAT_HTML;
-            $DB->insert_record('qtype_aitext_options', $defaultoptions);
+            $DB->insert_record('qtype_aitext', $defaultoptions);
         }
     }
 }
