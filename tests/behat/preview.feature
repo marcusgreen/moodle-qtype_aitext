@@ -1,4 +1,4 @@
-@qtype @qtype_essay
+@qtype @qtype_aitext
 Feature: Preview Essay questions
   As a teacher
   In order to check my Essay questions will work for students

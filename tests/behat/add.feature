@@ -1,4 +1,4 @@
-@qtype @qtype_essay
+@qtype @qtype_aitext
 Feature: Test creating an Essay question
   As a teacher
   In order to test my students
@@ -49,7 +49,7 @@ Feature: Test creating an Essay question
     Then I should see "essay-003"
     # Checking that the next new question form displays user preferences settings.
     And I press "Create a new question ..."
-    And I set the field "item_qtype_essay" to "1"
+    And I set the field "item_qtype_aitext" to "1"
     And I click on "Add" "button" in the "Choose a question type to add" "dialogue"
     And the following fields match these values:
       | id_responseformat      | editorfilepicker |

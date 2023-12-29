@@ -134,12 +134,12 @@ class qtype_aitext_edit_form extends question_edit_form {
         $draftid = file_get_submitted_draft_itemid('graderinfo');
         $question->graderinfo = array();
         $question->graderinfo['text'] = file_prepare_draft_area(
-            $draftid,           // Draftid
-            $this->context->id, // context
-            'qtype_aitext',      // component
-            'graderinfo',       // filarea
+            $draftid,           // Draftid.
+            $this->context->id, // Context.
+            'qtype_aitext',      // Component.
+            'graderinfo',       // Filarea.
             !empty($question->id) ? (int) $question->id : null, // itemid
-            $this->fileoptions, // options
+            $this->fileoptions, // Options.
             $question->options->graderinfo // text.
         );
         $question->graderinfo['format'] = $question->options->graderinfoformat;

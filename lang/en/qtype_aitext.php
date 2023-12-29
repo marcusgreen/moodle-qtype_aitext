@@ -26,8 +26,8 @@
 $string['acceptedfiletypes'] = 'Accepted file types';
 $string['acceptedfiletypes_help'] = 'Accepted file types can be restricted by entering a list of file extensions. If the field is left empty, then all file types are allowed.';
 
-$string['aiprompt'] = 'AI Prompt';
-$string['aiprompt_help'] = 'AI prompt help';
+    $string['aiprompt'] = 'AI Prompt';
+    $string['aiprompt_help'] = 'A prompt for the Large Language model. For marking include "Reply in json format with a response and marks fields"';
 $string['allowattachments'] = 'Allow attachments';
 $string['answerfiles'] = 'Answer files';
 $string['answertext'] = 'Answer text';

@@ -15,28 +15,29 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * aitext question renderer class.
+ * aitext question renderer class. Based on core Moodle qtype_essay
+ * which has its origins at the UK Open University
  *
  * @package    qtype
  * @subpackage aitext
- * @copyright  2009 The Open University
+ * @author     2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 defined('MOODLE_INTERNAL') || die();
-use local_ai_connector\ai;
-
 /**
  * Generates the output for aitext questions.
  *
- * @copyright  2009 The Open University
+ * @author     2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_renderer extends qtype_renderer {
     public function formulation_and_controls(question_attempt $qa,
             question_display_options $options) {
         global $CFG;
+
+        /** @var qtype_aitext $question */
         $question = $qa->get_question();
 
         /** @var qtype_aitext_format_renderer_base $responseoutput */
@@ -63,7 +64,7 @@ class qtype_aitext_renderer extends qtype_renderer {
             if (!empty($CFG->enableplagiarism)) {
                 require_once($CFG->libdir . '/plagiarismlib.php');
 
-                $answer .= plagiarism_get_links([
+                $answer .= plagiarism_get_links((object) [
                     'context' => $options->context->id,
                     'component' => $qa->get_question()->qtype->plugin_name(),
                     'area' => $qa->get_usage_id(),
@@ -97,72 +98,34 @@ class qtype_aitext_renderer extends qtype_renderer {
         }
         $result .= html_writer::tag('div', $files, array('class' => 'attachments'));
         $result .= html_writer::end_tag('div');
-        //$this->comment($qa, '<h2>Good!</h2>', 1, FORMAT_HTML, time(), 2);
-
-        // $this->ai_comment($qa);
-        // $comment = $qa->get_current_manual_comment();
-
 
         return $result;
     }
 
-    public function ai_comment($qa) {
-        global $DB;
-        $state = $qa->get_state();
-        if (!$state->is_finished()) {
-            return null;
-        }
-        $step = $qa->get_step(1);
-
-        $comment = $qa->get_current_manual_comment();
-        if ($comment[0] > '') {
-            return;
-        }
-        $question = $qa->get_question();
-        $response = $qa->get_last_qt_var('answer', -1);
-        $ai = new ai\ai();
-
-        $prompt = $question->aiprompt;
-        $comment = '';
-        if (is_object($response)) {
-            $prompt .= '"' . strip_tags($response->__toString()) . '"';
-            $gptresult = $ai->prompt_completion($prompt);
-            $comment = $gptresult['response']['choices'][0]['message']['content'];
-        }
-
-        // This code should be done by $qa->process_action but I could not get it to work.
-        $data = [
-            'attemptstepid' => $step->get_id(),
-            'name' => '-comment',
-            'value' => $comment
-        ];
-        $DB->insert_record('question_attempt_step_data', $data);
-        $data = [
-            'attemptstepid' => $step->get_id(),
-            'name' => '-commentformat',
-            'value' => 1
-        ];
-        $DB->insert_record('question_attempt_step_data', $data);
-
-        $data['name'] = '-mark';
-        $data['value'] = 1;
-        $DB->insert_record('question_attempt_step_data', $data);
-
-        $data['name'] = '-maxmark';
-        $data['value'] = 1;
-        $DB->insert_record('question_attempt_step_data', $data);
-
-        return $comment;
-
-    }
-
-
+    /**
+     * Return the ai evaluation into the feedback area, instead
+     * of the normal fixed/hint feedback when in preview mode.
+     *
+     * @param question_attempt $qa
+     * @param question_display_options $options
+     * @return void
+     */
     public function feedback(question_attempt $qa, question_display_options $options) {
+        global $DB;
+        $qaid = $qa->get_step(0)->get_id();
+        $data = [
+            'attemptstepid' => $qaid,
+            'name' => '-aicontent'
+        ];
+        $aicontent = $DB->get_record('question_attempt_step_data', $data);
+
 
         $comment = $qa->get_current_manual_comment();
-
         $pagetype = $this->page->pagetype;
         if ($pagetype == 'question-bank-previewquestion-preview') {
+            if ($aicontent) {
+                $comment[0] = $comment[0]. '<br/><br/>'.$aicontent->value;
+            }
             return $comment[0];
         }
     }
@@ -187,7 +150,7 @@ class qtype_aitext_renderer extends qtype_renderer {
             if (!empty($CFG->enableplagiarism)) {
                 require_once($CFG->libdir . '/plagiarismlib.php');
 
-                $out .= plagiarism_get_links([
+                $out .= plagiarism_get_links((object)[
                     'context' => $options->context->id,
                     'component' => $qa->get_question()->qtype->plugin_name(),
                     'area' => $qa->get_usage_id(),
@@ -277,9 +240,6 @@ class qtype_aitext_renderer extends qtype_renderer {
                 $question->graderinfo, $question->graderinfoformat, $qa, 'qtype_aitext',
                 'graderinfo', $question->id), array('class' => 'graderinfo'));
     }
-    // public function manual_comment_view(question_attempt $qa, question_display_options $options) {
-    //     return '';
-    // }
 }
 
 
@@ -313,7 +273,7 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
      * @param object $context the context teh output belongs to.
      * @return string html to display the response.
      */
-    public abstract function response_area_read_only($name, question_attempt $qa,
+    abstract public function response_area_read_only($name, question_attempt $qa,
             question_attempt_step $step, $lines, $context);
 
     /**
@@ -325,13 +285,13 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
      * @param object $context the context teh output belongs to.
      * @return string html to display the response for editing.
      */
-    public abstract function response_area_input($name, question_attempt $qa,
+    abstract public function response_area_input($name, question_attempt $qa,
             question_attempt_step $step, $lines, $context);
 
     /**
      * @return string specific class name to add to the input element.
      */
-    protected abstract function class_name();
+    abstract protected function class_name();
 }
 
 /**

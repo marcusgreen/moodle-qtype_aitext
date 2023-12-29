@@ -1,4 +1,4 @@
-@qtype @qtype_essay
+@qtype @qtype_aitext
 Feature: In a essay question, limit submittable file types
   In order to constrain student submissions for marking
   As a teacher

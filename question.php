@@ -88,23 +88,39 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
     }
 
+    /**
+     * Grade response by making a call to external
+     * large language model such as ChatGPT
+     *
+     * @param array $response
+     * @return void
+     */
     public function grade_response(array $response) {
         global $DB, $USER;
-        xdebug_break();
         $ai = new ai\ai();
         $prompt = $this->aiprompt;
-        $prompt .= 'respond in the language '.$USER->lang. ' ';
+        $prompt .= ' respond in the language '.$USER->lang. ' ';
+        $prompt .= 'reply in json format with a response and marks fields';
+
         if (is_array($response)) {
-            $prompt .= '"' . strip_tags($response['answer']) . '"';
+            $prompt .= '" ' . strip_tags($response['answer']) . '"';
             $llmresponse = $ai->prompt_completion($prompt);
             $content = $llmresponse['response']['choices'][0]['message']['content'];
         }
+
+        $data = [
+            'attemptstepid' => $this->step->get_id(),
+            'name' => '-aicontent',
+            'value' => $content
+        ];
+        $DB->insert_record('question_attempt_step_data', $data);
 
         $contentobject = json_decode($content);
         if (!is_string($contentobject->response)) {
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
         }
+        xdebug_break();
         if ($contentobject) {
              $response = $contentobject->response;
              $fraction = $contentobject->marks / $this->defaultmark;
@@ -127,6 +143,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             'value' => 1
         ];
         $DB->insert_record('question_attempt_step_data', $data);
+
         return $grade;
     }
 

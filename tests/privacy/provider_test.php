@@ -17,15 +17,15 @@
 /**
  * Privacy provider tests.
  *
- * @package    qtype_essay
+ * @package    qtype_aitext
  * @copyright  2021 The Open university
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace qtype_essay\privacy;
+namespace qtype_aitext\privacy;
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\user_preference_provider;
-use qtype_essay\privacy\provider;
+use qtype_aitext\privacy\provider;
 use core_privacy\local\request\writer;
 use core_privacy\local\request\transform;
 
@@ -37,7 +37,7 @@ require_once($CFG->dirroot . '/question/type/essay/classes/privacy/provider.php'
 /**
  * Privacy provider tests class.
  *
- * @package    qtype_essay
+ * @package    qtype_aitext
  * @copyright  2021 The Open university
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -45,8 +45,8 @@ class provider_test extends \core_privacy\tests\provider_testcase {
     // Include the privacy helper which has assertions on it.
 
     public function test_get_metadata() {
-        $collection = new \core_privacy\local\metadata\collection('qtype_essay');
-        $actual = \qtype_essay\privacy\provider::get_metadata($collection);
+        $collection = new \core_privacy\local\metadata\collection('qtype_aitext');
+        $actual = \qtype_aitext\privacy\provider::get_metadata($collection);
         $this->assertEquals($collection, $actual);
     }
 
@@ -70,17 +70,17 @@ class provider_test extends \core_privacy\tests\provider_testcase {
     public function test_export_user_preferences($name, $value, $expected) {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
-        set_user_preference("qtype_essay_$name", $value, $user);
+        set_user_preference("qtype_aitext_$name", $value, $user);
         provider::export_user_preferences($user->id);
         $writer = writer::with_context(\context_system::instance());
         $this->assertTrue($writer->has_any_data());
-        $preferences = $writer->get_user_preferences('qtype_essay');
+        $preferences = $writer->get_user_preferences('qtype_aitext');
         foreach ($preferences as $key => $pref) {
-            $preference = get_user_preferences("qtype_essay_{$key}", null, $user->id);
+            $preference = get_user_preferences("qtype_aitext_{$key}", null, $user->id);
             if ($preference === null) {
                 continue;
             }
-            $desc = get_string("privacy:preference:{$key}", 'qtype_essay');
+            $desc = get_string("privacy:preference:{$key}", 'qtype_aitext');
             $this->assertEquals($expected, $pref->value);
             $this->assertEquals($desc, $pref->description);
         }
@@ -94,19 +94,19 @@ class provider_test extends \core_privacy\tests\provider_testcase {
     public function user_preference_provider() {
         return [
                 'default mark 2' => ['defaultmark', 2, 2],
-                'responseformat editror ' => ['responseformat', 'editor', get_string('formateditor', 'qtype_essay')],
+                'responseformat editror ' => ['responseformat', 'editor', get_string('formateditor', 'qtype_aitext')],
                 'responseformat editor and filepicker ' =>
-                        ['responseformat', 'editorfilepicker', get_string('formateditorfilepicker', 'qtype_essay')],
-                'responseformat plain ' => ['responseformat', 'plain', get_string('formatplain', 'qtype_essay')],
-                'responseformat monospaced ' => ['responseformat', 'monospaced', get_string('formatmonospaced', 'qtype_essay')],
-                'responseformat noinline ' => ['responseformat', 'noinline', get_string('formatnoinline', 'qtype_essay')],
-                'responserequired yes' => ['responserequired', 1, get_string('responseisrequired', 'qtype_essay')],
-                'responserequired no ' => ['responserequired', 0, get_string('responsenotrequired', 'qtype_essay')],
+                        ['responseformat', 'editorfilepicker', get_string('formateditorfilepicker', 'qtype_aitext')],
+                'responseformat plain ' => ['responseformat', 'plain', get_string('formatplain', 'qtype_aitext')],
+                'responseformat monospaced ' => ['responseformat', 'monospaced', get_string('formatmonospaced', 'qtype_aitext')],
+                'responseformat noinline ' => ['responseformat', 'noinline', get_string('formatnoinline', 'qtype_aitext')],
+                'responserequired yes' => ['responserequired', 1, get_string('responseisrequired', 'qtype_aitext')],
+                'responserequired no ' => ['responserequired', 0, get_string('responsenotrequired', 'qtype_aitext')],
                 'responsefieldlines 10' => ['responsefieldlines', 10, '10 lines'],
                 'attachments none' => ['attachments', 0, get_string('no')],
                 'attachments 3' => ['attachments', 3, '3'],
                 'attachments unlimited' => ['attachments', -1, get_string('unlimited')],
-                'attachmentsrequired optional' => ['attachmentsrequired', 0, get_string('attachmentsoptional', 'qtype_essay')],
+                'attachmentsrequired optional' => ['attachmentsrequired', 0, get_string('attachmentsoptional', 'qtype_aitext')],
                 'attachmentsrequired 1' => ['attachmentsrequired', 1, '1'],
                 'maxbytes 50KB' => ['maxbytes', 51200, '50KB']
         ];

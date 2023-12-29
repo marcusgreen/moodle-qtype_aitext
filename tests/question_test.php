@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace qtype_essay;
+namespace qtype_aitext;
 
 use question_attempt_step;
 use question_display_options;
@@ -28,7 +28,7 @@ require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 /**
  * Unit tests for the matching question definition class.
  *
- * @package qtype_essay
+ * @package qtype_aitext
  * @copyright  2009 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -358,9 +358,9 @@ class question_test extends \advanced_testcase {
             'text input required, min/max word limit not set'  => [1, 0, 0, ''],
             'text input required, min/max word limit valid (within the boundaries)'  => [1, 10, 25, ''],
             'text input required, min word limit not reached'  => [1, 15, 25,
-                get_string('minwordlimitboundary', 'qtype_essay', ['count' => 14, 'limit' => 15])],
+                get_string('minwordlimitboundary', 'qtype_aitext', ['count' => 14, 'limit' => 15])],
             'text input required, max word limit is exceeded'  => [1, 5, 12,
-                get_string('maxwordlimitboundary', 'qtype_essay', ['count' => 14, 'limit' => 12])],
+                get_string('maxwordlimitboundary', 'qtype_aitext', ['count' => 14, 'limit' => 12])],
             'text input not required, min/max word limit not set'  => [0, 5, 12, ''],
         ];
     }
@@ -394,19 +394,19 @@ class question_test extends \advanced_testcase {
             'No limit' =>
                     [null, null, ''],
             'min and max, answer within range' =>
-                    [10, 25, get_string('wordcount', 'qtype_essay', 14)],
+                    [10, 25, get_string('wordcount', 'qtype_aitext', 14)],
             'min and max, answer too short' =>
-                    [15, 25, get_string('wordcounttoofew', 'qtype_essay', ['count' => 14, 'limit' => 15])],
+                    [15, 25, get_string('wordcounttoofew', 'qtype_aitext', ['count' => 14, 'limit' => 15])],
             'min and max, answer too long' =>
-                    [5, 12, get_string('wordcounttoomuch', 'qtype_essay', ['count' => 14, 'limit' => 12])],
+                    [5, 12, get_string('wordcounttoomuch', 'qtype_aitext', ['count' => 14, 'limit' => 12])],
             'min only, answer within range' =>
-                    [14, null, get_string('wordcount', 'qtype_essay', 14)],
+                    [14, null, get_string('wordcount', 'qtype_aitext', 14)],
             'min only, answer too short' =>
-                    [15, null, get_string('wordcounttoofew', 'qtype_essay', ['count' => 14, 'limit' => 15])],
+                    [15, null, get_string('wordcounttoofew', 'qtype_aitext', ['count' => 14, 'limit' => 15])],
             'max only, answer within range' =>
-                    [null, 14, get_string('wordcount', 'qtype_essay', 14)],
+                    [null, 14, get_string('wordcount', 'qtype_aitext', 14)],
             'max only, answer too short' =>
-                    [null, 13, get_string('wordcounttoomuch', 'qtype_essay', ['count' => 14, 'limit' => 13])],
+                    [null, 13, get_string('wordcounttoomuch', 'qtype_aitext', ['count' => 14, 'limit' => 13])],
         ];
     }
 

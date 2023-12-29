@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace qtype_essay;
+namespace qtype_aitext;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -24,20 +24,20 @@ require_once($CFG->libdir . "/phpunit/classes/restore_date_testcase.php");
 /**
  * Test restore logic.
  *
- * @package    qtype_essay
+ * @package    qtype_aitext
  * @copyright  2019 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_test extends \restore_date_testcase {
 
     /**
-     * Test missing qtype_essay_options creation.
+     * Test missing qtype_aitext_options creation.
      *
-     * Old backup files may contain essays with no qtype_essay_options record.
+     * Old backup files may contain essays with no qtype_aitext_options record.
      * During restore, we add default options for any questions like that.
      * That is what is tested in this file.
      */
-    public function test_restore_create_missing_qtype_essay_options() {
+    public function test_restore_create_missing_qtype_aitext_options() {
         global $DB;
 
         // Create a course with one essay question in its question bank.
@@ -49,7 +49,7 @@ class restore_test extends \restore_date_testcase {
         $essay = $questiongenerator->create_question('essay', null, array('category' => $category->id));
 
         // Remove the options record, which means that the backup will look like a backup made in an old Moodle.
-        $DB->delete_records('qtype_essay_options', ['questionid' => $essay->id]);
+        $DB->delete_records('qtype_aitext_options', ['questionid' => $essay->id]);
 
         // Do backup and restore.
         $newcourseid = $this->backup_and_restore($course);
@@ -63,6 +63,6 @@ class restore_test extends \restore_date_testcase {
                                               JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
                                              WHERE qbe.questioncategoryid = ?
                                                AND q.qtype = ?', [$newcategory->id, 'essay']);
-        $this->assertTrue($DB->record_exists('qtype_essay_options', ['questionid' => $newessay->id]));
+        $this->assertTrue($DB->record_exists('qtype_aitext_options', ['questionid' => $newessay->id]));
     }
 }

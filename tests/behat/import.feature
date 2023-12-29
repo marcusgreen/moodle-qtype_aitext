@@ -1,4 +1,4 @@
-@qtype @qtype_essay
+@qtype @qtype_aitext
 Feature: Test importing Essay questions
   As a teacher
   In order to reuse Essay questions

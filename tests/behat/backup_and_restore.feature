@@ -1,4 +1,4 @@
-@qtype @qtype_essay
+@qtype @qtype_aitext
 Feature: Test duplicating a quiz containing an Essay question
   As a teacher
   In order re-use my courses containing Essay questions

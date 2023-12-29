@@ -1,4 +1,4 @@
-@qtype @qtype_essay
+@qtype @qtype_aitext
 Feature: In an essay question, let the question author choose the min/max number of words for input text
   In order to constrain student submissions for marking
   As a teacher

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace qtype_essay;
+namespace qtype_aitext;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -25,7 +25,7 @@ require_once($CFG->dirroot . '/question/engine/upgrade/tests/helper.php');
 /**
  * Testing the upgrade of essay question attempts.
  *
- * @package    qtype_essay
+ * @package    qtype_aitext
  * @copyright  2009 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

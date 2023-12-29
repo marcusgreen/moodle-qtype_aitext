@@ -13,6 +13,11 @@ It is currently limited to the immediate feedback quesiton behaviour. It require
 
 It may help to test prompts directly on the Chat GPT site to confirm they  work as expected.
 
+## Limitations
+
+Although it is based on a clone of the core esssay question type with lots of inspiration from Gordon Batesons essay_autograde plugin, it is being built and tested mainly on text responses and so things like the inclusion of
+images in the question display may not work.
+
 ## Roadmap
 Support other LLM systems. Supporting a self hosted LLM will ensure data sovereignty
 

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace qtype_essay;
+namespace qtype_aitext;
 
 use question_bank;
 use question_engine;
@@ -28,7 +28,7 @@ require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 /**
  * Unit tests for the essay question type.
  *
- * @package   qtype_essay
+ * @package   qtype_aitext
  * @copyright 2013 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -628,7 +628,7 @@ class walkthrough_test extends \qbehaviour_walkthrough_test_base {
         $PAGE->set_url('/');
 
         // Create an essay question.
-        /** @var qtype_essay_question $q */
+        /** @var qtype_aitext_question $q */
         $q = \test_question_maker::make_question('essay', 'editor');
         $q->minwordlimit = 3;
         $q->maxwordlimit = 7;

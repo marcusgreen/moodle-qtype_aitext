@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace qtype_essay;
+namespace qtype_aitext;
 
-use qtype_essay;
+use qtype_aitext;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -27,7 +27,7 @@ require_once($CFG->dirroot . '/question/type/essay/questiontype.php');
 /**
  * Unit tests for the essay question type class.
  *
- * @package    qtype_essay
+ * @package    qtype_aitext
  * @copyright  2010 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,7 +35,7 @@ class question_type_test extends \advanced_testcase {
     protected $qtype;
 
     protected function setUp(): void {
-        $this->qtype = new qtype_essay();
+        $this->qtype = new qtype_aitext();
     }
 
     protected function tearDown(): void {

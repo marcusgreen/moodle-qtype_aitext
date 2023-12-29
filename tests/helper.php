@@ -17,7 +17,7 @@
 /**
  * Test helpers for the essay question type.
  *
- * @package    qtype_essay
+ * @package    qtype_aitext
  * @copyright  2013 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,18 +32,18 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2013 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_essay_test_helper extends question_test_helper {
+class qtype_aitext_test_helper extends question_test_helper {
     public function get_test_questions() {
         return array('editor', 'editorfilepicker', 'plain', 'monospaced', 'responsetemplate', 'noinline');
     }
 
     /**
      * Helper method to reduce duplication.
-     * @return qtype_essay_question
+     * @return qtype_aitext_question
      */
     protected function initialise_essay_question() {
         question_bank::load_question_definition_classes('essay');
-        $q = new qtype_essay_question();
+        $q = new qtype_aitext_question();
         test_question_maker::initialise_a_question($q);
         $q->name = 'Essay question (HTML editor)';
         $q->questiontext = 'Please write a story about a frog.';
@@ -66,7 +66,7 @@ class qtype_essay_test_helper extends question_test_helper {
 
     /**
      * Makes an essay question using the HTML editor as input.
-     * @return qtype_essay_question
+     * @return qtype_aitext_question
      */
     public function make_essay_question_editor() {
         return $this->initialise_essay_question();
@@ -103,7 +103,7 @@ class qtype_essay_test_helper extends question_test_helper {
     /**
      * Makes an essay question using the HTML editor allowing embedded files as
      * input, and up to three attachments.
-     * @return qtype_essay_question
+     * @return qtype_aitext_question
      */
     public function make_essay_question_editorfilepicker() {
         $q = $this->initialise_essay_question();
@@ -115,7 +115,7 @@ class qtype_essay_test_helper extends question_test_helper {
     /**
      * Makes an essay question using the HTML editor allowing embedded files as
      * input, and up to two attachments, two needed.
-     * @return qtype_essay_question
+     * @return qtype_aitext_question
      */
     public function make_essay_question_editorfilepickertworequired() {
         $q = $this->initialise_essay_question();
@@ -155,7 +155,7 @@ class qtype_essay_test_helper extends question_test_helper {
 
     /**
      * Makes an essay question using plain text input.
-     * @return qtype_essay_question
+     * @return qtype_aitext_question
      */
     public function make_essay_question_plain() {
         $q = $this->initialise_essay_question();
@@ -193,7 +193,7 @@ class qtype_essay_test_helper extends question_test_helper {
 
     /**
      * Makes an essay question using monospaced input.
-     * @return qtype_essay_question
+     * @return qtype_aitext_question
      */
     public function make_essay_question_monospaced() {
         $q = $this->initialise_essay_question();
@@ -210,7 +210,7 @@ class qtype_essay_test_helper extends question_test_helper {
 
     /**
      * Makes an essay question without an online text editor.
-     * @return qtype_essay_question
+     * @return qtype_aitext_question
      */
     public function make_essay_question_noinline() {
         $q = $this->initialise_essay_question();

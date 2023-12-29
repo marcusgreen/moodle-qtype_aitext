@@ -1,4 +1,4 @@
-@qtype @qtype_essay
+@qtype @qtype_aitext
 Feature: Test editing an Essay question
   As a teacher
   In order to be able to update my Essay question

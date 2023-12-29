@@ -95,9 +95,8 @@ class qtype_aitext extends question_type {
                 'text' => '',
                 'format' => FORMAT_HTML
             ];
-            $formdata->responsetemplate['text'] = '';
-            $formdata->responsetemplate['format'] = FORMAT_HTML;
-
+            $options->responsetemplate = $formdata->responsetemplate['text'];
+            $options->responsetemplateformat = $formdata->responsetemplate['format'];
 
         }
 

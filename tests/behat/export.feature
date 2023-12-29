@@ -1,4 +1,4 @@
-@qtype @qtype_essay
+@qtype @qtype_aitext
 Feature: Test exporting Essay questions
   As a teacher
   In order to be able to reuse my Essay questions
