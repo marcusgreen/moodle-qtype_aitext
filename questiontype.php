@@ -58,6 +58,8 @@ class qtype_aitext extends question_type {
         $this->set_default_value('attachments', $fromform->attachments);
         $this->set_default_value('attachmentsrequired', $fromform->attachmentsrequired);
         $this->set_default_value('maxbytes', $fromform->maxbytes);
+        $this->set_default_value('markscheme', $fromform->markscheme);
+
     }
 
     public function save_question_options($formdata) {
@@ -71,6 +73,8 @@ class qtype_aitext extends question_type {
             $options->id = $DB->insert_record('qtype_aitext', $options);
         }
         $options->aiprompt = $formdata->aiprompt;
+        $options->markscheme = $formdata->markscheme;
+
         $options->responseformat = $formdata->responseformat;
         $options->responserequired = $formdata->responserequired;
         $options->responsefieldlines = $formdata->responsefieldlines;
@@ -108,7 +112,13 @@ class qtype_aitext extends question_type {
         $options->responsetemplateformat = $formdata->responsetemplate['format'];
         $DB->update_record('qtype_aitext', $options);
     }
-
+    /**
+     *
+     * @param qtype_aitext $question
+     * @param object $questiondata
+     * @return void
+     * @throws coding_exception
+     */
     protected function initialise_question_instance(question_definition $question, $questiondata) {
         parent::initialise_question_instance($question, $questiondata);
         $question->responseformat = $questiondata->options->responseformat;
@@ -126,7 +136,7 @@ class qtype_aitext extends question_type {
         $question->filetypeslist = $filetypesutil->normalize_file_types($questiondata->options->filetypeslist);
         $question->maxbytes = $questiondata->options->maxbytes;
         $question->aiprompt = $questiondata->options->aiprompt;
-
+        $question->markscheme = $questiondata->options->markscheme;
     }
 
     public function delete_question($questionid, $contextid) {
@@ -245,7 +255,7 @@ class qtype_aitext extends question_type {
             'maxbytes',
             'filetypeslist',
             'aiprompt',
-            'marking'
+            'markscheme'
         ];
     }
     public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {

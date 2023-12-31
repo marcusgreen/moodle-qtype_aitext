@@ -36,9 +36,15 @@ class qtype_aitext_edit_form extends question_edit_form {
         $qtype = question_bank::get_qtype('aitext');
         $mform->removeelement('generalfeedback');
 
-        $mform->addElement('textarea', 'aiprompt', 'AI Prompt', ['maxlen' => 50, 'rows' => 10, 'size' => 30]);
+        $mform->addElement('textarea', 'aiprompt', get_string('aiprompt', 'qtype_aitext'),
+             ['maxlen' => 50, 'rows' => 10, 'size' => 30]);
         $mform->setType('aiprompt', PARAM_RAW);
         $mform->addHelpButton('aiprompt', 'aiprompt', 'qtype_aitext');
+
+        $mform->addElement('textarea', 'markscheme', get_string('markscheme', 'qtype_aitext'),
+             ['maxlen' => 50, 'rows' => 6, 'size' => 30]);
+        $mform->setType('markscheme', PARAM_RAW);
+        $mform->addHelpButton('markscheme', 'markscheme', 'qtype_aitext');
 
         $mform->addElement('editor', 'generalfeedback', get_string('generalfeedback', 'question')
         , ['rows' => 10], $this->editoroptions);
@@ -130,7 +136,6 @@ class qtype_aitext_edit_form extends question_edit_form {
         $question->maxbytes = $question->options->maxbytes;
         $question->aiprompt = $question->options->aiprompt;
 
-
         $draftid = file_get_submitted_draft_itemid('graderinfo');
         $question->graderinfo = array();
         $question->graderinfo['text'] = file_prepare_draft_area(
@@ -138,9 +143,9 @@ class qtype_aitext_edit_form extends question_edit_form {
             $this->context->id, // Context.
             'qtype_aitext',      // Component.
             'graderinfo',       // Filarea.
-            !empty($question->id) ? (int) $question->id : null, // itemid
+            !empty($question->id) ? (int) $question->id : null, // Itemid.
             $this->fileoptions, // Options.
-            $question->options->graderinfo // text.
+            $question->options->graderinfo // Text.
         );
         $question->graderinfo['format'] = $question->options->graderinfoformat;
         $question->graderinfo['itemid'] = $draftid;

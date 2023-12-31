@@ -26,8 +26,8 @@
 $string['acceptedfiletypes'] = 'Accepted file types';
 $string['acceptedfiletypes_help'] = 'Accepted file types can be restricted by entering a list of file extensions. If the field is left empty, then all file types are allowed.';
 
-    $string['aiprompt'] = 'AI Prompt';
-    $string['aiprompt_help'] = 'A prompt for the Large Language model. For marking include "Reply in json format with a response and marks fields"';
+$string['aiprompt'] = 'AI Prompt';
+$string['aiprompt_help'] = 'A prompt for the Large Language model. For marking include "Reply in json format with a response and marks fields"';
 $string['allowattachments'] = 'Allow attachments';
 $string['answerfiles'] = 'Answer files';
 $string['answertext'] = 'Answer text';
@@ -50,6 +50,8 @@ $string['formatplain'] = 'Plain text';
 $string['graderinfo'] = 'Information for graders';
 $string['graderinfoheader'] = 'Grader information';
 $string['maxbytes'] = 'Maximum file size';
+$string['markscheme'] = 'Mark scheme';
+$string['markscheme_help'] = 'Mark scheme help';
 $string['maxwordlimit'] = 'Maximum word limit';
 $string['maxwordlimit_help'] = 'If the response requires that students enter text, this is the maximum number of words that each student will be allowed to submit.';
 $string['maxwordlimitboundary'] = 'The word limit for this question is {$a->limit} words and you are attempting to submit {$a->count} words. Please shorten your response and try again.';

@@ -35,7 +35,7 @@ use local_ai_connector\ai;
  * @copyright  2009 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_aitext_question extends question_graded_automatically_with_countback  {
+class qtype_aitext_question extends question_graded_automatically_with_countback {
 
     public $responseformat;
 
@@ -62,8 +62,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     public $graderinfoformat;
     public $responsetemplate;
     public $responsetemplateformat;
-
     public $aiprompt;
+
+    public $markscheme;
 
     public $step;
 
@@ -95,32 +96,31 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param array $response
      * @return void
      */
-    public function grade_response(array $response) {
+    public function grade_response(array $response) : array {
         global $DB, $USER;
         $ai = new ai\ai();
+        xdebug_break();
         $prompt = $this->aiprompt;
+        if ($this->markscheme > '') {
+            $prompt .= ' '.$this->markscheme;
+            $prompt .= ' reply in json format with a response and marks fields';
+        }
         $prompt .= ' respond in the language '.$USER->lang. ' ';
-        $prompt .= 'reply in json format with a response and marks fields';
-
         if (is_array($response)) {
             $prompt .= '" ' . strip_tags($response['answer']) . '"';
             $llmresponse = $ai->prompt_completion($prompt);
             $content = $llmresponse['response']['choices'][0]['message']['content'];
         }
-
-        $data = [
-            'attemptstepid' => $this->step->get_id(),
-            'name' => '-aicontent',
-            'value' => $content
-        ];
-        $DB->insert_record('question_attempt_step_data', $data);
+      //  $this->insert_attempt_step_data('-aicontent', $content);
 
         $contentobject = json_decode($content);
-        if (!is_string($contentobject->response)) {
+        if (!$contentobject || !is_string($contentobject->response)) {
+            $content .= ' '.get_config('qtype_aitext', 'disclaimer');
+            $this->insert_attempt_step_data('-comment', $content);
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
         }
-        xdebug_break();
+        // The response musthave the expected fields.
         if ($contentobject) {
              $response = $contentobject->response;
              $fraction = $contentobject->marks / $this->defaultmark;
@@ -129,22 +129,22 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $response = $content;
             $grade = [0 => 0, question_state::$needsgrading];
         }
-        $response .= ' '.get_config('qtype_aitext', 'disclaimer');
 
-        $data = [
-            'attemptstepid' => $this->step->get_id(),
-            'name' => '-comment',
-            'value' => $response
-        ];
-        $DB->insert_record('question_attempt_step_data', $data);
-        $data = [
-            'attemptstepid' => $this->step->get_id(),
-            'name' => '-commentformat',
-            'value' => 1
-        ];
-        $DB->insert_record('question_attempt_step_data', $data);
+        $response .= ' '.get_config('qtype_aitext', 'disclaimer');
+        $this->insert_attempt_step_data('-comment', $response);
+
+        $this->insert_attempt_step_data('-commentformat', 1);
 
         return $grade;
+    }
+    protected function insert_attempt_step_data(string $name, string $value ) {
+        global $DB;
+        $data = [
+            'attemptstepid' => $this->step->get_id(),
+            'name' => $name,
+            'value' => $value
+        ];
+        $DB->insert_record('question_attempt_step_data', $data);
     }
 
     /**

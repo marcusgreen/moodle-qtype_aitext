@@ -119,7 +119,6 @@ class qtype_aitext_renderer extends qtype_renderer {
         ];
         $aicontent = $DB->get_record('question_attempt_step_data', $data);
 
-
         $comment = $qa->get_current_manual_comment();
         $pagetype = $this->page->pagetype;
         if ($pagetype == 'question-bank-previewquestion-preview') {
