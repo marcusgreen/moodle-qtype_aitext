@@ -24,7 +24,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 
-
 /**
  * Unit tests for the matching question definition class.
  *
@@ -85,10 +84,13 @@ class question_test extends \advanced_testcase {
             'text input required, not attachments required'  =>
                 [1, 0, 'This is the text input for this essay.', 0, 'This is the text input for this essay.'],
             'Text input required, one attachments required, one uploaded'  =>
-                [1, 1, 'This is the text input for this essay.', 1, 'This is the text input for this essay.Attachments: 0 (1 bytes)'],
+                [1, 1, 'This is the text input for this essay.', 1,
+                'This is the text input for this essay.Attachments: 0 (1 bytes)'],
             'Text input is optional, four attachments required, one uploaded'  => [0, 4, '', 1, 'Attachments: 0 (1 bytes)'],
-            'Text input is optional, four attachments required, two uploaded'  => [0, 4, '', 2, 'Attachments: 0 (1 bytes), 1 (1 bytes)'],
-            'Text input is optional, four attachments required, three uploaded'  => [0, 4, '', 3, 'Attachments: 0 (1 bytes), 1 (1 bytes), 2 (1 bytes)'],
+            'Text input is optional, four attachments required, two uploaded'  =>
+                [0, 4, '', 2, 'Attachments: 0 (1 bytes), 1 (1 bytes)'],
+            'Text input is optional, four attachments required, three uploaded'  =>
+                 [0, 4, '', 3, 'Attachments: 0 (1 bytes), 1 (1 bytes), 2 (1 bytes)'],
             'Text input is optional, four attachments required, four uploaded'  => [0, 4, 'I have attached 4 files.', 4,
                 'I have attached 4 files.Attachments: 0 (1 bytes), 1 (1 bytes), 2 (1 bytes), 3 (1 bytes)'],
             'Text input is optional, unlimited attachments required, one uploaded'  => [0, -1, '', 1, 'Attachments: 0 (1 bytes)'],

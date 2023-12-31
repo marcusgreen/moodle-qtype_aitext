@@ -81,7 +81,8 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->name = 'Essay question (HTML editor)';
         $fromform->questiontext = array('text' => 'Please write a story about a frog.', 'format' => FORMAT_HTML);
         $fromform->defaultmark = 1.0;
-        $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.', 'format' => FORMAT_HTML);
+        $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.',
+             'format' => FORMAT_HTML);
         $fromform->responseformat = 'editor';
         $fromform->responserequired = 1;
         $fromform->responsefieldlines = 10;
@@ -134,7 +135,8 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->name = 'Essay question with filepicker and attachments';
         $fromform->questiontext = array('text' => 'Please write a story about a frog.', 'format' => FORMAT_HTML);
         $fromform->defaultmark = 1.0;
-        $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.', 'format' => FORMAT_HTML);
+        $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.',
+             'format' => FORMAT_HTML);
         $fromform->responseformat = 'editorfilepicker';
         $fromform->responserequired = 1;
         $fromform->responsefieldlines = 10;
@@ -172,7 +174,8 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->name = 'Essay question with filepicker and attachments';
         $fromform->questiontext = array('text' => 'Please write a story about a frog.', 'format' => FORMAT_HTML);
         $fromform->defaultmark = 1.0;
-        $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.', 'format' => FORMAT_HTML);
+        $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.',
+             'format' => FORMAT_HTML);
         $fromform->responseformat = 'plain';
         $fromform->responserequired = 1;
         $fromform->responsefieldlines = 10;
