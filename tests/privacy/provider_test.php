@@ -18,7 +18,7 @@
  * Privacy provider tests.
  *
  * @package    qtype_aitext
- * @copyright  2021 The Open university
+ * @author     2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace qtype_aitext\privacy;
@@ -28,6 +28,8 @@ use core_privacy\local\request\user_preference_provider;
 use qtype_aitext\privacy\provider;
 use core_privacy\local\request\writer;
 use core_privacy\local\request\transform;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use PHPUnit\Framework\ExpectationFailedException;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -38,18 +40,32 @@ require_once($CFG->dirroot . '/question/type/essay/classes/privacy/provider.php'
  * Privacy provider tests class.
  *
  * @package    qtype_aitext
- * @copyright  2021 The Open university
+ * @author     2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider_test extends \core_privacy\tests\provider_testcase {
     // Include the privacy helper which has assertions on it.
 
+    /**
+     * Test privacy subsystem get_metadata
+     * @return void
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     *
+     * @covers ::get_metadata()
+     */
     public function test_get_metadata() {
-        $collection = new \core_privacy\local\metadata\collection('qtype_aitext');
-        $actual = \qtype_aitext\privacy\provider::get_metadata($collection);
+        $collection = new collection('qtype_aitext');
+        $actual = provider::get_metadata($collection);
         $this->assertEquals($collection, $actual);
     }
-
+    /**
+     * Test privacy subsystem export_user_preferences
+     *
+     * @return void
+     *
+     * @covers ::export_user_preferences()
+     */
     public function test_export_user_preferences_no_pref() {
         $this->resetAfterTest();
 
