@@ -97,7 +97,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return void
      */
     public function grade_response(array $response) : array {
-        global $DB, $USER;
+        global $USER;
         $ai = new ai\ai();
         xdebug_break();
         $prompt = $this->aiprompt;
@@ -111,7 +111,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $llmresponse = $ai->prompt_completion($prompt);
             $content = $llmresponse['response']['choices'][0]['message']['content'];
         }
-       $this->insert_attempt_step_data('-aicontent', $content);
+        $this->insert_attempt_step_data('-aicontent', $content);
 
         $contentobject = json_decode($content);
         if (!$contentobject || !is_string($contentobject->response)) {
