@@ -48,6 +48,7 @@ $string['formatmonospaced'] = 'Plain text, monospaced font';
 $string['formatnoinline'] = 'No online text';
 $string['formatplain'] = 'Plain text';
 $string['graderinfo'] = 'Information for graders';
+$string['get_llmmfeedback'] = 'Get LLM feedback';
 $string['graderinfoheader'] = 'Grader information';
 $string['maxbytes'] = 'Maximum file size';
 $string['markscheme'] = 'Mark scheme';
