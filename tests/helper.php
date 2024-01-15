@@ -32,7 +32,24 @@ class qtype_aitext_test_helper extends question_test_helper {
     public function get_test_questions() {
         return array('editor', 'editorfilepicker', 'plain', 'monospaced', 'responsetemplate', 'noinline');
     }
+    public static function make_aitext_question(array $options) {
+        $optionsparam = [
+            'questiontext' => $options['questiontext'] ?? '',
+            'aiprompt' => $options['aiprompt'] ?? 0,
+            'markscheme' => $options['markscheme'] ?? 0,
 
+        ];
+
+        $type = 'aitext';
+        question_bank::load_question_definition_classes($type);
+        $question = new qtype_aitext_question();
+        test_question_maker::initialise_a_question($question);
+        $question->qtype = question_bank::get_qtype('aitext');
+        return $question;
+
+
+        return new \stdClass();
+    }
     /**
      * Helper method to reduce duplication.
      * @return qtype_aitext_question

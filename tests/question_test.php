@@ -16,31 +16,47 @@
 
 namespace qtype_aitext;
 
+use coding_exception;
+use PHPUnit\Framework\ExpectationFailedException;
 use question_attempt_step;
 use question_display_options;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
+require_once($CFG->dirroot . '/question/type/aitext/tests/helper.php');
+use qtype_aitext_test_helper;
 
 /**
  * Unit tests for the matching question definition class.
  *
  * @package qtype_aitext
- * @copyright  2009 The Open University
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author  Marcus Green 2024
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class question_test extends \advanced_testcase {
+
+
+    /**
+     * @covers ::get_question_summary()
+     * @return void
+     * @throws coding_exception
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
     public function test_get_question_summary() {
-        $essay = \test_question_maker::make_an_essay_question();
-        $essay->questiontext = 'Hello <img src="http://example.com/globe.png" alt="world" />';
-        $this->assertEquals('Hello [world]', $essay->get_question_summary());
+            $aitext = qtype_aitext_test_helper::make_aitext_question([]);
+            $aitext->questiontext = 'Hello <img src="http://example.com/globe.png" alt="world" />';
+            $this->assertEquals('Hello [world]', $aitext->get_question_summary());
     }
 
     /**
      * Test summarise_response() when teachers view quiz attempts and then
      * review them to see what has been saved in the response history table.
+     *
+     * @covers ::summarise_response()
      *
      * @dataProvider summarise_response_provider
      * @param int $responserequired

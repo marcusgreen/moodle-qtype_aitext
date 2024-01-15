@@ -15,20 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for the essay question type.
+ * Cache definitions for AI Text
  *
- * @package    qtype
- * @subpackage essay
- * @copyright  2005 Mark Nielsen
+ * Documentation: {@link https://docs.moodle.org/dev/Cache_API}
+ *
+ * @package    qtype_aitext
+ * @category   cache
+ * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'qtype_aitext';
-$plugin->version   = 2023043002;
-$plugin->requires  = 2020110900;
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->dependencies = [
-    'local_ai_connector' => ANY_VERSION
+$definitions = [
+];
+$definitions = [
+    'stringdata' => [
+        'mode' => cache_store::MODE_SESSION,
+    ]
 ];

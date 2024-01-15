@@ -99,13 +99,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     public function grade_response(array $response) : array {
         global $USER;
         $ai = new ai\ai();
-        xdebug_break();
         $prompt = $this->aiprompt;
         if ($this->markscheme > '') {
             $prompt .= ' '.$this->markscheme;
-            $prompt .= ' reply in json format with a response and marks fields';
+            $prompt .= $this->get_json_prompt();
         }
-        $prompt .= ' respond in the language '.$USER->lang. ' ';
+        $prompt .= ' respond in the language '.current_language();
         if (is_array($response)) {
             $prompt .= '" ' . strip_tags($response['answer']) . '"';
             $llmresponse = $ai->prompt_completion($prompt);
@@ -130,12 +129,34 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = [0 => 0, question_state::$needsgrading];
         }
 
-        $response .= ' '.get_config('qtype_aitext', 'disclaimer');
+        $response .= ' '.$this->llm_translate(get_config('qtype_aitext', 'disclaimer'));
         $this->insert_attempt_step_data('-comment', $response);
 
         $this->insert_attempt_step_data('-commentformat', 1);
 
         return $grade;
+    }
+
+    protected function get_json_prompt() :string {
+        return 'return only a JSON object which enumerates a set of 2  elements.
+        The elements sould have properties of "response" and "marks".
+        The resulting JSON object should be in this format: {"response":"string","marks":"number"}.\n\n';
+    }
+    protected function llm_translate(string $text) :string {
+        global $USER;
+        if (current_language() == 'en') {
+            return $text;
+        }
+        $ai = new ai\ai();
+        $cache = cache::make('qtype_aitext', 'stringdata');
+        if (($translation = $cache->get(current_language().'_'.$text)) === false) {
+            $prompt = 'translate "'.$text .'" into '.current_language();
+            $llmresponse = $ai->prompt_completion($prompt);
+            $translation = $llmresponse['response']['choices'][0]['message']['content'];
+            $translation = trim($translation, '"');
+            $cache->set(current_language().'_'.$text, $translation);
+        }
+        return $translation;
     }
     protected function insert_attempt_step_data(string $name, string $value ) {
         global $DB;
@@ -152,7 +173,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return qtype_aitext_format_renderer_base the response-format-specific renderer.
      */
     public function get_format_renderer(moodle_page $page) {
-        return $page->get_renderer('qtype_aitext', 'format_' . $this->responseformat);
+        return  $page->get_renderer('qtype_aitext', 'format_' . $this->responseformat);
     }
 
     public function get_expected_data() {
