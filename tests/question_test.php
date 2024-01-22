@@ -117,7 +117,12 @@ class question_test extends \advanced_testcase {
                     '5 (1 bytes), 6 (1 bytes), 7 (1 bytes), 8 (1 bytes), 9 (1 bytes)']
         ];
     }
-
+    /**
+     *
+     * @covers ::is_same_response()
+     *
+     * @return void
+     */
     public function test_is_same_response() {
         $essay = \test_question_maker::make_an_essay_question();
 
@@ -162,6 +167,10 @@ class question_test extends \advanced_testcase {
                 array('answer' => '0')));
     }
 
+
+    /**
+     * @covers ::is_same_response_with_template()
+     */
     public function test_is_same_response_with_template() {
         $essay = \test_question_maker::make_an_essay_question();
 
@@ -206,6 +215,11 @@ class question_test extends \advanced_testcase {
                 array('answer' => '0')));
     }
 
+    /**
+     * @covers ::is_complete_response()
+     *
+     * @return void
+     */
     public function test_is_complete_response() {
         $this->resetAfterTest(true);
 
@@ -318,7 +332,7 @@ class question_test extends \advanced_testcase {
     }
 
     /**
-     * test_get_question_definition_for_external_rendering
+     * @covers ::get_question_definition_for_external_rendering()
      */
     public function test_get_question_definition_for_external_rendering() {
         $this->resetAfterTest();

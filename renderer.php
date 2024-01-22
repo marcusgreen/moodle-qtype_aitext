@@ -108,7 +108,7 @@ class qtype_aitext_renderer extends qtype_renderer {
      *
      * @param question_attempt $qa
      * @param question_display_options $options
-     * @return void
+     * @return string HTML fragment.
      */
     public function feedback(question_attempt $qa, question_display_options $options) {
         global $DB;
@@ -117,13 +117,19 @@ class qtype_aitext_renderer extends qtype_renderer {
             'attemptstepid' => $qaid,
             'name' => '-aicontent'
         ];
+        // Get data written in the question.php grade_response method.
+        // This probably should be retrieved by an api call.
         $aicontent = $DB->get_record('question_attempt_step_data', $data);
-
         $comment = $qa->get_current_manual_comment();
-        $pagetype = $this->page->pagetype;
-        if ($pagetype == 'question-bank-previewquestion-preview') {
+        if ( $this->page->pagetype == 'question-bank-previewquestion-preview') {
             if ($aicontent) {
-                $comment[0] = $comment[0]. '<br/><br/>'.$aicontent->value;
+                // If the response has more than value and marks properties, show in preview.
+                // Because the propmpt will need fixing so marking works.
+                $jsonobject = json_decode($aicontent->value);
+                $propertycount = count(get_object_vars($jsonobject));
+                if ($propertycount > 2) {
+                    $comment[0] = $comment[0]. '<br/><br/>'.$aicontent->value;
+                }
             }
             return $comment[0];
         }
@@ -298,6 +304,7 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
  * any inline response.
  *
  * @copyright  2013 Binghamton University
+ * @author     Marcus Green 2024 (building on work of Binghampton University)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_format_noinline_renderer extends qtype_aitext_format_renderer_base {
@@ -320,7 +327,7 @@ class qtype_aitext_format_noinline_renderer extends qtype_aitext_format_renderer
  * An aitext format renderer for aitexts where the student should use the HTML
  * editor without the file picker.
  *
- * @copyright  2011 The Open University
+ * @author     Marcus Green 2024 building on work by the UK OU
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_base {

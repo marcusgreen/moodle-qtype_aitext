@@ -66,7 +66,7 @@ class question_type_test extends \advanced_testcase {
      * Test get_possible_responses
      *
      * @return void
-     * @covers :get_possible_responses()
+     * @covers ::get_possible_responses()
      */
     public function test_get_possible_responses() {
         $q = $this->get_test_question_data();

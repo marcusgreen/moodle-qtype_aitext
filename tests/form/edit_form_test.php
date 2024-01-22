@@ -24,10 +24,11 @@ require_once($CFG->dirroot . '/question/type/edit_question_form.php');
 require_once($CFG->dirroot . '/question/type/essay/edit_essay_form.php');
 
 /**
- * Unit tests for the essay edit form.
+ * Unit tests for the aitext edit form.
  *
  * @package   qtype_aitext
- * @copyright  2021 The Open University
+ * @copyright  Marcus Green 2024 Extending work from 2021 The Open University
+ *
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edit_form_test extends \advanced_testcase {
@@ -72,7 +73,7 @@ class edit_form_test extends \advanced_testcase {
 
     /**
      * Test the form for correct validation of attachments options.
-     *
+     * @covers ::validation()
      * @dataProvider user_preference_provider
      * @param int $allowed
      * @param int $required

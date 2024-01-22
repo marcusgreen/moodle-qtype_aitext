@@ -46,9 +46,6 @@ class qtype_aitext_test_helper extends question_test_helper {
         test_question_maker::initialise_a_question($question);
         $question->qtype = question_bank::get_qtype('aitext');
         return $question;
-
-
-        return new \stdClass();
     }
     /**
      * Helper method to reduce duplication.

@@ -142,8 +142,14 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         The elements sould have properties of "response" and "marks".
         The resulting JSON object should be in this format: {"response":"string","marks":"number"}.\n\n';
     }
+    /**
+     * Translate into the current language and
+     * store in a cache
+     *
+     * @param string $text
+     * @return string
+     */
     protected function llm_translate(string $text) :string {
-        global $USER;
         if (current_language() == 'en') {
             return $text;
         }
