@@ -97,7 +97,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return void
      */
     public function grade_response(array $response) : array {
-        global $USER;
         $ai = new ai\ai();
         $prompt = $this->aiprompt;
         if ($this->markscheme > '') {
@@ -119,7 +118,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
         }
-        // The response musthave the expected fields.
+        // The response must have the expected fields.
         if ($contentobject) {
              $response = $contentobject->response;
              $fraction = $contentobject->marks / $this->defaultmark;

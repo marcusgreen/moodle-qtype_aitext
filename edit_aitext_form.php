@@ -36,7 +36,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $qtype = question_bank::get_qtype('aitext');
         $mform->removeelement('generalfeedback');
         $mform->removeelement('questiontext');
-        $mform->addElement('editor', 'questiontext', get_string('aiprompt', 'qtype_aitext'),
+        $mform->addElement('editor', 'questiontext', get_string('questiontext', 'mod_quiz'),
             ['maxlen' => 50, 'rows' => 5, 'size' => 30], $this->editoroptions);
 
         $mform->addElement('textarea', 'aiprompt', get_string('aiprompt', 'qtype_aitext'),
