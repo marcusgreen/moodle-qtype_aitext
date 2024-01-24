@@ -127,7 +127,7 @@ class qtype_aitext_renderer extends qtype_renderer {
                 // Because the propmpt will need fixing so marking works.
                 $jsonobject = json_decode($aicontent->value);
                 $propertycount = 0;
-                if($jsonobject) {
+                if(is_object($jsonobject)) {
                     $propertycount = count(get_object_vars($jsonobject));
                 }
                 if ($propertycount > 2) {
