@@ -121,12 +121,13 @@ class qtype_aitext_renderer extends qtype_renderer {
         // This probably should be retrieved by an api call.
         $aicontent = $DB->get_record('question_attempt_step_data', $data);
         $comment = $qa->get_current_manual_comment();
-        if ( $this->page->pagetype == 'question-bank-previewquestion-preview') {
+       if ($this->page->pagetype == 'question-bank-previewquestion-preview') {
             if ($aicontent) {
                 // If the response has more than value and marks properties, show in preview.
                 // Because the propmpt will need fixing so marking works.
-                $jsonobject = json_decode($aicontent->value);
-                $propertycount = count(get_object_vars($jsonobject));
+                if ($jsonobject = json_decode($aicontent->value)) {
+                    $propertycount = count(get_object_vars($jsonobject));
+                }
                 if ($propertycount > 2) {
                     $comment[0] = $comment[0]. '<br/><br/>'.$aicontent->value;
                 }
