@@ -125,7 +125,9 @@ class qtype_aitext_renderer extends qtype_renderer {
             if ($aicontent) {
                 // If the response has more than value and marks properties, show in preview.
                 // Because the propmpt will need fixing so marking works.
-                if ($jsonobject = json_decode($aicontent->value)) {
+                $jsonobject = json_decode($aicontent->value);
+                $propertycount = 0;
+                if($jsonobject) {
                     $propertycount = count(get_object_vars($jsonobject));
                 }
                 if ($propertycount > 2) {
