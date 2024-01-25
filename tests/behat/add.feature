@@ -2,7 +2,7 @@
 Feature: Test creating an AIText question
     As a teacher
     In order to test my students
-    I need to be able to create an Essay question
+    I need to be able to create an aitext question
 
   Background:
     Given the following "users" exist:
@@ -15,30 +15,30 @@ Feature: Test creating an AIText question
         | user    | course | role           |
         | teacher | C1     | editingteacher |
 
-  Scenario: Create an Essay question with Response format set to 'HTML editor'
+  Scenario: Create an aitext question with Response format set to 'HTML editor'
     When I am on the "Course 1" "core_question > course question bank" page logged in as teacher
-    And I add a "Essay" question filling the form with:
-        | Question name    | essay-001                      |
-        | Question text    | Write an essay with 500 words. |
+    And I add a "aitext" question filling the form with:
+        | Question name    | aitext-001                      |
+        | Question text    | Write an aitext with 500 words. |
         | General feedback | This is general feedback       |
         | Response format  | HTML editor                    |
-    Then I should see "essay-001"
+    Then I should see "aitext-001"
 
-  Scenario: Create an Essay question with Response format set to 'HTML editor with the file picker'
+  Scenario: Create an aitext question with Response format set to 'HTML editor with the file picker'
     When I am on the "Course 1" "core_question > course question bank" page logged in as teacher
-    And I add a "Essay" question filling the form with:
-        | Question name     | essay-002                      |
-        | Question text     | Write an essay with 500 words. |
+    And I add a "aitext" question filling the form with:
+        | Question name     | aitext-002                      |
+        | Question text     | Write an aitext with 500 words. |
         | General feedback  | This is general feedback       |
         | id_responseformat | editorfilepicker               |
-    Then I should see "essay-002"
+    Then I should see "aitext-002"
 
   @javascript
-  Scenario: Create an Essay question for testing some default options
+  Scenario: Create an aitext question for testing some default options
     When I am on the "Course 1" "core_question > course question bank" page logged in as teacher
-    And I add a "Essay" question filling the form with:
-        | Question name          | essay-003                      |
-        | Question text          | Write an essay with 500 words. |
+    And I add a "aitext" question filling the form with:
+        | Question name          | aitext-003                      |
+        | Question text          | Write an aitext with 500 words. |
         | General feedback       | This is general feedback       |
         | id_responseformat      | editorfilepicker               |
         | id_responserequired    | 0                              |
@@ -46,7 +46,7 @@ Feature: Test creating an AIText question
         | id_attachments         | 2                              |
         | id_attachmentsrequired | 2                              |
         | id_maxbytes            | 10240                          |
-    Then I should see "essay-003"
+    Then I should see "aitext-003"
     # Checking that the next new question form displays user preferences settings.
     And I press "Create a new question ..."
     And I set the field "item_qtype_aitext" to "1"

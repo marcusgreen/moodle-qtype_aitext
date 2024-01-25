@@ -1,5 +1,5 @@
 @qtype @qtype_aitext
-Feature: In an essay question, let the question author choose the maxbytes for attachments
+Feature: In an aitext question, let the question author choose the maxbytes for attachments
   In order to constrain student submissions for marking
   As a teacher
   I need to choose the appropriate maxbytes for attachments
@@ -19,17 +19,17 @@ Feature: In an essay question, let the question author choose the maxbytes for a
       | Course       | C1        | Test questions |
     And the following "questions" exist:
       | questioncategory | qtype | name          | template         | attachments | maxbytes |
-      | Test questions   | essay | essay-1-512KB | editor           | 1           | 524288   |
-      | Test questions   | essay | essay-1-max   | editor           | 1           | 0        |
+      | Test questions   | aitext | aitext-1-512KB | editor           | 1           | 524288   |
+      | Test questions   | aitext | aitext-1-max   | editor           | 1           | 0        |
 
   @javascript @_switch_window
-  Scenario: Preview an Essay question and see the allowed maximum file sizes and number of attachments.
-    When I am on the "essay-1-512KB" "core_question > preview" page logged in as teacher
+  Scenario: Preview an aitext question and see the allowed maximum file sizes and number of attachments.
+    When I am on the "aitext-1-512KB" "core_question > preview" page logged in as teacher
     Then I should see "Please write a story about a frog."
     And I should see "Maximum file size: 512 KB, maximum number of files: 1"
 
   @javascript @_switch_window
-  Scenario: Preview an Essay question with Course upload limit and see the allowed maximum file size.
-    When I am on the "essay-1-max" "core_question > preview" page logged in as teacher
+  Scenario: Preview an aitext question with Course upload limit and see the allowed maximum file size.
+    When I am on the "aitext-1-max" "core_question > preview" page logged in as teacher
     Then I should see "Please write a story about a frog."
     And I should see "Maximum file size: 1 MB, maximum number of files: 1"

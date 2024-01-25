@@ -1,5 +1,5 @@
 @qtype @qtype_aitext
-Feature: In a essay question, limit submittable file types
+Feature: In a aitext question, limit submittable file types
   In order to constrain student submissions for marking
   As a teacher
   I need to limit the submittable file types
@@ -21,7 +21,7 @@ Feature: In a essay question, limit submittable file types
       | Course       | C1        | Test questions |
     And the following "questions" exist:
       | questioncategory | qtype       | name  | questiontext    | defaultmark |
-      | Test questions   | essay       | TF1   | First question  | 20          |
+      | Test questions   | aitext       | TF1   | First question  | 20          |
     And the following "activities" exist:
       | activity   | name   | intro              | course | idnumber | grade |
       | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | 20    |
@@ -43,7 +43,7 @@ Feature: In a essay question, limit submittable file types
     Then I log out
 
   @javascript @_file_upload
-  Scenario: Preview an Essay question and submit a response with a correct filetype.
+  Scenario: Preview an aitext question and submit a response with a correct filetype.
     When I log in as "student"
     And I follow "Manage private files"
     And I upload "lib/tests/fixtures/empty.txt" file to "Files" filemanager
@@ -61,7 +61,7 @@ Feature: In a essay question, limit submittable file types
     Then I should not see "These file types are not allowed here:"
 
   @javascript @_file_upload
-  Scenario: Preview an Essay question and try to submit a response with an incorrect filetype.
+  Scenario: Preview an aitext question and try to submit a response with an incorrect filetype.
     When I log in as "student"
     And I follow "Manage private files"
     And I upload "lib/tests/fixtures/upload_users.csv" file to "Files" filemanager

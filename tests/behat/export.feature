@@ -1,7 +1,7 @@
 @qtype @qtype_aitext
-Feature: Test exporting Essay questions
+Feature: Test exporting aitext questions
   As a teacher
-  In order to be able to reuse my Essay questions
+  In order to be able to reuse my aitext questions
   I need to export them
 
   Background:
@@ -19,11 +19,11 @@ Feature: Test exporting Essay questions
       | Course       | C1        | Test questions |
     And the following "questions" exist:
       | questioncategory | qtype | name      | template         |
-      | Test questions   | essay | essay-001 | editor           |
-      | Test questions   | essay | essay-002 | editorfilepicker |
-      | Test questions   | essay | essay-003 | plain            |
+      | Test questions   | aitext | aitext-001 | editor           |
+      | Test questions   | aitext | aitext-002 | editorfilepicker |
+      | Test questions   | aitext | aitext-003 | plain            |
 
-  Scenario: Export 3 Essay questions
+  Scenario: Export 3 aitext questions
     When I am on the "Course 1" "core_question > course question export" page logged in as teacher
     And I set the field "id_format_xml" to "1"
     And I press "Export questions to file"
