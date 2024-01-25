@@ -363,6 +363,8 @@ class question_test extends \advanced_testcase {
      *
      * (The tests are done with a fixed 14-word response.)
      *
+     * @covers ::get_validation_error()
+     *
      * @dataProvider get_min_max_wordlimit_test_cases()
      * @param  int $responserequired whether response required (yes = 1, no = 0)
      * @param  int $minwordlimit minimum word limit
@@ -401,6 +403,8 @@ class question_test extends \advanced_testcase {
      * Test get_word_count_message_for_review when users submit their input text.
      *
      * (The tests are done with a fixed 14-word response.)
+     *
+     * @covers ::get_word_count()
      *
      * @dataProvider get_word_count_message_for_review_test_cases()
      * @param int|null $minwordlimit minimum word limit

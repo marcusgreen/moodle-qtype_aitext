@@ -77,8 +77,9 @@ class provider_test extends \core_privacy\tests\provider_testcase {
 
     /**
      * Test the export_user_preferences given different inputs
+     * @covers ::export_user_preferences
+     *
      * @dataProvider user_preference_provider
-
      * @param string $name The name of the user preference to get/set
      * @param string $value The value stored in the database
      * @param string $expected The expected transformed value
