@@ -16,7 +16,9 @@
 
 namespace qtype_aitext;
 
+use PHPUnit\Framework\ExpectationFailedException;
 use qtype_aitext;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -48,15 +50,32 @@ class question_type_test extends \advanced_testcase {
 
         return $q;
     }
-
+    /**
+     * @covers ::name()
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
     public function test_name() {
         $this->assertEquals($this->qtype->name(), 'aitext');
     }
-
+    /**
+     * @covers ::can_analyst_responses()
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
     public function test_can_analyse_responses() {
         $this->assertFalse($this->qtype->can_analyse_responses());
     }
 
+    /**
+     * @covers ::get_radom_guess_score()
+     *
+     * @return void
+     */
     public function test_get_random_guess_score() {
         $q = $this->get_test_question_data();
         $this->assertEquals(0, $this->qtype->get_random_guess_score($q));

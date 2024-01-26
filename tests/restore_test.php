@@ -33,7 +33,8 @@ class restore_test extends \restore_date_testcase {
     /**
      * Test missing qtype_aitext_options creation.
      *
-     * Old backup files may contain essays with no qtype_aitext_options record.
+     *
+     * Old backup files may contain aitext with no qtype_aitext_options record.
      * During restore, we add default options for any questions like that.
      * That is what is tested in this file.
      */
@@ -49,7 +50,7 @@ class restore_test extends \restore_date_testcase {
         $essay = $questiongenerator->create_question('essay', null, array('category' => $category->id));
 
         // Remove the options record, which means that the backup will look like a backup made in an old Moodle.
-        $DB->delete_records('qtype_aitext_options', ['questionid' => $essay->id]);
+        $DB->delete_records('qtype_aitex', ['questionid' => $essay->id]);
 
         // Do backup and restore.
         $newcourseid = $this->backup_and_restore($course);
@@ -63,6 +64,6 @@ class restore_test extends \restore_date_testcase {
                                               JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
                                              WHERE qbe.questioncategoryid = ?
                                                AND q.qtype = ?', [$newcategory->id, 'essay']);
-        $this->assertTrue($DB->record_exists('qtype_aitext_options', ['questionid' => $newessay->id]));
+        $this->assertTrue($DB->record_exists('qtype_aitext', ['questionid' => $newessay->id]));
     }
 }
