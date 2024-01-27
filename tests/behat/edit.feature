@@ -1,5 +1,5 @@
 @qtype @qtype_aitext
-Feature: Test editing an aitext question
+Feature: Test editing an AI Text question
   As a teacher
   In order to be able to update my aitext question
   I need to edit them

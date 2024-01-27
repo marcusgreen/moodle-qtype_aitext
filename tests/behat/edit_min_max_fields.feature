@@ -1,5 +1,5 @@
 @qtype @qtype_aitext
-Feature: In an aitext question, let the question author choose the min/max number of words for input text
+Feature: In an AI Text question, let the question author choose the min/max number of words for input text
   In order to constrain student submissions for marking
   As a teacher
   I need to choose the appropriate minimum and/or maximum number of words for input text
