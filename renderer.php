@@ -130,7 +130,7 @@ class qtype_aitext_renderer extends qtype_renderer {
                 if (is_object($jsonobject)) {
                     $propertycount = count(get_object_vars($jsonobject));
                 } else {
-                    $comment[0] = print_r($aicontent, true);
+                    $comment[0] = json_encode($aicontent, true);
                 }
 
                 if ($propertycount > 2) {
