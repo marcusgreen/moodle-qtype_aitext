@@ -40,6 +40,13 @@ class qtype_aitext_renderer extends qtype_renderer {
         /** @var qtype_aitext $question */
         $question = $qa->get_question();
 
+        xdebug_break();
+        $behaviour = $qa->get_behaviour_name();
+        if($behaviour !== 'immediatefeedback') {
+            $msg = get_string('requiresimmediatefeedback', 'qtype_aitext');
+            \core\notification::add($msg, \core\notification::WARNING);
+        }
+
         /** @var qtype_aitext_format_renderer_base $responseoutput */
         $responseoutput = $question->get_format_renderer($this->page);
         $responseoutput->set_displayoptions($options);
@@ -139,6 +146,7 @@ class qtype_aitext_renderer extends qtype_renderer {
             }
             return $comment[0];
         }
+        return '';
     }
 
     /**

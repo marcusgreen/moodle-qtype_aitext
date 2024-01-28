@@ -78,6 +78,7 @@ $string['privacy:preference:responsefieldlines'] = 'Number of lines indicating t
 $string['privacy:preference:attachments'] = 'Number of allowed attachments.';
 $string['privacy:preference:attachmentsrequired'] = 'Number of required attachments.';
 $string['privacy:preference:maxbytes'] = 'Maximum file size.';
+$string['requiresimmediatefeedback'] = 'The AI Text question type will onlywork with the immediate feedback question behaviour';
 $string['responsefieldlines'] = 'Input box size';
 $string['responseformat'] = 'Response format';
 $string['responseoptions'] = 'Response options';
