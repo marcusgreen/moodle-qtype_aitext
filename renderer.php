@@ -40,10 +40,12 @@ class qtype_aitext_renderer extends qtype_renderer {
         /** @var qtype_aitext $question */
         $question = $qa->get_question();
 
-        xdebug_break();
+        $istestedwith = [
+            'immediatefeedback'
+        ];
         $behaviour = $qa->get_behaviour_name();
-        if($behaviour !== 'immediatefeedback') {
-            $msg = get_string('requiresimmediatefeedback', 'qtype_aitext');
+        if (!in_array($behaviour, $istestedwith)) {
+            $msg = get_string('untestedquestionbehaviour', 'qtype_aitext');
             \core\notification::add($msg, \core\notification::WARNING);
         }
 
