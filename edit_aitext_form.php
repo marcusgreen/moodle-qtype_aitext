@@ -33,6 +33,7 @@
 class qtype_aitext_edit_form extends question_edit_form {
 
     protected function definition_inner($mform) {
+        /** @var qtype_aitext $qtype */
         $qtype = question_bank::get_qtype('aitext');
         $mform->removeelement('generalfeedback');
         $mform->removeelement('questiontext');
@@ -90,6 +91,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->hideIf('maxgroup', 'responserequired', 'eq', '0');
         $mform->hideIf('maxgroup', 'responseformat', 'eq', 'noinline');
 
+        $mform->addElement('html', '<div class="hidden">');
         $mform->addElement('select', 'attachments',
                 get_string('allowattachments', 'qtype_aitext'), $qtype->attachment_options());
         $mform->setDefault('attachments', $this->get_default_value('attachments', 0));
@@ -107,6 +109,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addElement('select', 'maxbytes', get_string('maxbytes', 'qtype_aitext'), $qtype->max_file_size_options());
         $mform->setDefault('maxbytes', $this->get_default_value('maxbytes', 0));
         $mform->hideIf('maxbytes', 'attachments', 'eq', 0);
+        $mform->addElement('html', '</div>');
 
         $mform->addElement('header', 'responsetemplateheader', get_string('responsetemplateheader', 'qtype_aitext'));
         $mform->addElement('editor', 'responsetemplate', get_string('responsetemplate', 'qtype_aitext'),

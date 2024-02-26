@@ -1,34 +1,40 @@
 
-/* .que .formulation {
-    height: 330px!important;
-} */
-
-.que.essay textarea.qtype_essay_response {
+.que.aitext textarea.qtype_aitext_response {
     width: 100%;
 }
 
-.que.essay textarea.qtype_essay_response.qtype_essay_plain {
+.que.aitext textarea.qtype_aitext_response.qtype_aitext_plain {
     white-space: pre-wrap;
     font: inherit;
 }
 
-.que.essay textarea.qtype_essay_response.qtype_essay_monospaced {
+.que.aitext .qtext {
+    color:inherit;;
+}
+.que.aitext .formulation .answer {
+    font-size:12pt;
+}
+.que.aitext .answer {
+    color:inherit;
+}
+
+.que.aitext textarea.qtype_essay_response.qtype_essay_monospaced {
     white-space: pre;
     font-family: Andale Mono, Monaco, Courier New, DejaVu Sans Mono, monospace;
 }
 
-.que.essay .qtype_essay_response {
+.que.aitext .qtype_aitext_response {
     min-height: 3em;
 }
 
-.que.essay .qtype_essay_response.readonly {
+.que.aitext .qtype_aitext_response.readonly {
     background-color: white;
 }
 
-.que.essay div.qtype_essay_response textarea {
+.que.aitext div.qtype_aitext_response textarea {
     width: 100%;
 }
 
-.que.essay .ablock .filemanager .fp-restrictions {
+.que.aitext .ablock .filemanager .fp-restrictions {
     margin-top: 1em;
 }

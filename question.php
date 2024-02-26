@@ -19,7 +19,7 @@
  *
  * @package    qtype
  * @subpackage aitext
- * @copyright  2009 The Open University
+ * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,8 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/questionbase.php');
-use local_ai_connector\ai;
-
+use tool_aiconnect\ai;
 /**
  * Represents an aitext question.
  *
@@ -98,48 +97,49 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function grade_response(array $response) : array {
         $ai = new ai\ai();
-        $prompt = $this->aiprompt;
-        if ($this->markscheme > '') {
-            $prompt .= ' '.$this->markscheme;
-            $prompt .= $this->get_json_prompt();
-        }
-        $prompt .= ' respond in the language '.current_language();
         if (is_array($response)) {
-            $prompt .= '" ' . strip_tags($response['answer']) . '"';
+            $prompt = 'in [[' . strip_tags($response['answer']) . ']]';
+            $prompt .= ' analyse the part between [[ and ]] as follows: ';
+            $prompt .= $this->aiprompt;
+
+            if ($this->markscheme > '') {
+                $prompt .= ' '.$this->markscheme;
+            } else {
+                $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
+            }
+            $prompt .= ' '.$this->get_json_prompt();
+            $prompt .= ' respond in the language '.current_language();
+
             $llmresponse = $ai->prompt_completion($prompt);
             $content = $llmresponse['response']['choices'][0]['message']['content'];
         }
-        $this->insert_attempt_step_data('-aicontent', $content);
-
         $contentobject = json_decode($content);
-        if (!$contentobject || !is_string($contentobject->response)) {
-            $content .= ' '.get_config('qtype_aitext', 'disclaimer');
-            $this->insert_attempt_step_data('-comment', $content);
+        $contentobject->feedback = trim($contentobject->feedback);
+        $contentobject->feedback = preg_replace(array('/\[\[/', '/\]\]/'), '"', $contentobject->feedback);
+
+        $contentobject->feedback .= ' '.$this->llm_translate(get_config('qtype_aitext', 'disclaimer'));
+
+        // If there are no marks, write the feedback and set to needs grading .
+        if (is_null($contentobject->marks)) {
             $grade = [0 => 0, question_state::$needsgrading];
-            return $grade;
-        }
-        // The response must have the expected fields.
-        if ($contentobject) {
-             $response = $contentobject->response;
-             $fraction = $contentobject->marks / $this->defaultmark;
-             $grade = array($fraction, question_state::graded_state_for_fraction($fraction));
         } else {
-            $response = $content;
-            $grade = [0 => 0, question_state::$needsgrading];
+            $fraction = $contentobject->marks / $this->defaultmark;
+            $grade = array($fraction, question_state::graded_state_for_fraction($fraction));
         }
-
-        $response .= ' '.$this->llm_translate(get_config('qtype_aitext', 'disclaimer'));
-        $this->insert_attempt_step_data('-comment', $response);
-
-        $this->insert_attempt_step_data('-commentformat', 1);
+         // The -aicontent data is used in question preview. Only needs to happen in preview.
+         xdebug_break();
+        $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);
+        $this->insert_attempt_step_data('-comment', $contentobject->feedback);
+        $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
 
         return $grade;
     }
 
     protected function get_json_prompt() :string {
-        return 'return only a JSON object which enumerates a set of 2  elements.
-        The elements sould have properties of "response" and "marks".
-        The resulting JSON object should be in this format: {"response":"string","marks":"number"}.\n\n';
+        return 'Return only a JSON object which enumerates a set of 2  elements.
+        The elements should have properties of "feedback" and "marks".
+        The resulting JSON object should be in this format: {"feedback":"string","marks":"number"}
+        where marks is a single value summing all marks.\n\n';
     }
     /**
      * Translate into the current language and
@@ -175,7 +175,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
     /**
      * @param moodle_page the page we are outputting to.
-     * @return qtype_aitext_format_renderer_base the response-format-specific renderer.
+     * @return renderer_base the response-format-specific renderer.
      */
     public function get_format_renderer(moodle_page $page) {
         return  $page->get_renderer('qtype_aitext', 'format_' . $this->responseformat);

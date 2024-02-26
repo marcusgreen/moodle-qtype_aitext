@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'qtype_aitext', language 'en', branch 'MOODLE_20_STABLE'
+ * Strings for component 'qtype_aitext', language 'en'
  *
  * @package    qtype
  * @subpackage aitext
- * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,7 +35,7 @@ $string['attachedfiles'] = 'Attachments: {$a}';
 $string['attachmentsoptional'] = 'Attachments are optional';
 $string['attachmentsrequired'] = 'Require attachments';
 $string['disclaimer'] = 'Disclaimer';
-$string['disclaimer_setting'] = 'Disclaimer';
+$string['disclaimer_setting'] = 'Text appended to each response indicating feedback is from a Large Language Model and not a human';
 $string['attachmentsrequired_help'] = 'This option specifies the minimum number of attachments required for a response to be considered gradable.';
 $string['err_maxminmismatch'] = 'Maximum word limit must be greater than minimum word limit';
 $string['err_maxwordlimit'] = 'Maximum word limit is enabled but is not set';

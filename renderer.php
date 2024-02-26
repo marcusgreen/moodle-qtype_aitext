@@ -38,6 +38,7 @@ class qtype_aitext_renderer extends qtype_renderer {
         global $CFG;
 
         /** @var qtype_aitext $question */
+
         $question = $qa->get_question();
 
         $istestedwith = [
@@ -128,24 +129,8 @@ class qtype_aitext_renderer extends qtype_renderer {
         ];
         // Get data written in the question.php grade_response method.
         // This probably should be retrieved by an api call.
-        $aicontent = $DB->get_record('question_attempt_step_data', $data);
         $comment = $qa->get_current_manual_comment();
         if ($this->page->pagetype == 'question-bank-previewquestion-preview') {
-            if ($aicontent) {
-                // If the response has more than value and marks properties, show in preview.
-                // Because the propmpt will need fixing so marking works.
-                $jsonobject = json_decode($aicontent->value);
-                $propertycount = 0;
-                if (is_object($jsonobject)) {
-                    $propertycount = count(get_object_vars($jsonobject));
-                } else {
-                    $comment[0] = json_encode($aicontent, true);
-                }
-
-                if ($propertycount > 2) {
-                    $comment[0] = $comment[0]. '<br/><br/>'.$aicontent->value;
-                }
-            }
             return $comment[0];
         }
         return '';
@@ -255,7 +240,7 @@ class qtype_aitext_renderer extends qtype_renderer {
         if ($options->manualcomment != question_display_options::EDITABLE) {
             return '';
         }
-
+        /**@var qtype_aitext $qeustion */
         $question = $qa->get_question();
         return html_writer::nonempty_tag('div', $question->format_text(
                 $question->graderinfo, $question->graderinfoformat, $qa, 'qtype_aitext',
@@ -352,7 +337,7 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
     }
 
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
-         $labelbyid = $qa->get_qt_field_name($name) . '_label';
+        $labelbyid = $qa->get_qt_field_name($name) . '_label';
         $responselabel = $this->displayoptions->add_question_identifier_to_label(get_string('answertext', 'qtype_aitext'));
         $output = html_writer::tag('h4', $responselabel, ['id' => $labelbyid, 'class' => 'sr-only']);
         $output .= html_writer::tag('div', $this->prepare_response($name, $qa, $step, $context), [
@@ -360,9 +345,9 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
             'aria-readonly' => 'true',
             'aria-labelledby' => $labelbyid,
             'class' => $this->class_name() . ' qtype_aitext_response readonly',
-            'style' => 'min-height: ' . ($lines * 1.5) . 'em;',
+            'style' => 'min-height: ' . ($lines * 1.25) . 'em;',
         ]);
-        // Height $lines * 1.5 because that is a typical line-height on web pages.
+        // Height $lines * 1.25 because that is a typical line-height on web pages.
         // That seems to give results that look OK.
 
         return $output;
@@ -397,7 +382,6 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
         ]);
         $output .= html_writer::start_tag('div', array('class' =>
                 $this->class_name() . ' qtype_aitext_response'));
-
         $output .= html_writer::tag('div', html_writer::tag('textarea', s($response),
                 array('id' => $id, 'name' => $inputname, 'rows' => $lines, 'cols' => 60, 'class' => 'form-control')));
 

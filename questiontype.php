@@ -55,9 +55,9 @@ class qtype_aitext extends question_type {
         $this->set_default_value('responseformat', $fromform->responseformat);
         $this->set_default_value('responserequired', $fromform->responserequired);
         $this->set_default_value('responsefieldlines', $fromform->responsefieldlines);
-        $this->set_default_value('attachments', $fromform->attachments);
-        $this->set_default_value('attachmentsrequired', $fromform->attachmentsrequired);
-        $this->set_default_value('maxbytes', $fromform->maxbytes);
+        $this->set_default_value('attachments', $fromform->attachments ?? '');
+        $this->set_default_value('attachmentsrequired', $fromform->attachmentsrequired ?? '');
+        $this->set_default_value('maxbytes', $fromform->maxbytes ?? '');
         $this->set_default_value('markscheme', $fromform->markscheme);
 
     }
@@ -65,6 +65,7 @@ class qtype_aitext extends question_type {
     public function save_question_options($formdata) {
         global $DB;
         $context = $formdata->context;
+        xdebug_break();
 
         $options = $DB->get_record('qtype_aitext', array('questionid' => $formdata->id));
         if (!$options) {
@@ -110,6 +111,8 @@ class qtype_aitext extends question_type {
         $options->graderinfoformat = $formdata->graderinfo['format'];
         $options->responsetemplate = $formdata->responsetemplate['text'];
         $options->responsetemplateformat = $formdata->responsetemplate['format'];
+        $options->attachments = $formdata->attachments ?? '';
+        $options->attachmentsrequired = $formdata->attachmentsrequired ?? '';
         $DB->update_record('qtype_aitext', $options);
     }
     /**
@@ -153,10 +156,8 @@ class qtype_aitext extends question_type {
     public function response_formats() {
         return array(
             'editor' => get_string('formateditor', 'qtype_aitext'),
-            'editorfilepicker' => get_string('formateditorfilepicker', 'qtype_aitext'),
             'plain' => get_string('formatplain', 'qtype_aitext'),
             'monospaced' => get_string('formatmonospaced', 'qtype_aitext'),
-            'noinline' => get_string('formatnoinline', 'qtype_aitext'),
         );
     }
 
