@@ -13,14 +13,11 @@
         <FIELD NAME="responsefieldlines" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="15" SEQUENCE="false" COMMENT="Approximate height, in lines, of the input box the students should be given for their response."/>
         <FIELD NAME="minwordlimit" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Minimum number of words"/>
         <FIELD NAME="maxwordlimit" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Maximum number of words"/>
-        <FIELD NAME="attachments" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether, and how many, attachments a student is allowed to include with their response. -1 means unlimited."/>
-        <FIELD NAME="attachmentsrequired" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The number of attachments that should be required"/>
         <FIELD NAME="graderinfo" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Information shown to people with permission to manually grade the question, when they are grading."/>
         <FIELD NAME="graderinfoformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The text format for graderinfo."/>
         <FIELD NAME="responsetemplate" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The template to pre-populate student's response field during attempt."/>
         <FIELD NAME="responsetemplateformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The text format for responsetemplate."/>
         <FIELD NAME="maxbytes" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Maximum size of attached files in bytes."/>
-        <FIELD NAME="filetypeslist" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="What attachment file type a student is allowed to include with their response. * or empty means unlimited."/>
         <FIELD NAME="aiprompt" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The prompt to be sent to the LLM for getting an answer/feedback"/>
         <FIELD NAME="markscheme" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Instructions on how responses are to be marked."/>
       </FIELDS>
