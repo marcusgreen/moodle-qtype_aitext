@@ -48,7 +48,7 @@ class restore_test extends \restore_date_testcase {
         $contexts = new \core_question\local\bank\question_edit_contexts(\context_course::instance($course->id));
         $category = question_make_default_categories($contexts->all());
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $essay = $questiongenerator->create_question('essay', null, array('category' => $category->id));
+        $essay = $questiongenerator->create_question('aitext', null, array('category' => $category->id));
 
         // Remove the options record, which means that the backup will look like a backup made in an old Moodle.
         $DB->delete_records('qtype_aitext', ['questionid' => $essay->id]);
@@ -59,12 +59,12 @@ class restore_test extends \restore_date_testcase {
         // Verify that the restored question has options.
         $contexts = new \core_question\local\bank\question_edit_contexts(\context_course::instance($newcourseid));
         $newcategory = question_make_default_categories($contexts->all());
-        $newessay = $DB->get_record_sql('SELECT q.*
+        $newaitext = $DB->get_record_sql('SELECT q.*
                                               FROM {question} q
                                               JOIN {question_versions} qv ON qv.questionid = q.id
                                               JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
                                              WHERE qbe.questioncategoryid = ?
-                                               AND q.qtype = ?', [$newcategory->id, 'essay']);
-        $this->assertTrue($DB->record_exists('qtype_aitext', ['questionid' => $newessay->id]));
+                                               AND q.qtype = ?', [$newcategory->id, 'aitext']);
+        $this->assertTrue($DB->record_exists('qtype_aitext', ['questionid' => $newaitext->id]));
     }
 }

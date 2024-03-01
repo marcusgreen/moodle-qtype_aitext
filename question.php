@@ -49,14 +49,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     /** @var int indicates whether the maximum number of words required */
     public $maxwordlimit;
 
-    public $attachments;
-
-    /** @var int maximum file size in bytes */
-    public $maxbytes;
-
-    /** @var int The number of attachments required for a response to be complete. */
-    public $attachmentsrequired;
-
     public $graderinfo;
     public $graderinfoformat;
     public $responsetemplate;
@@ -96,7 +88,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return void
      */
     public function grade_response(array $response) : array {
-        $ai = new ai\ai();
+        $ai = new ai\ai('gpt-4');
         if (is_array($response)) {
             $prompt = 'in [[' . strip_tags($response['answer']) . ']]';
             $prompt .= ' analyse the part between [[ and ]] as follows: ';
@@ -127,7 +119,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = array($fraction, question_state::graded_state_for_fraction($fraction));
         }
          // The -aicontent data is used in question preview. Only needs to happen in preview.
-         xdebug_break();
         $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);
         $this->insert_attempt_step_data('-comment', $contentobject->feedback);
         $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
@@ -202,15 +193,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 $response['answerformat'], array('para' => false));
         }
 
-        if (isset($response['attachments'])  && $response['attachments']) {
-            $attachedfiles = [];
-            foreach ($response['attachments']->get_files() as $file) {
-                $attachedfiles[] = $file->get_filename() . ' (' . display_size($file->get_filesize()) . ')';
-            }
-            if ($attachedfiles) {
-                $output .= get_string('attachedfiles', 'qtype_aitext', implode(', ', $attachedfiles));
-            }
-        }
         return $output;
     }
 
@@ -349,10 +331,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             'responseformat' => $this->responseformat,
             'responserequired' => $this->responserequired,
             'responsefieldlines' => $this->responsefieldlines,
-            'attachments' => $this->attachments,
-            'attachmentsrequired' => $this->attachmentsrequired,
-            'maxbytes' => $this->maxbytes,
-            'filetypeslist' => $this->filetypeslist,
             'responsetemplate' => $this->responsetemplate,
             'responsetemplateformat' => $this->responsetemplateformat,
             'minwordlimit' => $this->minwordlimit,

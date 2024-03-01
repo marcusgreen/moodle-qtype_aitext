@@ -31,7 +31,7 @@ require_once($CFG->libdir . '/questionlib.php');
 /**
  * The aitext question type.
  *
- * @copyright  2023 Marcus Green
+ * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext extends question_type {
@@ -55,9 +55,6 @@ class qtype_aitext extends question_type {
         $this->set_default_value('responseformat', $fromform->responseformat);
         $this->set_default_value('responserequired', $fromform->responserequired);
         $this->set_default_value('responsefieldlines', $fromform->responsefieldlines);
-        $this->set_default_value('attachments', $fromform->attachments ?? '');
-        $this->set_default_value('attachmentsrequired', $fromform->attachmentsrequired ?? '');
-        $this->set_default_value('maxbytes', $fromform->maxbytes ?? '');
         $this->set_default_value('markscheme', $fromform->markscheme);
 
     }
@@ -65,7 +62,6 @@ class qtype_aitext extends question_type {
     public function save_question_options($formdata) {
         global $DB;
         $context = $formdata->context;
-        xdebug_break();
 
         $options = $DB->get_record('qtype_aitext', array('questionid' => $formdata->id));
         if (!$options) {
@@ -81,18 +77,6 @@ class qtype_aitext extends question_type {
         $options->responsefieldlines = $formdata->responsefieldlines;
         $options->minwordlimit = isset($formdata->minwordenabled) ? $formdata->minwordlimit : null;
         $options->maxwordlimit = isset($formdata->maxwordenabled) ? $formdata->maxwordlimit : null;
-        $options->attachments = $formdata->attachments;
-        if ((int)$formdata->attachments === 0 && $formdata->attachmentsrequired > 0) {
-            // Adjust the value for the field 'attachmentsrequired' when the field 'attachments' is set to 'No'.
-            $options->attachmentsrequired = 0;
-        } else {
-            $options->attachmentsrequired = $formdata->attachmentsrequired;
-        }
-        if (!isset($formdata->filetypeslist)) {
-            $options->filetypeslist = null;
-        } else {
-            $options->filetypeslist = $formdata->filetypeslist;
-        }
         $options->maxbytes = $formdata->maxbytes ?? 0;
         if (is_array($formdata->graderinfo)) {
             // Today find out what it should save and ensure it is available as text not arrays.
@@ -111,8 +95,6 @@ class qtype_aitext extends question_type {
         $options->graderinfoformat = $formdata->graderinfo['format'];
         $options->responsetemplate = $formdata->responsetemplate['text'];
         $options->responsetemplateformat = $formdata->responsetemplate['format'];
-        $options->attachments = $formdata->attachments ?? '';
-        $options->attachmentsrequired = $formdata->attachmentsrequired ?? '';
         $DB->update_record('qtype_aitext', $options);
     }
     /**
@@ -124,20 +106,16 @@ class qtype_aitext extends question_type {
      */
     protected function initialise_question_instance(question_definition $question, $questiondata) {
         parent::initialise_question_instance($question, $questiondata);
+        /**@var qtype_aitext_question  $question */
         $question->responseformat = $questiondata->options->responseformat;
         $question->responserequired = $questiondata->options->responserequired;
         $question->responsefieldlines = $questiondata->options->responsefieldlines;
         $question->minwordlimit = $questiondata->options->minwordlimit;
         $question->maxwordlimit = $questiondata->options->maxwordlimit;
-        $question->attachments = $questiondata->options->attachments;
-        $question->attachmentsrequired = $questiondata->options->attachmentsrequired;
         $question->graderinfo = $questiondata->options->graderinfo;
         $question->graderinfoformat = $questiondata->options->graderinfoformat;
         $question->responsetemplate = $questiondata->options->responsetemplate;
         $question->responsetemplateformat = $questiondata->options->responsetemplateformat;
-        $filetypesutil = new \core_form\filetypes_util();
-        $question->filetypeslist = $filetypesutil->normalize_file_types($questiondata->options->filetypeslist);
-        $question->maxbytes = $questiondata->options->maxbytes;
         $question->aiprompt = $questiondata->options->aiprompt;
         $question->markscheme = $questiondata->options->markscheme;
     }
@@ -211,29 +189,6 @@ class qtype_aitext extends question_type {
     }
 
     /**
-     * Return array of the choices that should be offered for the maximum file sizes.
-     * @return array|lang_string[]|string[]
-     */
-    public function max_file_size_options() {
-        global $CFG, $COURSE;
-        return get_max_upload_sizes($CFG->maxbytes, $COURSE->maxbytes);
-    }
-
-    public function move_files($questionid, $oldcontextid, $newcontextid) {
-        parent::move_files($questionid, $oldcontextid, $newcontextid);
-        $fs = get_file_storage();
-        $fs->move_area_files_to_new_context($oldcontextid,
-                $newcontextid, 'qtype_aitext', 'graderinfo', $questionid);
-    }
-
-    protected function delete_files($questionid, $contextid) {
-        parent::delete_files($questionid, $contextid);
-        $fs = get_file_storage();
-        $fs->delete_area_files($contextid, 'qtype_aitext', 'graderinfo', $questionid);
-    }
-
-
-    /**
      * data used by export_to_xml
      * @return array
      */
@@ -244,17 +199,12 @@ class qtype_aitext extends question_type {
             'responseformat',
             'responserequired',
             'responsefieldlines',
-            'attachments',
             'minwordlimit',
             'maxwordlimit',
-            'attachments',
-            'attachmentsrequired',
             'graderinfo',
             'graderinfoformat',
             'responsetemplate',
             'responsetemplateformat',
-            'maxbytes',
-            'filetypeslist',
             'aiprompt',
             'markscheme'
         ];
@@ -333,6 +283,5 @@ class qtype_aitext extends question_type {
         }
         return '';
     }
-
 
 }

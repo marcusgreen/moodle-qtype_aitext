@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Test helpers for the essay question type.
+ * Test helpers for the aitext question type.
  *
  * @package    qtype_aitext
  * @copyright  2013 The Open University
@@ -23,7 +23,7 @@
  */
 
 /**
- * Test helper class for the essay question type.
+ * Test helper class for the aitext question type.
  *
  * @copyright  2013 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -51,11 +51,11 @@ class qtype_aitext_test_helper extends question_test_helper {
      * Helper method to reduce duplication.
      * @return qtype_aitext_question
      */
-    protected function initialise_essay_question() {
-        question_bank::load_question_definition_classes('essay');
+    protected function initialise_aitext_question() {
+        question_bank::load_question_definition_classes('aitext');
         $q = new qtype_aitext_question();
         test_question_maker::initialise_a_question($q);
-        $q->name = 'Essay question (HTML editor)';
+        $q->name = 'aitext question (HTML editor)';
         $q->questiontext = 'Please write a story about a frog.';
         $q->generalfeedback = 'I hope your story had a beginning, a middle and an end.';
         $q->responseformat = 'editor';
@@ -69,30 +69,30 @@ class qtype_aitext_test_helper extends question_test_helper {
         $q->filetypeslist = null;
         $q->graderinfo = '';
         $q->graderinfoformat = FORMAT_HTML;
-        $q->qtype = question_bank::get_qtype('essay');
+        $q->qtype = question_bank::get_qtype('aitext');
 
         return $q;
     }
 
     /**
-     * Makes an essay question using the HTML editor as input.
+     * Makes an aitext question using the HTML editor as input.
      * @return qtype_aitext_question
      */
-    public function make_essay_question_editor() {
-        return $this->initialise_essay_question();
+    public function make_aitext_question_editor() {
+        return $this->initialise_aitext_question();
     }
 
     /**
-     * Make the data what would be received from the editing form for an essay
+     * Make the data what would be received from the editing form for an aitext
      * question using the HTML editor allowing embedded files as input, and up
      * to three attachments.
      *
      * @return stdClass the data that would be returned by $form->get_gata();
      */
-    public function get_essay_question_form_data_editor() {
+    public function get_aitext_question_form_data_editor() {
         $fromform = new stdClass();
 
-        $fromform->name = 'Essay question (HTML editor)';
+        $fromform->name = 'aitext question (HTML editor)';
         $fromform->questiontext = array('text' => 'Please write a story about a frog.', 'format' => FORMAT_HTML);
         $fromform->defaultmark = 1.0;
         $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.',
@@ -107,29 +107,30 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->graderinfo = array('text' => '', 'format' => FORMAT_HTML);
         $fromform->responsetemplate = array('text' => '', 'format' => FORMAT_HTML);
         $fromform->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
-
+        $fromform->aiprompt = 'A prompt for the LLM';
+        $fromform->markscheme = 'Give one mark if the answer is correct';
         return $fromform;
     }
 
     /**
-     * Makes an essay question using the HTML editor allowing embedded files as
+     * Makes an aitext question using the HTML editor allowing embedded files as
      * input, and up to three attachments.
      * @return qtype_aitext_question
      */
-    public function make_essay_question_editorfilepicker() {
-        $q = $this->initialise_essay_question();
+    public function make_aitext_question_editorfilepicker() {
+        $q = $this->initialise_aitext_question();
         $q->responseformat = 'editorfilepicker';
         $q->attachments = 3;
         return $q;
     }
 
     /**
-     * Makes an essay question using the HTML editor allowing embedded files as
+     * Makes an aitext question using the HTML editor allowing embedded files as
      * input, and up to two attachments, two needed.
      * @return qtype_aitext_question
      */
-    public function make_essay_question_editorfilepickertworequired() {
-        $q = $this->initialise_essay_question();
+    public function make_aitext_question_editorfilepickertworequired() {
+        $q = $this->initialise_aitext_question();
         $q->responseformat = 'editorfilepicker';
         $q->attachments = 2;
         $q->attachmentsrequired = 2;
@@ -137,16 +138,16 @@ class qtype_aitext_test_helper extends question_test_helper {
     }
 
     /**
-     * Make the data what would be received from the editing form for an essay
+     * Make the data what would be received from the editing form for an aitext
      * question using the HTML editor allowing embedded files as input, and up
      * to three attachments.
      *
      * @return stdClass the data that would be returned by $form->get_gata();
      */
-    public function get_essay_question_form_data_editorfilepicker() {
+    public function get_aitext_question_form_data_editorfilepicker() {
         $fromform = new stdClass();
 
-        $fromform->name = 'Essay question with filepicker and attachments';
+        $fromform->name = 'aitext question with filepicker and attachments';
         $fromform->questiontext = array('text' => 'Please write a story about a frog.', 'format' => FORMAT_HTML);
         $fromform->defaultmark = 1.0;
         $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.',
@@ -166,26 +167,26 @@ class qtype_aitext_test_helper extends question_test_helper {
     }
 
     /**
-     * Makes an essay question using plain text input.
+     * Makes an aitext question using plain text input.
      * @return qtype_aitext_question
      */
-    public function make_essay_question_plain() {
-        $q = $this->initialise_essay_question();
+    public function make_aitext_question_plain() {
+        $q = $this->initialise_aitext_question();
         $q->responseformat = 'plain';
         return $q;
     }
 
     /**
-     * Make the data what would be received from the editing form for an essay
+     * Make the data what would be received from the editing form for an aitext
      * question using the HTML editor allowing embedded files as input, and up
      * to three attachments.
      *
      * @return stdClass the data that would be returned by $form->get_gata();
      */
-    public function get_essay_question_form_data_plain() {
+    public function get_aitext_question_form_data_plain() {
         $fromform = new stdClass();
 
-        $fromform->name = 'Essay question with filepicker and attachments';
+        $fromform->name = 'aitext question with filepicker and attachments';
         $fromform->questiontext = array('text' => 'Please write a story about a frog.', 'format' => FORMAT_HTML);
         $fromform->defaultmark = 1.0;
         $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.',
@@ -205,28 +206,28 @@ class qtype_aitext_test_helper extends question_test_helper {
     }
 
     /**
-     * Makes an essay question using monospaced input.
+     * Makes an aitext question using monospaced input.
      * @return qtype_aitext_question
      */
-    public function make_essay_question_monospaced() {
-        $q = $this->initialise_essay_question();
+    public function make_aitext_question_monospaced() {
+        $q = $this->initialise_aitext_question();
         $q->responseformat = 'monospaced';
         return $q;
     }
 
-    public function make_essay_question_responsetemplate() {
-        $q = $this->initialise_essay_question();
+    public function make_aitext_question_responsetemplate() {
+        $q = $this->initialise_aitext_question();
         $q->responsetemplate = 'Once upon a time';
         $q->responsetemplateformat = FORMAT_HTML;
         return $q;
     }
 
     /**
-     * Makes an essay question without an online text editor.
+     * Makes an aitext question without an online text editor.
      * @return qtype_aitext_question
      */
-    public function make_essay_question_noinline() {
-        $q = $this->initialise_essay_question();
+    public function make_aitext_question_noinline() {
+        $q = $this->initialise_aitext_question();
         $q->responseformat = 'noinline';
         $q->attachments = 3;
         $q->attachmentsrequired = 1;

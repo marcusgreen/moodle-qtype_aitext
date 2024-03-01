@@ -91,25 +91,6 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->hideIf('maxgroup', 'responserequired', 'eq', '0');
         $mform->hideIf('maxgroup', 'responseformat', 'eq', 'noinline');
 
-        $mform->addElement('html', '<div class="hidden">');
-        $mform->addElement('select', 'attachments',
-                get_string('allowattachments', 'qtype_aitext'), $qtype->attachment_options());
-        $mform->setDefault('attachments', $this->get_default_value('attachments', 0));
-
-        $mform->addElement('select', 'attachmentsrequired',
-                get_string('attachmentsrequired', 'qtype_aitext'), $qtype->attachments_required_options());
-        $mform->setDefault('attachmentsrequired', $this->get_default_value('attachmentsrequired', 0));
-        $mform->addHelpButton('attachmentsrequired', 'attachmentsrequired', 'qtype_aitext');
-        $mform->hideIf('attachmentsrequired', 'attachments', 'eq', 0);
-
-        $mform->addElement('filetypes', 'filetypeslist', get_string('acceptedfiletypes', 'qtype_aitext'));
-        $mform->addHelpButton('filetypeslist', 'acceptedfiletypes', 'qtype_aitext');
-        $mform->hideIf('filetypeslist', 'attachments', 'eq', 0);
-
-        $mform->addElement('select', 'maxbytes', get_string('maxbytes', 'qtype_aitext'), $qtype->max_file_size_options());
-        $mform->setDefault('maxbytes', $this->get_default_value('maxbytes', 0));
-        $mform->hideIf('maxbytes', 'attachments', 'eq', 0);
-        $mform->addElement('html', '</div>');
 
         $mform->addElement('header', 'responsetemplateheader', get_string('responsetemplateheader', 'qtype_aitext'));
         $mform->addElement('editor', 'responsetemplate', get_string('responsetemplate', 'qtype_aitext'),
@@ -136,25 +117,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $question->minwordlimit = $question->options->minwordlimit;
         $question->maxwordenabled = $question->options->maxwordlimit ? 1 : 0;
         $question->maxwordlimit = $question->options->maxwordlimit;
-        $question->attachments = $question->options->attachments;
-        $question->attachmentsrequired = $question->options->attachmentsrequired;
-        $question->filetypeslist = $question->options->filetypeslist;
-        $question->maxbytes = $question->options->maxbytes;
         $question->aiprompt = $question->options->aiprompt;
-
-        $draftid = file_get_submitted_draft_itemid('graderinfo');
-        $question->graderinfo = array();
-        $question->graderinfo['text'] = file_prepare_draft_area(
-            $draftid,           // Draftid.
-            $this->context->id, // Context.
-            'qtype_aitext',      // Component.
-            'graderinfo',       // Filarea.
-            !empty($question->id) ? (int) $question->id : null, // Itemid.
-            $this->fileoptions, // Options.
-            $question->options->graderinfo // Text.
-        );
-        $question->graderinfo['format'] = $question->options->graderinfoformat;
-        $question->graderinfo['itemid'] = $draftid;
 
         $question->responsetemplate = array(
             'text' => $question->options->responsetemplate,
@@ -166,24 +129,6 @@ class qtype_aitext_edit_form extends question_edit_form {
 
     public function validation($fromform, $files) {
         $errors = parent::validation($fromform, $files);
-
-        // Don't allow both 'no inline response' and 'no attachments' to be selected,
-        // as these options would result in there being no input requested from the user.
-        if ($fromform['responseformat'] == 'noinline' && !$fromform['attachments']) {
-            $errors['attachments'] = get_string('mustattach', 'qtype_aitext');
-        }
-
-        // If 'no inline response' is set, force the teacher to require attachments;
-        // otherwise there will be nothing to grade.
-        if ($fromform['responseformat'] == 'noinline' && !$fromform['attachmentsrequired']) {
-            $errors['attachmentsrequired'] = get_string('mustrequire', 'qtype_aitext');
-        }
-
-        // Don't allow the teacher to require more attachments than they allow; as this would
-        // create a condition that it's impossible for the student to meet.
-        if ($fromform['attachments'] > 0 && $fromform['attachments'] < $fromform['attachmentsrequired'] ) {
-            $errors['attachmentsrequired']  = get_string('mustrequirefewer', 'qtype_aitext');
-        }
 
         if ($fromform['responserequired']) {
             if (isset($fromform['minwordenabled'])) {
