@@ -91,7 +91,6 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->hideIf('maxgroup', 'responserequired', 'eq', '0');
         $mform->hideIf('maxgroup', 'responseformat', 'eq', 'noinline');
 
-
         $mform->addElement('header', 'responsetemplateheader', get_string('responsetemplateheader', 'qtype_aitext'));
         $mform->addElement('editor', 'responsetemplate', get_string('responsetemplate', 'qtype_aitext'),
                 array('rows' => 10),  array_merge($this->editoroptions, array('maxfiles' => 0)));

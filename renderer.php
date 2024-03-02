@@ -240,7 +240,7 @@ class qtype_aitext_renderer extends qtype_renderer {
         if ($options->manualcomment != question_display_options::EDITABLE) {
             return '';
         }
-        /**@var qtype_aitext $qeustion */
+        /**@var qtype_aitext $question */
         $question = $qa->get_question();
         return html_writer::nonempty_tag('div', $question->format_text(
                 $question->graderinfo, $question->graderinfoformat, $qa, 'qtype_aitext',

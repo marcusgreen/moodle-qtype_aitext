@@ -27,7 +27,7 @@ require_once($CFG->dirroot . '/question/type/essay/edit_essay_form.php');
  * Unit tests for the aitext edit form.
  *
  * @package   qtype_aitext
- * @copyright  Marcus Green 2024 Extending work from 2021 The Open University
+ * @copyright  Marcus Green 2024
  *
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -57,8 +57,6 @@ class edit_form_test extends \advanced_testcase {
         $fakequestion->responseformat = 'editorfilepicker';
         $fakequestion->responserequired = 1;
         $fakequestion->responsefieldlines = 10;
-        $fakequestion->attachments = -1;
-        $fakequestion->attachmentsrequired = 3;
         $fakequestion->filetypeslist = '';
 
         $form = new $classname(
@@ -89,8 +87,6 @@ class edit_form_test extends \advanced_testcase {
             ],
             'responseformat' => 'editorfilepicker',
             'responserequired' => '1',
-            'attachments' => $allowed,
-            'attachmentsrequired' => $required,
         ];
         $errors = $form->validation($submitteddata, []);
         $this->assertArrayNotHasKey('attachments', $errors);
