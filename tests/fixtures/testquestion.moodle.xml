@@ -13,7 +13,7 @@
       <text>aitext-001</text>
     </name>
     <questiontext format="html">
-      <text>Write an essay with 500 words.</text>
+      <text>Write an aitext with 500 words.</text>
     </questiontext>
     <generalfeedback format="html">
       <text>This is general feedback</text>

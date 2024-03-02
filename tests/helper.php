@@ -30,7 +30,7 @@
  */
 class qtype_aitext_test_helper extends question_test_helper {
     public function get_test_questions() {
-        return array('editor', 'editorfilepicker', 'plain', 'monospaced', 'responsetemplate', 'noinline');
+        return array('editor', 'plain', 'monospaced', 'responsetemplate', 'noinline');
     }
     public static function make_aitext_question(array $options) {
         $optionsparam = [
@@ -63,10 +63,6 @@ class qtype_aitext_test_helper extends question_test_helper {
         $q->responsefieldlines = 10;
         $q->minwordlimit = null;
         $q->maxwordlimit = null;
-        $q->attachments = 0;
-        $q->attachmentsrequired = 0;
-        $q->maxbytes = 0;
-        $q->filetypeslist = null;
         $q->graderinfo = '';
         $q->graderinfoformat = FORMAT_HTML;
         $q->qtype = question_bank::get_qtype('aitext');
@@ -101,68 +97,11 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->responserequired = 1;
         $fromform->responsefieldlines = 10;
         $fromform->attachments = 0;
-        $fromform->attachmentsrequired = 0;
-        $fromform->maxbytes = 0;
-        $fromform->filetypeslist = ''; // Although once saved in the DB, this becomes null, the form returns '' here.
         $fromform->graderinfo = array('text' => '', 'format' => FORMAT_HTML);
         $fromform->responsetemplate = array('text' => '', 'format' => FORMAT_HTML);
         $fromform->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
         $fromform->aiprompt = 'A prompt for the LLM';
         $fromform->markscheme = 'Give one mark if the answer is correct';
-        return $fromform;
-    }
-
-    /**
-     * Makes an aitext question using the HTML editor allowing embedded files as
-     * input, and up to three attachments.
-     * @return qtype_aitext_question
-     */
-    public function make_aitext_question_editorfilepicker() {
-        $q = $this->initialise_aitext_question();
-        $q->responseformat = 'editorfilepicker';
-        $q->attachments = 3;
-        return $q;
-    }
-
-    /**
-     * Makes an aitext question using the HTML editor allowing embedded files as
-     * input, and up to two attachments, two needed.
-     * @return qtype_aitext_question
-     */
-    public function make_aitext_question_editorfilepickertworequired() {
-        $q = $this->initialise_aitext_question();
-        $q->responseformat = 'editorfilepicker';
-        $q->attachments = 2;
-        $q->attachmentsrequired = 2;
-        return $q;
-    }
-
-    /**
-     * Make the data what would be received from the editing form for an aitext
-     * question using the HTML editor allowing embedded files as input, and up
-     * to three attachments.
-     *
-     * @return stdClass the data that would be returned by $form->get_gata();
-     */
-    public function get_aitext_question_form_data_editorfilepicker() {
-        $fromform = new stdClass();
-
-        $fromform->name = 'aitext question with filepicker and attachments';
-        $fromform->questiontext = array('text' => 'Please write a story about a frog.', 'format' => FORMAT_HTML);
-        $fromform->defaultmark = 1.0;
-        $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.',
-             'format' => FORMAT_HTML);
-        $fromform->responseformat = 'editorfilepicker';
-        $fromform->responserequired = 1;
-        $fromform->responsefieldlines = 10;
-        $fromform->attachments = 3;
-        $fromform->attachmentsrequired = 0;
-        $fromform->maxbytes = 0;
-        $fromform->filetypeslist = ''; // Although once saved in the DB, this becomes null, the form returns '' here.
-        $fromform->graderinfo = array('text' => '', 'format' => FORMAT_HTML);
-        $fromform->responsetemplate = array('text' => '', 'format' => FORMAT_HTML);
-        $fromform->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
-
         return $fromform;
     }
 
@@ -194,10 +133,9 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->responseformat = 'plain';
         $fromform->responserequired = 1;
         $fromform->responsefieldlines = 10;
-        $fromform->attachments = 0;
-        $fromform->attachmentsrequired = 0;
+        $fromform->aiprompt = 'Evaluate this';
+        $fromform->markscheme = 'One mark if correct';
         $fromform->maxbytes = 0;
-        $fromform->filetypeslist = ''; // Although once saved in the DB, this becomes null, the form returns '' here.
         $fromform->graderinfo = array('text' => '', 'format' => FORMAT_HTML);
         $fromform->responsetemplate = array('text' => '', 'format' => FORMAT_HTML);
         $fromform->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
@@ -229,81 +167,7 @@ class qtype_aitext_test_helper extends question_test_helper {
     public function make_aitext_question_noinline() {
         $q = $this->initialise_aitext_question();
         $q->responseformat = 'noinline';
-        $q->attachments = 3;
-        $q->attachmentsrequired = 1;
-        $q->filetypeslist = '';
-        $q->maxbytes = 0;
         return $q;
     }
-
-    /**
-     * Creates an empty draft area for attachments.
-     * @return int The draft area's itemid.
-     */
-    protected function make_attachment_draft_area() {
-        $draftid = 0;
-        $contextid = 0;
-
-        $component = 'question';
-        $filearea = 'response_attachments';
-
-        // Create an empty file area.
-        file_prepare_draft_area($draftid, $contextid, $component, $filearea, null);
-        return $draftid;
-    }
-
-    /**
-     * Creates an attachment in the provided attachment draft area.
-     * @param int $draftid The itemid for the draft area in which the file should be created.
-     * @param string $name The filename for the file to be created.
-     * @param string $contents The contents of the file to be created.
-     */
-    protected function make_attachment($draftid, $name, $contents) {
-        global $USER;
-
-        $fs = get_file_storage();
-        $usercontext = context_user::instance($USER->id);
-
-        // Create the file in the provided draft area.
-        $fileinfo = array(
-            'contextid' => $usercontext->id,
-            'component' => 'user',
-            'filearea'  => 'draft',
-            'itemid'    => $draftid,
-            'filepath'  => '/',
-            'filename'  => $name,
-        );
-        $fs->create_file_from_string($fileinfo, $contents);
-    }
-
-    /**
-     * Generates a draft file area that contains the provided number of attachments. You should ensure
-     * that a user is logged in with setUser before you run this function.
-     *
-     * @param int $attachments The number of attachments to generate.
-     * @return int The itemid of the generated draft file area.
-     */
-    public function make_attachments($attachments) {
-        $draftid = $this->make_attachment_draft_area();
-
-        // Create the relevant amount of dummy attachments in the given draft area.
-        for ($i = 0; $i < $attachments; ++$i) {
-            $this->make_attachment($draftid, $i, $i);
-        }
-
-        return $draftid;
-    }
-
-    /**
-     * Generates a question_file_saver that contains the provided number of attachments. You should ensure
-     * that a user is logged in with setUser before you run this function.
-     *
-     * @param int $:attachments The number of attachments to generate.
-     * @return question_file_saver a question_file_saver that contains the given amount of dummy files, for use in testing.
-     */
-    public function make_attachments_saver($attachments) {
-        return new question_file_saver($this->make_attachments($attachments), 'question', 'response_attachments');
-    }
-
 
 }
