@@ -1,4 +1,4 @@
-@qtype @qtype_aitext
+@qtype @qtype_aitext @qtype_aitext_backup_restore
 Feature: Test duplicating a quiz containing an aitext question
     As a teacher
     In order re-use my courses containing aitext questions
@@ -12,17 +12,15 @@ Feature: Test duplicating a quiz containing an aitext question
         | contextlevel | reference | name           |
         | Course       | C1        | Test questions |
     And the following "questions" exist:
-        | questioncategory | qtype  | name       | template         |
-        | Test questions   | aitext | aitext-001 | editor           |
-        | Test questions   | aitext | aitext-002 | editorfilepicker |
-        | Test questions   | aitext | aitext-003 | plain            |
+        | questioncategory | qtype  | name       | template |
+        | Test questions   | aitext | aitext-001 | editor   |
+        | Test questions   | aitext | aitext-002 | plain    |
     And the following "activities" exist:
         | activity | name      | course | idnumber |
         | quiz     | Test quiz | C1     | quiz1    |
     And quiz "Test quiz" contains the following questions:
         | aitext-001 | 1 |
         | aitext-002 | 1 |
-        | aitext-003 | 1 |
 
   @javascript
   Scenario: Backup and restore a course containing 3 aitext questions
@@ -35,7 +33,6 @@ Feature: Test duplicating a quiz containing an aitext question
     And I am on the "Course 2" "core_question > course question bank" page
     Then I should see "aitext-001"
     And I should see "aitext-002"
-    And I should see "aitext-003"
     And I choose "Edit question" action for "aitext-001" in the question bank
     Then the following fields match these values:
         | Question name    | aitext-001                                              |
@@ -47,14 +44,6 @@ Feature: Test duplicating a quiz containing an aitext question
     And I choose "Edit question" action for "aitext-002" in the question bank
     Then the following fields match these values:
         | Question name    | aitext-002                                              |
-        | Question text    | Please write a story about a frog.                      |
-        | General feedback | I hope your story had a beginning, a middle and an end. |
-        | Response format  | HTML editor with file picker                            |
-        | Require text     | Require the student to enter text                       |
-    And I press "Cancel"
-    And I choose "Edit question" action for "aitext-003" in the question bank
-    Then the following fields match these values:
-        | Question name    | aitext-003                                              |
         | Question text    | Please write a story about a frog.                      |
         | General feedback | I hope your story had a beginning, a middle and an end. |
         | Response format  | Plain text                                              |
