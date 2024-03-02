@@ -1,19 +1,19 @@
-@qtype @qtype_aitext
+@qtype @qtype_aitext @qtype_aitext_import
 Feature: Test importing aitext questions
-  As a teacher
-  In order to reuse aitext questions
-  I need to import them
+    As a teacher
+    In order to reuse aitext questions
+    I need to import them
 
   Background:
     Given the following "users" exist:
-      | username |
-      | teacher  |
+        | username |
+        | teacher  |
     And the following "courses" exist:
-      | fullname | shortname | category |
-      | Course 1 | C1        | 0        |
+        | fullname | shortname | category |
+        | Course 1 | C1        | 0        |
     And the following "course enrolments" exist:
-      | user    | course | role           |
-      | teacher | C1     | editingteacher |
+        | user    | course | role           |
+        | teacher | C1     | editingteacher |
 
   @javascript @_file_upload
   Scenario: import aitext question.
