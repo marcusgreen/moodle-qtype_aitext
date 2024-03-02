@@ -4,14 +4,13 @@
   <question type="category">
     <category>
         <text>$course$/Default for C1</text>
-
     </category>
   </question>
 
 <!-- question: 114000  -->
   <question type="essay">
     <name>
-      <text>essay-001</text>
+      <text>aitext-001</text>
     </name>
     <questiontext format="html">
       <text>Write an essay with 500 words.</text>
@@ -27,8 +26,8 @@
     <responsefieldlines>15</responsefieldlines>
     <minwordlimit></minwordlimit>
     <maxwordlimit>20</maxwordlimit>
-    <attachments>0</attachments>
-    <attachmentsrequired>0</attachmentsrequired>
+    <aiprompt>Evaluate me</aiprompt>
+    <markscheme>One mark if correct</markscheme>
     <maxbytes>0</maxbytes>
     <filetypeslist></filetypeslist>
     <graderinfo format="html">
@@ -38,5 +37,4 @@
       <text></text>
     </responsetemplate>
   </question>
-
 </quiz>
