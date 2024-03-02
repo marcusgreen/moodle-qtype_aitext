@@ -1,4 +1,4 @@
-@qtype @qtype_aitext_add
+@qtype @qtype_aitext @qtype_aitext_add
 Feature: Test creating an AIText question
     As a teacher
     In order to test my students
