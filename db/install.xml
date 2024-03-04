@@ -9,7 +9,6 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key linking to the question table."/>
         <FIELD NAME="responseformat" TYPE="char" LENGTH="16" NOTNULL="true" DEFAULT="editor" SEQUENCE="false" COMMENT="The type of input area students should be given for their response."/>
-        <FIELD NAME="responserequired" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Nonzero if an online text response is optional"/>
         <FIELD NAME="responsefieldlines" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="15" SEQUENCE="false" COMMENT="Approximate height, in lines, of the input box the students should be given for their response."/>
         <FIELD NAME="minwordlimit" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Minimum number of words"/>
         <FIELD NAME="maxwordlimit" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Maximum number of words"/>

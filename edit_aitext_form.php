@@ -59,11 +59,6 @@ class qtype_aitext_edit_form extends question_edit_form {
                 get_string('responseformat', 'qtype_aitext'), $qtype->response_formats());
         $mform->setDefault('responseformat', $this->get_default_value('responseformat', 'editor'));
 
-        $mform->addElement('select', 'responserequired',
-                get_string('responserequired', 'qtype_aitext'), $qtype->response_required_options());
-        $mform->setDefault('responserequired', $this->get_default_value('responserequired', 1));
-        $mform->hideIf('responserequired', 'responseformat', 'eq', 'noinline');
-
         $mform->addElement('select', 'responsefieldlines',
                 get_string('responsefieldlines', 'qtype_aitext'), $qtype->response_sizes());
         $mform->setDefault('responsefieldlines', $this->get_default_value('responsefieldlines', 10));
@@ -78,7 +73,6 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addGroup($mingrp, 'mingroup', get_string('minwordlimit', 'qtype_aitext'), ' ', false);
         $mform->addHelpButton('mingroup', 'minwordlimit', 'qtype_aitext');
         $mform->disabledIf('minwordlimit', 'minwordenabled', 'notchecked');
-        $mform->hideIf('mingroup', 'responserequired', 'eq', '0');
         $mform->hideIf('mingroup', 'responseformat', 'eq', 'noinline');
 
         $maxgrp[] = $mform->createElement('text', 'maxwordlimit', '', $wordlimitoptions);
@@ -88,7 +82,6 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addGroup($maxgrp, 'maxgroup', get_string('maxwordlimit', 'qtype_aitext'), ' ', false);
         $mform->addHelpButton('maxgroup', 'maxwordlimit', 'qtype_aitext');
         $mform->disabledIf('maxwordlimit', 'maxwordenabled', 'notchecked');
-        $mform->hideIf('maxgroup', 'responserequired', 'eq', '0');
         $mform->hideIf('maxgroup', 'responseformat', 'eq', 'noinline');
 
         $mform->addElement('header', 'responsetemplateheader', get_string('responsetemplateheader', 'qtype_aitext'));
