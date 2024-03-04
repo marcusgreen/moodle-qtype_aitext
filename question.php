@@ -17,7 +17,7 @@
 /**
  * aitext question definition class.
  *
- * @package    qtype
+ * @package    qtype_aitext
  * @subpackage aitext
  * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -75,9 +75,14 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         return true;
     }
+    /**
+     * Re-initialise the state during a quiz (or question use)
+     *
+     * @param question_attempt_step $step
+     * @return void
+     */
     public function apply_attempt_state(question_attempt_step $step) {
         $this->step = $step;
-
     }
 
     /**

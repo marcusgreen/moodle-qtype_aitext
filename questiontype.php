@@ -17,7 +17,7 @@
 /**
  * Question type class for the aitext question type.
  *
- * @package    qtype
+ * @package    qtype_aitext
  * @subpackage aitext
  * @author     Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

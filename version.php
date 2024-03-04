@@ -17,7 +17,7 @@
 /**
  * Version information for the essay question type.
  *
- * @package    qtype
+ * @package    qtype_aitext
  * @subpackage essay
  * @copyright  2005 Mark Nielsen
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

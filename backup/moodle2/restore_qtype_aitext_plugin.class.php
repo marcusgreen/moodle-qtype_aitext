@@ -15,7 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    moodlecore
+ * Aitext question type backup
+ *
+ * @package    qtype_aitext
  * @subpackage backup-moodle2
  * @copyright  2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -23,6 +25,8 @@
 
 
 /**
+ * Provide the necessary information needed to restore one aitext instance
+ *
  * restore plugin class that provides the necessary information
  * needed to restore one aitext qtype plugin
  *
@@ -42,6 +46,9 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
 
     /**
      * Process the qtype/aitext element
+     *
+     * @param array $data
+     * @return void
      */
     public function process_aitext($data) {
         global $DB;

@@ -17,7 +17,7 @@
 /**
  * Strings for component 'qtype_aitext', language 'en'
  *
- * @package    qtype
+ * @package    qtype_aitext
  * @subpackage aitext
  * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

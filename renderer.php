@@ -18,7 +18,7 @@
  * aitext question renderer class. Based on core Moodle qtype_essay
  * which has its origins at the UK Open University
  *
- * @package    qtype
+ * @package    qtype_aitext
  * @subpackage aitext
  * @author     2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -33,6 +33,14 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_renderer extends qtype_renderer {
+    /**
+     * Generate the display of the formulation part of the question shown at runtime
+     * in a quiz
+     *
+     * @param question_attempt $qa
+     * @param question_display_options $options
+     * @return string
+     */
     public function formulation_and_controls(question_attempt $qa,
             question_display_options $options) {
         global $CFG;
