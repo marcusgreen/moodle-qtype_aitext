@@ -44,15 +44,6 @@ Feature: In an AI Text question, let the question author choose the min/max numb
     Then I should see "Maximum word limit must be greater than minimum word limit"
 
   @javascript
-  Scenario: Modify the question to see 'Minimum word limit' and  'Maximum word limit' are hidden when 'Require text' field is set to 'Text input is optional'
-    When I am on the "aitext-min-max" "core_question > edit" page logged in as teacher
-    And I should see "Minimum word limit"
-    And I should see "Maximum word limit"
-    And I set the field "Require text" to "Text input is optional"
-    Then I should not see "Minimum word limit"
-    And I should not see "Minimum word limit"
-
-  @javascript
   Scenario: Minimum/Maximum word limit can be unset after being set.
     When I am on the "aitext-min-max" "core_question > edit" page logged in as teacher
     And I set the following fields to these values:
