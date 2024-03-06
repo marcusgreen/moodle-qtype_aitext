@@ -45,6 +45,7 @@ class qtype_aitext extends question_type {
 
     public function get_question_options($question) {
         global $DB;
+        xdebug_break();
         $question->options = $DB->get_record('qtype_aitext',
                 array('questionid' => $question->id), '*', MUST_EXIST);
         parent::get_question_options($question);
@@ -53,10 +54,8 @@ class qtype_aitext extends question_type {
     public function save_defaults_for_new_questions(stdClass $fromform): void {
         parent::save_defaults_for_new_questions($fromform);
         $this->set_default_value('responseformat', $fromform->responseformat);
-        $this->set_default_value('responserequired', $fromform->responserequired);
         $this->set_default_value('responsefieldlines', $fromform->responsefieldlines);
         $this->set_default_value('markscheme', $fromform->markscheme);
-
     }
 
     public function save_question_options($formdata) {
@@ -73,7 +72,6 @@ class qtype_aitext extends question_type {
         $options->markscheme = $formdata->markscheme;
 
         $options->responseformat = $formdata->responseformat;
-        $options->responserequired = $formdata->responserequired;
         $options->responsefieldlines = $formdata->responsefieldlines;
         $options->minwordlimit = isset($formdata->minwordenabled) ? $formdata->minwordlimit : null;
         $options->maxwordlimit = isset($formdata->maxwordenabled) ? $formdata->maxwordlimit : null;
@@ -108,7 +106,6 @@ class qtype_aitext extends question_type {
         parent::initialise_question_instance($question, $questiondata);
         /**@var qtype_aitext_question  $question */
         $question->responseformat = $questiondata->options->responseformat;
-        $question->responserequired = $questiondata->options->responserequired;
         $question->responsefieldlines = $questiondata->options->responsefieldlines;
         $question->minwordlimit = $questiondata->options->minwordlimit;
         $question->maxwordlimit = $questiondata->options->maxwordlimit;
@@ -197,7 +194,6 @@ class qtype_aitext extends question_type {
             'qtype_aitext',
             'aiprompt',
             'responseformat',
-            'responserequired',
             'responsefieldlines',
             'minwordlimit',
             'maxwordlimit',

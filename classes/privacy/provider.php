@@ -17,7 +17,7 @@
 /**
  * Privacy Subsystem implementation for qtype_aitext.
  *
- * @package    qtype_aitext
+ * @package    qtype_aitext_aitext
  * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -49,10 +49,7 @@ class provider implements
     public static function get_metadata(collection $collection) : collection {
         $collection->add_user_preference('qtype_aitext_defaultmark', 'privacy:preference:defaultmark');
         $collection->add_user_preference('qtype_aitext_responseformat', 'privacy:preference:responseformat');
-        $collection->add_user_preference('qtype_aitext_responserequired', 'privacy:preference:responserequired');
         $collection->add_user_preference('qtype_aitext_responsefieldlines', 'privacy:preference:responsefieldlines');
-        $collection->add_user_preference('qtype_aitext_attachments', 'privacy:preference:attachments');
-        $collection->add_user_preference('qtype_aitext_attachmentsrequired', 'privacy:preference:attachmentsrequired');
         $collection->add_user_preference('qtype_aitext_maxbytes', 'privacy:preference:maxbytes');
         return $collection;
     }

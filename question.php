@@ -37,10 +37,6 @@ use tool_aiconnect\ai;
 class qtype_aitext_question extends question_graded_automatically_with_countback {
 
     public $responseformat;
-
-    /** @var int Indicates whether an inline response is required ('0') or optional ('1')  */
-    public $responserequired;
-
     public $responsefieldlines;
 
     /** @var int indicates whether the minimum number of words required */
@@ -130,7 +126,11 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         return $grade;
     }
-
+    /**
+     * Get the LLM string that tells it to return the result as json
+     *
+     * @return string
+     */
     protected function get_json_prompt() :string {
         return 'Return only a JSON object which enumerates a set of 2  elements.
         The elements should have properties of "feedback" and "marks".
@@ -159,6 +159,13 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
         return $translation;
     }
+    /**
+     *
+     *
+     * @param string $name
+     * @param string $value
+     * @return void
+     */
     protected function insert_attempt_step_data(string $name, string $value ) {
         global $DB;
         $data = [
@@ -227,37 +234,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 return false;
             }
         }
-        $hasattachments = array_key_exists('attachments', $response)
-            && $response['attachments'] instanceof question_response_files;
-
-        // Determine the number of attachments present.
-        if ($hasattachments) {
-            // Check the filetypes.
-            $filetypesutil = new \core_form\filetypes_util();
-            $allowlist = $filetypesutil->normalize_file_types($this->filetypeslist);
-            $wrongfiles = array();
-            foreach ($response['attachments']->get_files() as $file) {
-                if (!$filetypesutil->is_allowed_file_type($file->get_filename(), $allowlist)) {
-                    $wrongfiles[] = $file->get_filename();
-                }
-            }
-            if ($wrongfiles) { // At least one filetype is wrong.
-                return false;
-            }
-            $attachcount = count($response['attachments']->get_files());
-        } else {
-            $attachcount = 0;
-        }
-
-        // Determine if we have /some/ content to be graded.
-        $hascontent = $hasinlinetext || ($attachcount > 0);
-
-        // Determine if we meet the optional requirements.
-        $meetsinlinereq = $hasinlinetext || (!$this->responserequired) || ($this->responseformat == 'noinline');
-        $meetsattachmentreq = ($attachcount >= $this->attachmentsrequired);
-
-        // The response is complete iff all of our requirements are met.
-        return $hascontent && $meetsinlinereq && $meetsattachmentreq;
+        return true;
     }
 
     /**
@@ -334,7 +311,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         $settings = [
             'responseformat' => $this->responseformat,
-            'responserequired' => $this->responserequired,
             'responsefieldlines' => $this->responsefieldlines,
             'responsetemplate' => $this->responsetemplate,
             'responsetemplateformat' => $this->responsetemplateformat,
@@ -353,9 +329,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return string|null
      .*/
     private function check_input_word_count($responsestring) {
-        if (!$this->responserequired) {
-            return null;
-        }
+
         if (!$this->minwordlimit && !$this->maxwordlimit) {
             // This question does not care about the word count.
             return null;

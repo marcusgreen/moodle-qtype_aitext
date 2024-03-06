@@ -62,9 +62,7 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
         if (!isset($data->responsetemplateformat)) {
             $data->responsetemplateformat = FORMAT_HTML;
         }
-        if (!isset($data->responserequired)) {
-            $data->responserequired = 1;
-        }
+
         if (!isset($data->minwordlimit)) {
             $data->minwordlimit = null;
         }
@@ -120,7 +118,6 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
             $defaultoptions->questionid = $q->id;
             $defaultoptions->aimprompt = '';
             $defaultoptions->responseformat = 'editor';
-            $defaultoptions->responserequired = 1;
             $defaultoptions->responsefieldlines = 15;
             $defaultoptions->minwordlimit = null;
             $defaultoptions->maxwordlimit = null;

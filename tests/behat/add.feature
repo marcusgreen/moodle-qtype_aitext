@@ -45,7 +45,6 @@ Feature: Test creating an AIText question
         | Question name         | aitext-003                      |
         | Question text         | Write an aitext with 500 words. |
         | General feedback      | This is general feedback        |
-        | id_responserequired   | 0                               |
         | id_responsefieldlines | 15                              |
     Then I should see "aitext-003"
     # Checking that the next new question form displays user preferences settings.
@@ -53,5 +52,4 @@ Feature: Test creating an AIText question
     And I set the field "item_qtype_aitext" to "1"
     And I click on "Add" "button" in the "Choose a question type to add" "dialogue"
     And the following fields match these values:
-        | id_responserequired   | 0  |
         | id_responsefieldlines | 15 |

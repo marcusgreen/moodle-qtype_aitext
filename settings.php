@@ -17,7 +17,7 @@
 /**
  * TODO describe file settings
  *
- * @package    qtype_aitext
+ * @package    qtype_aitext_aitext
  * @copyright  2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

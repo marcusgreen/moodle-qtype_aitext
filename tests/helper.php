@@ -17,7 +17,7 @@
 /**
  * Test helpers for the aitext question type.
  *
- * @package    qtype_aitext
+ * @package    qtype_aitext_aitext
  * @copyright  2013 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -59,7 +59,6 @@ class qtype_aitext_test_helper extends question_test_helper {
         $q->questiontext = 'Please write a story about a frog.';
         $q->generalfeedback = 'I hope your story had a beginning, a middle and an end.';
         $q->responseformat = 'editor';
-        $q->responserequired = 1;
         $q->responsefieldlines = 10;
         $q->minwordlimit = null;
         $q->maxwordlimit = null;
@@ -94,7 +93,6 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.',
              'format' => FORMAT_HTML);
         $fromform->responseformat = 'editor';
-        $fromform->responserequired = 1;
         $fromform->responsefieldlines = 10;
         $fromform->attachments = 0;
         $fromform->graderinfo = array('text' => '', 'format' => FORMAT_HTML);
@@ -131,7 +129,6 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.',
              'format' => FORMAT_HTML);
         $fromform->responseformat = 'plain';
-        $fromform->responserequired = 1;
         $fromform->responsefieldlines = 10;
         $fromform->aiprompt = 'Evaluate this';
         $fromform->markscheme = 'One mark if correct';

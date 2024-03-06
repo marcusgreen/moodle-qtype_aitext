@@ -1,25 +1,25 @@
-@qtype @qtype_aitext
+@qtype @qtype_aitext @qtype_aitext_max_min
 Feature: In an AI Text question, let the question author choose the min/max number of words for input text
-  In order to constrain student submissions for marking
-  As a teacher
-  I need to choose the appropriate minimum and/or maximum number of words for input text
+    In order to constrain student submissions for marking
+    As a teacher
+    I need to choose the appropriate minimum and/or maximum number of words for input text
 
   Background:
     Given the following "users" exist:
-      | username |
-      | teacher  |
+        | username |
+        | teacher  |
     And the following "courses" exist:
-      | fullname | shortname | category |
-      | Course 1 | C1        | 0        |
+        | fullname | shortname | category |
+        | Course 1 | C1        | 0        |
     And the following "course enrolments" exist:
-      | user    | course | role           |
-      | teacher | C1     | editingteacher |
+        | user    | course | role           |
+        | teacher | C1     | editingteacher |
     And the following "question categories" exist:
-      | contextlevel | reference | name           |
-      | Course       | C1        | Test questions |
+        | contextlevel | reference | name           |
+        | Course       | C1        | Test questions |
     And the following "questions" exist:
-      | questioncategory | qtype | name          | template | minwordlimit | maxwordlimit |
-      | Test questions   | aitext | aitext-min-max | editor   | 0            | 0            |
+        | questioncategory | qtype  | name           | template | minwordlimit | maxwordlimit |
+        | Test questions   | aitext | aitext-min-max | editor   | 0            | 0            |
 
   Scenario: Minimum/Maximum word limit are enabled but not set.
     When I am on the "aitext-min-max" "core_question > edit" page logged in as teacher
@@ -56,22 +56,22 @@ Feature: In an AI Text question, let the question author choose the min/max numb
   Scenario: Minimum/Maximum word limit can be unset after being set.
     When I am on the "aitext-min-max" "core_question > edit" page logged in as teacher
     And I set the following fields to these values:
-      | minwordenabled  | 1   |
-      | id_minwordlimit | 100 |
-      | maxwordenabled  | 1   |
-      | id_maxwordlimit | 200 |
+        | minwordenabled  | 1   |
+        | id_minwordlimit | 100 |
+        | maxwordenabled  | 1   |
+        | id_maxwordlimit | 200 |
     And I click on "Save changes and continue editing" "button"
     Then the following fields match these values:
-      | minwordenabled  | 1   |
-      | id_minwordlimit | 100 |
-      | maxwordenabled  | 1   |
-      | id_maxwordlimit | 200 |
+        | minwordenabled  | 1   |
+        | id_minwordlimit | 100 |
+        | maxwordenabled  | 1   |
+        | id_maxwordlimit | 200 |
     And I set the following fields to these values:
-      | minwordenabled  | 0 |
-      | maxwordenabled  | 0 |
+        | minwordenabled | 0 |
+        | maxwordenabled | 0 |
     And I click on "Save changes and continue editing" "button"
     And the following fields match these values:
-      | minwordenabled  | 0 |
-      | id_minwordlimit |   |
-      | maxwordenabled  | 0 |
-      | id_maxwordlimit |   |
+        | minwordenabled  | 0 |
+        | id_minwordlimit |   |
+        | maxwordenabled  | 0 |
+        | id_maxwordlimit |   |

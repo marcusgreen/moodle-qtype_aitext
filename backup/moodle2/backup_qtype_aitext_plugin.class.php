@@ -46,10 +46,10 @@ class backup_qtype_aitext_plugin extends backup_qtype_plugin {
         $plugin->add_child($pluginwrapper);
 
         // Now create the qtype own structures.
-        $aitext = new backup_nested_element('aitext', array('id'), array(
-                'aiprompt', 'responseformat', 'responserequired', 'responsefieldlines', 'minwordlimit', 'maxwordlimit',
-                'attachments', 'attachmentsrequired', 'graderinfo', 'graderinfoformat', 'responsetemplate',
-                'responsetemplateformat', 'filetypeslist', 'maxbytes'));
+        $aitext = new backup_nested_element('aitext', ['id'], array(
+                'aiprompt', 'responseformat', 'responsefieldlines', 'minwordlimit', 'maxwordlimit',
+                'graderinfo', 'graderinfoformat', 'responsetemplate',
+                'responsetemplateformat', 'maxbytes'));
 
         // Now the own qtype tree.
         $pluginwrapper->add_child($aitext);

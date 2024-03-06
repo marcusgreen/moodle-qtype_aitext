@@ -39,7 +39,6 @@ Feature: Test duplicating a quiz containing an aitext question
         | Question text    | Please write a story about a frog.                      |
         | General feedback | I hope your story had a beginning, a middle and an end. |
         | Response format  | HTML editor                                             |
-        | Require text     | Require the student to enter text                       |
     And I press "Cancel"
     And I choose "Edit question" action for "aitext-002" in the question bank
     Then the following fields match these values:
@@ -47,4 +46,3 @@ Feature: Test duplicating a quiz containing an aitext question
         | Question text    | Please write a story about a frog.                      |
         | General feedback | I hope your story had a beginning, a middle and an end. |
         | Response format  | Plain text                                              |
-        | Require text     | Require the student to enter text                       |

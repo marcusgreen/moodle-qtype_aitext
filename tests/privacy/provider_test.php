@@ -17,7 +17,7 @@
 /**
  * Privacy provider tests.
  *
- * @package    qtype_aitext
+ * @package    qtype_aitext_aitext
  * @author     2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -39,7 +39,7 @@ require_once($CFG->dirroot . '/question/type/essay/classes/privacy/provider.php'
 /**
  * Privacy provider tests class.
  *
- * @package    qtype_aitext
+ * @package    qtype_aitext_aitext
  * @author     2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

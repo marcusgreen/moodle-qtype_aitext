@@ -86,7 +86,7 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         $mform->addElement('header', 'responsetemplateheader', get_string('responsetemplateheader', 'qtype_aitext'));
         $mform->addElement('editor', 'responsetemplate', get_string('responsetemplate', 'qtype_aitext'),
-                array('rows' => 10),  array_merge($this->editoroptions, array('maxfiles' => 0)));
+                ['rows' => 10],  array_merge($this->editoroptions, ['maxfiles' => 0]));
         $mform->addHelpButton('responsetemplate', 'responsetemplate', 'qtype_aitext');
 
         $mform->addElement('header', 'graderinfoheader', get_string('graderinfoheader', 'qtype_aitext'));
@@ -103,7 +103,6 @@ class qtype_aitext_edit_form extends question_edit_form {
         }
 
         $question->responseformat = $question->options->responseformat;
-        $question->responserequired = $question->options->responserequired;
         $question->responsefieldlines = $question->options->responsefieldlines;
         $question->minwordenabled = $question->options->minwordlimit ? 1 : 0;
         $question->minwordlimit = $question->options->minwordlimit;
@@ -122,7 +121,6 @@ class qtype_aitext_edit_form extends question_edit_form {
     public function validation($fromform, $files) {
         $errors = parent::validation($fromform, $files);
 
-        if ($fromform['responserequired']) {
             if (isset($fromform['minwordenabled'])) {
                 if (!is_numeric($fromform['minwordlimit'])) {
                     $errors['mingroup'] = get_string('err_numeric', 'form');
@@ -151,7 +149,7 @@ class qtype_aitext_edit_form extends question_edit_form {
                     $errors['maxgroup'] = get_string('err_maxminmismatch', 'qtype_aitext');
                 }
             }
-        }
+
         return $errors;
     }
 

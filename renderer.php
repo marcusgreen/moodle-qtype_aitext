@@ -243,17 +243,6 @@ class qtype_aitext_renderer extends qtype_renderer {
         return $output;
     }
 
-    public function manual_comment(question_attempt $qa, question_display_options $options) {
-        return '';
-        if ($options->manualcomment != question_display_options::EDITABLE) {
-            return '';
-        }
-        /**@var qtype_aitext $question */
-        $question = $qa->get_question();
-        return html_writer::nonempty_tag('div', $question->format_text(
-                $question->graderinfo, $question->graderinfoformat, $qa, 'qtype_aitext',
-                'graderinfo', $question->id), array('class' => 'graderinfo'));
-    }
 }
 
 
