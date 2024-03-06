@@ -45,7 +45,6 @@ class qtype_aitext extends question_type {
 
     public function get_question_options($question) {
         global $DB;
-        xdebug_break();
         $question->options = $DB->get_record('qtype_aitext',
                 array('questionid' => $question->id), '*', MUST_EXIST);
         parent::get_question_options($question);
