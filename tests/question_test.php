@@ -57,66 +57,22 @@ class question_test extends \advanced_testcase {
      * review them to see what has been saved in the response history table.
      *
      * @covers ::summarise_response()
-     *
-     * @dataProvider summarise_response_provider
-     * @param int $responserequired
-     * @param int $attachmentsrequired
-     * @param string $answertext
-     * @param int $attachmentuploaded
-     * @param string $expected
      */
-    public function test_summarise_response(int $responserequired, int $attachmentsrequired,
-                                            string $answertext, int $attachmentuploaded, string $expected): void {
+    public function test_summarise_response(): void {
         $this->resetAfterTest();
 
-        // If number of allowed attachments is set to 'Unlimited', generate 10 attachments for testing purpose.
-        $numberofattachments = ($attachmentsrequired === -1) ? 10 : $attachmentsrequired;
-
-        // Create sample attachments.
-        $attachments = $this->create_user_and_sample_attachments($numberofattachments);
-
         // Create the aitext question under test.
-        $aitext = \test_question_maker::make_an_aitext_question();
+        $questiontext = 'AI question text';
+        $aitext = qtype_aitext_test_helper::make_aitext_question(['questiontext' => $questiontext]);
         $aitext->start_attempt(new question_attempt_step(), 1);
 
         $aitext->responseformat = 'editor';
-        $aitext->responserequired = $responserequired;
-        $aitext->attachmentsrequired = $attachmentsrequired;
 
-        // The space before the number of bytes from display_size is actually a non-breaking space.
-        $expected = str_replace(' bytes', "\xc2\xa0bytes", $expected);
-
-        $this->assertEquals($expected, $aitext->summarise_response(
-            ['answer' => $answertext, 'answerformat' => FORMAT_HTML,  'attachments' => $attachments[$attachmentuploaded]]));
+        $this->assertEquals($questiontext, $aitext->summarise_response(
+            ['answer' => $questiontext, 'answerformat' => FORMAT_HTML]));
     }
 
-    /**
-     * Data provider for summarise_response() test cases.
-     *
-     * @return array List of data sets (test cases)
-     */
-    public function summarise_response_provider(): array {
-        return [
-            'text input required, not attachments required'  =>
-                [1, 0, 'This is the text input for this aitext.', 0, 'This is the text input for this aitext.'],
-            'Text input required, one attachments required, one uploaded'  =>
-                [1, 1, 'This is the text input for this aitext.', 1,
-                'This is the text input for this aitext.Attachments: 0 (1 bytes)'],
-            'Text input is optional, four attachments required, one uploaded'  => [0, 4, '', 1, 'Attachments: 0 (1 bytes)'],
-            'Text input is optional, four attachments required, two uploaded'  =>
-                [0, 4, '', 2, 'Attachments: 0 (1 bytes), 1 (1 bytes)'],
-            'Text input is optional, four attachments required, three uploaded'  =>
-                 [0, 4, '', 3, 'Attachments: 0 (1 bytes), 1 (1 bytes), 2 (1 bytes)'],
-            'Text input is optional, four attachments required, four uploaded'  => [0, 4, 'I have attached 4 files.', 4,
-                'I have attached 4 files.Attachments: 0 (1 bytes), 1 (1 bytes), 2 (1 bytes), 3 (1 bytes)'],
-            'Text input is optional, unlimited attachments required, one uploaded'  => [0, -1, '', 1, 'Attachments: 0 (1 bytes)'],
-            'Text input is optional, unlimited attachments required, five uploaded'  => [0, -1, 'I have attached 5 files.', 5,
-                'I have attached 5 files.Attachments: 0 (1 bytes), 1 (1 bytes), 2 (1 bytes), 3 (1 bytes), 4 (1 bytes)'],
-            'Text input is optional, unlimited attachments required, ten uploaded'  =>
-                [0, -1, '', 10, 'Attachments: 0 (1 bytes), 1 (1 bytes), 2 (1 bytes), 3 (1 bytes), 4 (1 bytes), ' .
-                    '5 (1 bytes), 6 (1 bytes), 7 (1 bytes), 8 (1 bytes), 9 (1 bytes)']
-        ];
-    }
+
     /**
      *
      * @covers ::is_same_response()
@@ -124,7 +80,7 @@ class question_test extends \advanced_testcase {
      * @return void
      */
     public function test_is_same_response() {
-        $aitext = \test_question_maker::make_an_aitext_question();
+        $aitext = \test_question_maker::make_an_essay_question();
 
         $aitext->responsetemplate = '';
 
@@ -172,7 +128,7 @@ class question_test extends \advanced_testcase {
      * @covers ::is_same_response_with_template()
      */
     public function test_is_same_response_with_template() {
-        $aitext = \test_question_maker::make_an_aitext_question();
+        $aitext = \test_question_maker::make_an_essay_question();
 
         $aitext->responsetemplate = 'Once upon a time';
 
@@ -226,9 +182,14 @@ class question_test extends \advanced_testcase {
         // Create sample attachments.
         $attachments = $this->create_user_and_sample_attachments();
 
-        // Create the aitext question under test.
-        $aitext = \test_question_maker::make_an_aitext_question();
+        // Create the essay question under test.
+        $aitext = \test_question_maker::make_an_essay_question();
         $aitext->start_attempt(new question_attempt_step(), 1);
+
+        // Test the "traditional" case, where we must receive a response from the user.
+        $aitext->responserequired = 1;
+        $aitext->attachmentsrequired = 0;
+        $aitext->responseformat = 'editor';
 
         // The empty string should be considered an incomplete response, as should a lack of a response.
         $this->assertFalse($aitext->is_complete_response(array('answer' => '')));
@@ -241,7 +202,7 @@ class question_test extends \advanced_testcase {
 
         // Test case for minimum and/or maximum word limit.
         $response = [];
-        $response['answer'] = 'In this aitext, I will be testing a function called check_input_word_count().';
+        $response['answer'] = 'In this essay, I will be testing a function called check_input_word_count().';
 
         $aitext->minwordlimit = 50; // The answer is shorter than the required minimum word limit.
         $this->assertFalse($aitext->is_complete_response($response));
@@ -320,7 +281,11 @@ class question_test extends \advanced_testcase {
         $this->assertTrue($aitext->is_complete_response(
                 array('attachments' => $attachments[1])));
 
-          }
+        // Ensure that responserequired is ignored when we're in inline response mode.
+        $aitext->responserequired = 1;
+        $this->assertTrue($aitext->is_complete_response(
+                array('attachments' => $attachments[1])));
+    }
 
     /**
      * @covers ::get_question_definition_for_external_rendering()
@@ -328,7 +293,7 @@ class question_test extends \advanced_testcase {
     public function test_get_question_definition_for_external_rendering() {
         $this->resetAfterTest();
 
-        $aitext = \test_question_maker::make_an_aitext_question();
+        $aitext = qtype_aitext_test_helper::make_aitext_question([]);
         $aitext->minwordlimit = 15;
         $aitext->start_attempt(new question_attempt_step(), 1);
         $qa = \test_question_maker::get_a_qa($aitext);
@@ -339,10 +304,6 @@ class question_test extends \advanced_testcase {
         $this->assertEquals('editor', $options['responseformat']);
         $this->assertEquals(1, $options['responserequired']);
         $this->assertEquals(15, $options['responsefieldlines']);
-        $this->assertEquals(0, $options['attachments']);
-        $this->assertEquals(0, $options['attachmentsrequired']);
-        $this->assertNull($options['maxbytes']);
-        $this->assertNull($options['filetypeslist']);
         $this->assertEquals('', $options['responsetemplate']);
         $this->assertEquals(FORMAT_MOODLE, $options['responsetemplateformat']);
         $this->assertEquals($aitext->minwordlimit, $options['minwordlimit']);
@@ -364,7 +325,7 @@ class question_test extends \advanced_testcase {
      */
     public function test_get_validation_error(int $responserequired,
                                               int $minwordlimit, int $maxwordlimit, string $expected): void {
-        $question = \test_question_maker::make_an_aitext_question();
+        $question = \test_question_maker::make_an_essay_question();
         $response = ['answer' => 'One two three four five six seven eight nine ten eleven twelve thirteen fourteen.'];
         $question->responserequired = $responserequired;
         $question->minwordlimit = $minwordlimit;
@@ -403,7 +364,7 @@ class question_test extends \advanced_testcase {
      * @param string $expected error message | null
      */
     public function test_get_word_count_message_for_review(?int $minwordlimit, ?int $maxwordlimit, string $expected): void {
-        $question = \test_question_maker::make_an_aitext_question();
+        $question = \test_question_maker::make_an_essay_question();
         $question->minwordlimit = $minwordlimit;
         $question->maxwordlimit = $maxwordlimit;
 
@@ -448,7 +409,7 @@ class question_test extends \advanced_testcase {
         $this->setUser($user);
 
         // Create sample attachments to use in testing.
-        $helper = \test_question_maker::get_test_helper('aitext');
+        $helper = qtype_aitext_test_helper::make_aitext_question([]);
         $attachments = [];
         for ($i = 0; $i < ($numberofattachments + 1); ++$i) {
             $attachments[$i] = $helper->make_attachments_saver($i);

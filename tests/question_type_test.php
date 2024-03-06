@@ -29,7 +29,7 @@ require_once($CFG->dirroot . '/question/type/aitext/questiontype.php');
 /**
  * Unit tests for the essay question type class.
  *
- * @package    qtype_aitext_aitext
+ * @package    qtype_aitext
  * @author     Marcus Green 2023
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
