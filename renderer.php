@@ -269,6 +269,7 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
 
     /**
      * Render the students respone when the question is in read-only mode.
+     *
      * @param string $name the variable name this input edits.
      * @param question_attempt $qa the question attempt being display.
      * @param question_attempt_step $step the current step.
@@ -292,33 +293,11 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
             question_attempt_step $step, $lines, $context);
 
     /**
-     * @return string specific class name to add to the input element.
+     * Specific class name to add to the input element.
+     *
+     * @return string
      */
     abstract protected function class_name();
-}
-
-/**
- * An aitext format renderer for aitexts where the student should not enter
- * any inline response.
- *
- * @copyright  2013 Binghamton University
- * @author     Marcus Green 2024 (building on work of Binghampton University)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class qtype_aitext_format_noinline_renderer extends qtype_aitext_format_renderer_base {
-
-    protected function class_name() {
-        return 'qtype_aitext_noinline';
-    }
-
-    public function response_area_read_only($name, $qa, $step, $lines, $context) {
-        return '';
-    }
-
-    public function response_area_input($name, $qa, $step, $lines, $context) {
-        return '';
-    }
-
 }
 
 /**
@@ -329,11 +308,17 @@ class qtype_aitext_format_noinline_renderer extends qtype_aitext_format_renderer
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_base {
+    /**
+     * Specific class name to add to the input element.
+     *
+     * @return string
+     */
     protected function class_name() {
         return 'qtype_aitext_editor';
     }
 
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
+        xdebug_break();
         $labelbyid = $qa->get_qt_field_name($name) . '_label';
         $responselabel = $this->displayoptions->add_question_identifier_to_label(get_string('answertext', 'qtype_aitext'));
         $output = html_writer::tag('h4', $responselabel, ['id' => $labelbyid, 'class' => 'sr-only']);
@@ -471,6 +456,11 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_editor_renderer {
+    /**
+     * Specific class name to add to the input element.
+     *
+     * @return string
+     */
     protected function class_name() {
         return 'qtype_aitext_editorfilepicker';
     }
@@ -578,6 +568,11 @@ class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_ba
         return html_writer::tag('textarea', s($response), $attributes);
     }
 
+    /**
+     * Specific class name to add to the input element.
+     *
+     * @return string
+     */
     protected function class_name() {
         return 'qtype_aitext_plain';
     }
@@ -614,6 +609,11 @@ class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_ba
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_format_monospaced_renderer extends qtype_aitext_format_plain_renderer {
+    /**
+     * Specific class name to add to the input element.
+     *
+     * @return string
+     */
     protected function class_name() {
         return 'qtype_aitext_monospaced';
     }
