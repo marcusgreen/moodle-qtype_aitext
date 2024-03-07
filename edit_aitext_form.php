@@ -121,34 +121,34 @@ class qtype_aitext_edit_form extends question_edit_form {
     public function validation($fromform, $files) {
         $errors = parent::validation($fromform, $files);
 
-            if (isset($fromform['minwordenabled'])) {
-                if (!is_numeric($fromform['minwordlimit'])) {
-                    $errors['mingroup'] = get_string('err_numeric', 'form');
-                }
-                if ($fromform['minwordlimit'] < 0) {
-                    $errors['mingroup'] = get_string('err_minwordlimitnegative', 'qtype_aitext');
-                }
-                if (!$fromform['minwordlimit']) {
-                    $errors['mingroup'] = get_string('err_minwordlimit', 'qtype_aitext');
-                }
+        if (isset($fromform['minwordenabled'])) {
+            if (!is_numeric($fromform['minwordlimit'])) {
+                $errors['mingroup'] = get_string('err_numeric', 'form');
             }
-            if (isset($fromform['maxwordenabled'])) {
-                if (!is_numeric($fromform['maxwordlimit'])) {
-                    $errors['maxgroup'] = get_string('err_numeric', 'form');
-                }
-                if ($fromform['maxwordlimit'] < 0) {
-                    $errors['maxgroup'] = get_string('err_maxwordlimitnegative', 'qtype_aitext');
-                }
-                if (!$fromform['maxwordlimit']) {
-                    $errors['maxgroup'] = get_string('err_maxwordlimit', 'qtype_aitext');
-                }
+            if ($fromform['minwordlimit'] < 0) {
+                $errors['mingroup'] = get_string('err_minwordlimitnegative', 'qtype_aitext');
             }
-            if (isset($fromform['maxwordenabled']) && isset($fromform['minwordenabled'])) {
-                if ($fromform['maxwordlimit'] < $fromform['minwordlimit'] &&
-                    $fromform['maxwordlimit'] > 0 && $fromform['minwordlimit'] > 0) {
-                    $errors['maxgroup'] = get_string('err_maxminmismatch', 'qtype_aitext');
-                }
+            if (!$fromform['minwordlimit']) {
+                $errors['mingroup'] = get_string('err_minwordlimit', 'qtype_aitext');
             }
+        }
+        if (isset($fromform['maxwordenabled'])) {
+            if (!is_numeric($fromform['maxwordlimit'])) {
+                $errors['maxgroup'] = get_string('err_numeric', 'form');
+            }
+            if ($fromform['maxwordlimit'] < 0) {
+                $errors['maxgroup'] = get_string('err_maxwordlimitnegative', 'qtype_aitext');
+            }
+            if (!$fromform['maxwordlimit']) {
+                $errors['maxgroup'] = get_string('err_maxwordlimit', 'qtype_aitext');
+            }
+        }
+        if (isset($fromform['maxwordenabled']) && isset($fromform['minwordenabled'])) {
+            if ($fromform['maxwordlimit'] < $fromform['minwordlimit'] &&
+                $fromform['maxwordlimit'] > 0 && $fromform['minwordlimit'] > 0) {
+                $errors['maxgroup'] = get_string('err_maxminmismatch', 'qtype_aitext');
+            }
+        }
 
         return $errors;
     }
