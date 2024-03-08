@@ -48,8 +48,6 @@ class qtype_aitext_renderer extends qtype_renderer {
         /** @var qtype_aitext_question $question */
         $question = $qa->get_question();
 
-        xdebug_break();
-
         $istestedwith = [
             'immediatefeedback'
         ];
