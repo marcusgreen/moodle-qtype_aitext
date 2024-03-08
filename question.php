@@ -216,7 +216,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * For testing only
      * @param string $summary
      * @return array
-    */
+     */
     public function un_summarise_response(string $summary) {
         if (empty($summary)) {
             return [];
@@ -264,7 +264,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param array $response
      * @return string
      */
-    public function get_validation_error(array $response) {
+     public function get_validation_error(array $response) {
         if ($this->is_complete_response($response)) {
             return '';
         }
