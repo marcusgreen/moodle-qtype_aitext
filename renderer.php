@@ -45,9 +45,10 @@ class qtype_aitext_renderer extends qtype_renderer {
             question_display_options $options) {
         global $CFG;
 
-        /** @var qtype_aitext $question */
-
+        /** @var qtype_aitext_question $question */
         $question = $qa->get_question();
+
+        xdebug_break();
 
         $istestedwith = [
             'immediatefeedback'
@@ -316,9 +317,18 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
     protected function class_name() {
         return 'qtype_aitext_editor';
     }
-
+    /**
+     * Return a read only version of the response areay. Typically for after
+     * a quesiton has been answered and the response cannot be modified.
+     * @param string $name
+     * @param question_attempt $qa
+     * @param question_attempt_step $step
+     * @param int $lines number of lines in the editor
+     * @param object $context
+     * @return string
+     * @throws coding_exception
+     */
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
-        xdebug_break();
         $labelbyid = $qa->get_qt_field_name($name) . '_label';
         $responselabel = $this->displayoptions->add_question_identifier_to_label(get_string('answertext', 'qtype_aitext'));
         $output = html_writer::tag('h4', $responselabel, ['id' => $labelbyid, 'class' => 'sr-only']);
@@ -335,6 +345,17 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
         return $output;
     }
 
+    /**
+     * Where the student types in their response
+     *
+     * @param string $name
+     * @param question_attempt $qa
+     * @param question_attempt_step $step
+     * @param int $lines lines available to type in response
+     * @param object $context
+     * @return string
+     * @throws coding_exception
+     */
     public function response_area_input($name, $qa, $step, $lines, $context) {
         global $CFG;
         require_once($CFG->dirroot . '/repository/lib.php');
@@ -412,11 +433,11 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
      * @param string $name the variable name this input edits.
      * @param question_attempt_step $step the current step.
      * @param object $context the context the attempt belongs to.
-     * @return string the response prepared for display.
+     * @return array the response prepared for display.
      */
     protected function prepare_response_for_editing($name,
             question_attempt_step $step, $context) {
-        return array(0, $step->get_qt_var($name));
+        return [0, $step->get_qt_var($name)];
     }
 
     /**
@@ -576,7 +597,16 @@ class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_ba
     protected function class_name() {
         return 'qtype_aitext_plain';
     }
-
+    /**
+     * Read only version of response (typically after submission)
+     * @param string $name
+     * @param question_attempt $qa
+     * @param question_attempt_step $step
+     * @param int $lines
+     * @param object $context
+     * @return string
+     * @throws coding_exception
+     */
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
         $id = $qa->get_qt_field_name($name) . '_id';
 
@@ -586,6 +616,17 @@ class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_ba
         return $output;
     }
 
+    /**
+     * Text area for response to be keyed in
+     *
+     * @param string $name
+     * @param question_attempt $qa
+     * @param question_attempt_step $step
+     * @param int $lines
+     * @param object $context
+     * @return string
+     * @throws coding_exception
+     */
     public function response_area_input($name, $qa, $step, $lines, $context) {
         $inputname = $qa->get_qt_field_name($name);
         $id = $inputname . '_id';

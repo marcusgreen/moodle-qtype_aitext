@@ -183,17 +183,13 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     public function get_format_renderer(moodle_page $page) {
         return  $page->get_renderer('qtype_aitext', 'format_' . $this->responseformat);
     }
-
+    /**
+     * Get expected data types
+     * @return array
+     */
     public function get_expected_data() {
-        if ($this->responseformat == 'editorfilepicker') {
-            $expecteddata = array('answer' => question_attempt::PARAM_RAW_FILES);
-        } else {
-            $expecteddata = array('answer' => PARAM_RAW);
-        }
+        $expecteddata = ['answer' => PARAM_RAW];
         $expecteddata['answerformat'] = PARAM_ALPHANUMEXT;
-        if ($this->attachments != 0) {
-            $expecteddata['attachments'] = question_attempt::PARAM_FILES;
-        }
         return $expecteddata;
     }
 
