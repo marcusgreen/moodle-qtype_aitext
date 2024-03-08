@@ -17,15 +17,14 @@
 /**
  * Privacy Subsystem implementation for qtype_aitext.
  *
- * @package    qtype_aitext_aitext
- * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
+ * @package    qtype_aitext
+ * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace qtype_aitext\privacy;
 
 use \core_privacy\local\metadata\collection;
-use \core_privacy\local\request\user_preference_provider;
 use \core_privacy\local\request\writer;
 
 /**

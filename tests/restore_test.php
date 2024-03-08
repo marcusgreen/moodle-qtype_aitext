@@ -24,7 +24,7 @@ require_once($CFG->libdir . "/phpunit/classes/restore_date_testcase.php");
 /**
  * Test restore logic.
  *
- * @package    qtype_aitext_aitext
+ * @package    qtype_aitext
  * @copyright  2019 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -19,7 +19,7 @@ namespace qtype_aitext\task;
 /**
  * Class llm_feedback
  *
- * @package    qtype_aitext_aitext
+ * @package    qtype_aitext
  * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

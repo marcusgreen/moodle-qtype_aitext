@@ -45,12 +45,23 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     /** @var int indicates whether the maximum number of words required */
     public $maxwordlimit;
 
+    /**@var string $graderinfo */
     public $graderinfo;
     public $graderinfoformat;
     public $responsetemplate;
     public $responsetemplateformat;
+    /**
+     * String to pass to the LLM telling it how to give
+     * feedback
+     * @var mixed
+     */
     public $aiprompt;
 
+    /**
+     * String to pass to the LLM telling it how to mark
+     * a submission
+     * @var string
+     */
     public $markscheme;
 
     public $step;
@@ -264,7 +275,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param array $response
      * @return string
      */
-     public function get_validation_error(array $response) {
+    public function get_validation_error(array $response) {
         if ($this->is_complete_response($response)) {
             return '';
         }
@@ -283,6 +294,17 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
     }
 
+    /* *
+    *if you are moving from viewing one question to another this will
+    * discard the processing if the answer has not changed. If you don't
+    * use this method it will constantantly generate new question steps and
+    * the question will be repeatedly set to incomplete. This is a comparison of
+    * the equality of two arrays.
+
+    * @param array $prevresponse
+    * @param array $newresponse
+    * @return bool
+    */
     public function is_same_response(array $prevresponse, array $newresponse) {
         if (array_key_exists('answer', $prevresponse) && $prevresponse['answer'] !== $this->responsetemplate) {
             $value1 = (string) $prevresponse['answer'];
