@@ -193,17 +193,30 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         return $expecteddata;
     }
 
+
+    /**
+     * Value returned will be written to responsesummary field of the
+     * question_attempts table
+     *
+     * @param array $response
+     * @return string
+     */
     public function summarise_response(array $response) {
         $output = null;
-
         if (isset($response['answer'])) {
             $output .= question_utils::to_plain_text($response['answer'],
-                $response['answerformat'], array('para' => false));
+                $response['answerformat'], ['para' => false]);
         }
 
         return $output;
     }
 
+    /**
+     * Construct a response that could have lead to the given response summary.
+     * For testing only
+     * @param string $summary
+     * @return array
+    */
     public function un_summarise_response(string $summary) {
         if (empty($summary)) {
             return [];
@@ -216,10 +229,21 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
     }
 
+    /**
+     * There is no one correct response for this quesiton type
+     * so return null.
+     * @return array|null
+     */
     public function get_correct_response() {
         return null;
     }
 
+    /**
+     * Is there some text and does it match the required word count?
+     * @param array $response
+     * @return bool
+     * @throws coding_exception
+     */
     public function is_complete_response(array $response) {
         // Determine if the given response has online text and attachments.
         $hasinlinetext = array_key_exists('answer', $response) && ($response['answer'] !== '');

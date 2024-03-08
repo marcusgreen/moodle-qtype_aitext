@@ -19,7 +19,7 @@
  *
  * Documentation: {@link https://moodledev.io/docs/apis/subsystems/task}
  *
- * @package    qtype_aitext_aitext
+ * @package    qtype_aitext
  * @category   task
  * @copyright  2024 YOUR NAME Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

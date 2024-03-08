@@ -17,9 +17,8 @@
 /**
  * Serve question type files
  *
- * @since      Moodle 2.0
- * @package    qtype_aitext_aitext
- * @copyright  Dongsheng Cai <dongsheng@moodle.com>
+ * @package    qtype_aitext
+ * @copyright  Marcus Green 2024
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
