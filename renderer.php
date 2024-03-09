@@ -577,8 +577,14 @@ class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_base {
+
     /**
-     * @return string the HTML for the textarea.
+     * Where the student keys in the response
+     *
+     * @param string $response
+     * @param mixed $lines
+     * @param mixed $attributes
+     * @return string
      */
     protected function textarea($response, $lines, $attributes) {
         $attributes['class'] = $this->class_name() . ' qtype_aitext_response form-control';

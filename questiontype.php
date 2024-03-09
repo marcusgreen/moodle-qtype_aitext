@@ -227,6 +227,15 @@ class qtype_aitext extends question_type {
             'markscheme'
         ];
     }
+    /**
+     * Create a question from reading in a file in Moodle xml format
+     *
+     * @param array $data
+     * @param stdClass $question (might be an array)
+     * @param qformat_xml $format
+     * @param stdClass $extra
+     * @return boolean
+     */
     public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
         $questiontype = $data['@']['type'];
         if ($questiontype != $this->name()) {
@@ -254,6 +263,14 @@ class qtype_aitext extends question_type {
 
         return $qo;
     }
+    /**
+     * Export question to the Moodle XML format
+     *
+     * @param object $question
+     * @param qformat_xml $format
+     * @param object $extra
+     * @return string
+     */
     public function export_to_xml($question, qformat_xml $format, $extra = null) {
         $fs = get_file_storage();
         $textfields = $this->get_text_fields();;

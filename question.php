@@ -36,7 +36,17 @@ use tool_aiconnect\ai;
  */
 class qtype_aitext_question extends question_graded_automatically_with_countback {
 
+    /**
+     * Plain text or html
+     * @var string
+     */
     public $responseformat;
+
+    /**
+     * Count of lines of text
+     *
+     * @var int
+     */
     public $responsefieldlines;
 
     /** @var int indicates whether the minimum number of words required */
@@ -45,10 +55,29 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     /** @var int indicates whether the maximum number of words required */
     public $maxwordlimit;
 
-    /**@var string $graderinfo */
+    /**
+     * Information on how to manually grade
+     *
+     * @var string
+     */
     public $graderinfo;
+
+    /**
+     * Plain text or html
+     * @var int
+     */
     public $graderinfoformat;
+
+    /**
+     * Text to appear in area where student types response.
+     * @var string
+     */
     public $responsetemplate;
+    /**
+     * plain text or html
+     *
+     * @var int
+     */
     public $responsetemplateformat;
     /**
      * String to pass to the LLM telling it how to give
@@ -282,6 +311,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         return $this->check_input_word_count($response['answer']);
     }
 
+    /**
+     * Has the quesiton been answered, the attachment stuff needs removing
+     *
+     * @param array $response
+     * @return bool
+     */
     public function is_gradable_response(array $response) {
         // Determine if the given response has online text and attachments.
         if (array_key_exists('answer', $response) && ($response['answer'] !== '')) {

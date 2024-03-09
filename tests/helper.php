@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use Random\RandomException;
+
 /**
  * Test helper class for the aitext question type.
  *
@@ -29,9 +31,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_test_helper extends question_test_helper {
+    /**
+     * What test questions to import
+     * @return array
+     */
     public function get_test_questions() {
         return array('editor', 'plain', 'monospaced', 'responsetemplate', 'noinline');
     }
+    /**
+     * Make an aitext question for testing
+     * @param array $options
+     * @return qtype_aitext_question
+    */
     public static function make_aitext_question(array $options) {
         $optionsparam = [
             'questiontext' => $options['questiontext'] ?? '',
