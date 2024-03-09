@@ -24,6 +24,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use Random\RandomException;
 
 defined('MOODLE_INTERNAL') || die();
 /**
@@ -439,6 +440,8 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
     }
 
     /**
+     * Fixed options for context and autosave is always false
+     *
      * @param object $context the context the attempt belongs to.
      * @return array options for the editor.
      */
@@ -448,6 +451,10 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
     }
 
     /**
+     * Redunant with the removal of the file submission option
+     *
+     * @todo remove calls to this then remove this
+     *
      * @param object $context the context the attempt belongs to.
      * @param int $draftitemid draft item id.
      * @return array filepicker options for the editor.
@@ -457,6 +464,10 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
     }
 
     /**
+     * Redundant with the removal of file submission
+     *
+     * @todo remove along with calls to it
+     *
      * @param string $inputname input field name.
      * @param int $draftitemid draft file area itemid.
      * @return string HTML for the filepicker, if used.
@@ -486,6 +497,7 @@ class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_
 
     protected function prepare_response($name, question_attempt $qa,
             question_attempt_step $step, $context) {
+                xdebug_break();
         if (!$step->has_qt_var($name)) {
             return '';
         }
@@ -541,6 +553,9 @@ class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_
     }
 
     /**
+     * Probably redunant with the removal of file submission as a response
+     * @todo     remove calls to this then remove this
+     *
      * @param object $context the context the attempt belongs to.
      * @param int $draftitemid draft item id.
      * @return array filepicker options for the editor.
@@ -549,6 +564,14 @@ class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_
         return question_utils::get_filepicker_options($context, $draftitemid);
     }
 
+    /**
+     * Redundant with the removal of the file submission option
+     * @todo remove calls and this function
+     *
+     * @param string $inputname
+     * @param int $draftitemid
+     * @return string
+     */
     protected function filepicker_html($inputname, $draftitemid) {
         $nonjspickerurl = new moodle_url('/repository/draftfiles_manager.php', array(
             'action' => 'browse',
@@ -646,8 +669,9 @@ class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_ba
 
 
 /**
- * An aitext format renderer for aitexts where the student should use a plain
- * input box with a monospaced font. You might use this, for example, for a
+ * An aitext format renderer for aitexts for plain input
+ *
+ * With an input box with a monospaced font. You might use this, for example, for a
  * question where the students should type computer code.
  *
  * @copyright  2011 The Open University

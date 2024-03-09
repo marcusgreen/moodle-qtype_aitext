@@ -42,7 +42,7 @@ class qtype_aitext_test_helper extends question_test_helper {
      * Make an aitext question for testing
      * @param array $options
      * @return qtype_aitext_question
-    */
+     */
     public static function make_aitext_question(array $options) {
         $optionsparam = [
             'questiontext' => $options['questiontext'] ?? '',
@@ -161,6 +161,10 @@ class qtype_aitext_test_helper extends question_test_helper {
         return $q;
     }
 
+    /**
+     * Create a aitext question with a response template for testing
+     * @return qtype_aitext_question
+     */
     public function make_aitext_question_responsetemplate() {
         $q = $this->initialise_aitext_question();
         $q->responsetemplate = 'Once upon a time';

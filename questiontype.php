@@ -45,7 +45,12 @@ class qtype_aitext extends question_type {
     public function is_manual_graded() {
         return true;
     }
-
+    /**
+     * Probably redundant with the removal of
+     * files as a response type
+     *
+     * @return array
+     */
     public function response_file_areas() {
         return array('attachments', 'answer');
     }
@@ -62,6 +67,12 @@ class qtype_aitext extends question_type {
         parent::get_question_options($question);
     }
 
+    /**
+     * Markscheme may not be required here
+     *
+     * @param stdClass $fromform
+     * @return void
+     */
     public function save_defaults_for_new_questions(stdClass $fromform): void {
         parent::save_defaults_for_new_questions($fromform);
         $this->set_default_value('responseformat', $fromform->responseformat);
@@ -147,8 +158,10 @@ class qtype_aitext extends question_type {
     }
 
     /**
-     * @return array the different response formats that the question type supports.
+     * The different response formats that the question type supports.
      * internal name => human-readable name.
+     *
+     * @return array
      */
     public function response_formats() {
         return array(
@@ -159,7 +172,9 @@ class qtype_aitext extends question_type {
     }
 
     /**
-     * @return array the choices that should be offerd when asking if a response is required
+     * The choices that should be offerd when asking if a response is required
+     *
+     * @return array
      */
     public function response_required_options() {
         return array(
@@ -169,7 +184,9 @@ class qtype_aitext extends question_type {
     }
 
     /**
-     * @return array the choices that should be offered for the input box size.
+     * The choices that should be offered for the input box size.
+     *
+     * @return array
      */
     public function response_sizes() {
         $choices = [
@@ -300,14 +317,26 @@ class qtype_aitext extends question_type {
 
         return $output;
     }
+    /**
+     * Editing form text fields
+     *
+     * @return string[]
+     */
     public function get_text_fields() {
-        return array('graderinfo',
-                     'responsetemplate',
-                     'responsesample',
-                     'correctfeedback',
-                     'incorrectfeedback',
-                     'partiallycorrectfeedback');
+        return [
+                'graderinfo',
+                'responsetemplate',
+                'responsesample',
+                'correctfeedback',
+                'incorrectfeedback',
+                'partiallycorrectfeedback'
+        ];
     }
+    /**
+     * Thrown on error   when exporting xml
+     * @param mixed $cmid
+     * @return string
+     */
     protected function export_errorcmid($cmid) {
         global $PAGE;
         if ($PAGE && $PAGE->course && $cmid) {

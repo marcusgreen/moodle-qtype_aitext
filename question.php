@@ -93,6 +93,11 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public $markscheme;
 
+    /**
+     * Question attempt step
+     *
+     * @var mixed
+     */
     public $step;
 
     /** @var int */
@@ -200,13 +205,13 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         return $translation;
     }
     /**
-     *
+     * Fake manual grading
      *
      * @param string $name
      * @param string $value
      * @return void
      */
-    protected function insert_attempt_step_data(string $name, string $value ) {
+    protected function insert_attempt_step_data(string $name, string $value ) :void {
         global $DB;
         $data = [
             'attemptstepid' => $this->step->get_id(),
@@ -217,7 +222,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     }
 
     /**
-     * @param moodle_page the page we are outputting to.
+     * Possibly redundant, a legacy from filesubmission
+     *
+     * @param moodle_page $page     the page we are outputting to.
      * @return renderer_base the response-format-specific renderer.
      */
     public function get_format_renderer(moodle_page $page) {
@@ -356,6 +363,17 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 $prevresponse, $newresponse, 'attachments'));
     }
 
+    /**
+     *  Checks whether the users is allow to be served a particular file.
+     *
+     * @param question_attempt $qa
+     * @param question_display_options $options
+     * @param string $component
+     * @param string $filearea
+     * @param array $args
+     * @param bool $forcedownload
+     * @return bool
+     */
     public function check_file_access($qa, $options, $component, $filearea, $args, $forcedownload) {
         if ($component == 'question' && $filearea == 'response_attachments') {
             // Response attachments visible if the question has them.
