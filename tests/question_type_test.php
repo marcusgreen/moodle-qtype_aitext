@@ -34,6 +34,11 @@ require_once($CFG->dirroot . '/question/type/aitext/questiontype.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class question_type_test extends \advanced_testcase {
+    /**
+     * Always aitext
+     *
+     * @var mixed
+     */
     protected $qtype;
 
     protected function setUp(): void {
@@ -44,13 +49,21 @@ class question_type_test extends \advanced_testcase {
         $this->qtype = null;
     }
 
+    /**
+     * Get data skeleton
+     * @todo consolidate into another earlier function
+     *
+     * @return \stdClass
+     */
     protected function get_test_question_data() {
         $q = new \stdClass();
         $q->id = 1;
-
         return $q;
     }
     /**
+     * Expanded version of name
+     * @todo confirm and perhaps put more detail into this comment
+     *
      * @covers ::name()
      *
      * @return void
@@ -61,11 +74,11 @@ class question_type_test extends \advanced_testcase {
         $this->assertEquals($this->qtype->name(), 'aitext');
     }
     /**
-     * @covers ::can_analyst_responses()
+     * Does can_analyse_response work (it will always be false for this qtype)
+     *
+     * @covers ::can_analyse_responses()
      *
      * @return void
-     * @throws InvalidArgumentException
-     * @throws ExpectationFailedException
      */
     public function test_can_analyse_responses() {
         $this->assertFalse($this->qtype->can_analyse_responses());

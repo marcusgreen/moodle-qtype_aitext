@@ -331,6 +331,7 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
         $labelbyid = $qa->get_qt_field_name($name) . '_label';
         $responselabel = $this->displayoptions->add_question_identifier_to_label(get_string('answertext', 'qtype_aitext'));
         $output = html_writer::tag('h4', $responselabel, ['id' => $labelbyid, 'class' => 'sr-only']);
+        xdebug_break();
         $output .= html_writer::tag('div', $this->prepare_response($name, $qa, $step, $context), [
             'role' => 'textbox',
             'aria-readonly' => 'true',
@@ -495,9 +496,16 @@ class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_
         return 'qtype_aitext_editorfilepicker';
     }
 
+    /**
+     * Ensure safe html is returned (?)
+     * @param string $name
+     * @param question_attempt $qa
+     * @param question_attempt_step $step
+     * @param object $context
+     * @return string
+     */
     protected function prepare_response($name, question_attempt $qa,
             question_attempt_step $step, $context) {
-                xdebug_break();
         if (!$step->has_qt_var($name)) {
             return '';
         }
@@ -509,6 +517,14 @@ class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_
         return format_text($text, $step->get_qt_var($name . 'format'), $formatoptions);
     }
 
+    /**
+     * Process any images included with the text (?)
+     *
+     * @param string $name
+     * @param question_attempt_step $step
+     * @param object $context
+     * @return void
+     */
     protected function prepare_response_for_editing($name,
             question_attempt_step $step, $context) {
         return $step->prepare_response_files_draft_itemid_with_text(

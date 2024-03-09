@@ -15,11 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ *
  * Question type class for the aitext question type.
  *
  * @package    qtype_aitext
  * @subpackage aitext
- * @author     Marcus Green
+ * @copyright  Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -125,7 +126,7 @@ class qtype_aitext extends question_type {
     /**
      * Called when previewing a question or when displayed in a quiz
      *  (not from within the editing form)
-     * @param qtype_aitext_question $question
+     * @param question_definition $question
      * @param object $questiondata
      * @return void
      */
@@ -200,7 +201,10 @@ class qtype_aitext extends question_type {
     }
 
     /**
-     * @return array the choices that should be offered for the number of attachments.
+     * The choices that should be offered for the number of attachments.
+     * @todo remove method and calls to it as file is no longer a submit option
+     *
+     * @return array
      */
     public function attachment_options() {
         return array(
@@ -213,7 +217,10 @@ class qtype_aitext extends question_type {
     }
 
     /**
-     * @return array the choices that should be offered for the number of required attachments.
+     * The choices that should be offered for the number of required attachments.
+     * @todo remove as file has been removed as a submission type
+     *
+     * @return array
      */
     public function attachments_required_options() {
         return array(
