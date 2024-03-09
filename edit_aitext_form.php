@@ -31,7 +31,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_edit_form extends question_edit_form {
-
+    /**
+     * Add aitext specific form fields for editing
+     *
+     * @param object $mform
+     * @return void
+     */
     protected function definition_inner($mform) {
         /** @var qtype_aitext $qtype */
         $qtype = question_bank::get_qtype('aitext');
@@ -95,6 +100,12 @@ class qtype_aitext_edit_form extends question_edit_form {
                 array('rows' => 10), $this->editoroptions);
     }
 
+    /**
+     * Perform any preprocessing needed on the data passed in
+     * before it is used to initialise the form.
+     * @param object $question the data being passed to the form.
+     * @return object $question the modified data.
+     */
     protected function data_preprocessing($question) {
         $question = parent::data_preprocessing($question);
 
@@ -118,8 +129,16 @@ class qtype_aitext_edit_form extends question_edit_form {
         return $question;
     }
 
-    public function validation($fromform, $files) {
-        $errors = parent::validation($fromform, $files);
+    /**
+     * Check the question text is valid, specifically that
+     * any word limits make sense.
+     *
+     * @param array $fromform
+     * @param array $data
+     * @return array
+     */
+    public function validation($fromform, $data) {
+        $errors = parent::validation($fromform, $data);
 
         if (isset($fromform['minwordenabled'])) {
             if (!is_numeric($fromform['minwordlimit'])) {
@@ -153,6 +172,10 @@ class qtype_aitext_edit_form extends question_edit_form {
         return $errors;
     }
 
+    /**
+     * Name of this question type
+     * @return string
+     */
     public function qtype() {
         return 'aitext';
     }

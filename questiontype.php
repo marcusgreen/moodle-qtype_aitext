@@ -35,6 +35,13 @@ require_once($CFG->libdir . '/questionlib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext extends question_type {
+
+    /**
+     * Question type is manually graded, though with this type it is
+     * marked by the AI/LLM system
+     *
+     * @return bool
+     */
     public function is_manual_graded() {
         return true;
     }
@@ -42,7 +49,12 @@ class qtype_aitext extends question_type {
     public function response_file_areas() {
         return array('attachments', 'answer');
     }
-
+    /**
+     * Loads the question type specific options for the question
+     *
+     * @param object $question
+     * @return bool
+     */
     public function get_question_options($question) {
         global $DB;
         $question->options = $DB->get_record('qtype_aitext',
@@ -56,7 +68,12 @@ class qtype_aitext extends question_type {
         $this->set_default_value('responsefieldlines', $fromform->responsefieldlines);
         $this->set_default_value('markscheme', $fromform->markscheme);
     }
-
+    /**
+     * Write the question data from the editing form to the database
+     *
+     * @param object $formdata
+     * @return object
+     */
     public function save_question_options($formdata) {
         global $DB;
         $context = $formdata->context;
@@ -95,11 +112,11 @@ class qtype_aitext extends question_type {
         $DB->update_record('qtype_aitext', $options);
     }
     /**
-     *
-     * @param qtype_aitext $question
+     * Called when previewing a question or when displayed in a quiz
+     *  (not from within the editing form)
+     * @param qtype_aitext_question $question
      * @param object $questiondata
      * @return void
-     * @throws coding_exception
      */
     protected function initialise_question_instance(question_definition $question, $questiondata) {
         parent::initialise_question_instance($question, $questiondata);
@@ -115,7 +132,13 @@ class qtype_aitext extends question_type {
         $question->aiprompt = $questiondata->options->aiprompt;
         $question->markscheme = $questiondata->options->markscheme;
     }
-
+    /**
+     * Delete a question from the database
+     *
+     * @param int $questionid
+     * @param int $contextid
+     * @return void
+     */
     public function delete_question($questionid, $contextid) {
         global $DB;
 

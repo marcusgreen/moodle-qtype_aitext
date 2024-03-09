@@ -294,17 +294,17 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
     }
 
-    /* *
-    *if you are moving from viewing one question to another this will
-    * discard the processing if the answer has not changed. If you don't
-    * use this method it will constantantly generate new question steps and
-    * the question will be repeatedly set to incomplete. This is a comparison of
-    * the equality of two arrays.
-
-    * @param array $prevresponse
-    * @param array $newresponse
-    * @return bool
-    */
+    /**
+     * If you are moving from viewing one question to another this will
+     * discard the processing if the answer has not changed. If you don't
+     * use this method it will constantantly generate new question steps and
+     * the question will be repeatedly set to incomplete. This is a comparison of
+     * the equality of two arrays.
+     *
+     * @param array $prevresponse
+     * @param array $newresponse
+     * @return bool
+     */
     public function is_same_response(array $prevresponse, array $newresponse) {
         if (array_key_exists('answer', $prevresponse) && $prevresponse['answer'] !== $this->responsetemplate) {
             $value1 = (string) $prevresponse['answer'];
