@@ -40,6 +40,8 @@ class question_test extends \advanced_testcase {
 
 
     /**
+     * Tests the call to the quesitonbase summary code
+     *
      * @covers ::get_question_summary()
      * @return void
      * @throws coding_exception
@@ -74,6 +76,7 @@ class question_test extends \advanced_testcase {
 
 
     /**
+     * Test aitext is_same_response, used when scrolling beween questions
      *
      * @covers ::is_same_response()
      *
@@ -127,6 +130,8 @@ class question_test extends \advanced_testcase {
 
 
     /**
+     * Test aitext is_same_response, used when scrolling beween questions
+     *
      * @covers ::is_same_response_with_template()
      */
     public function test_is_same_response_with_template() {

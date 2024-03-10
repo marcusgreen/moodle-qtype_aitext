@@ -85,6 +85,10 @@ class question_type_test extends \advanced_testcase {
     }
 
     /**
+     * An estimate of the score a student would get by guessing randomly.
+     * Which unlike a multi choice or similar would be zero or very close to.
+     * Used by statistics calculation rather than the actual qtype.
+     *
      * @covers ::get_radom_guess_score()
      *
      * @return void

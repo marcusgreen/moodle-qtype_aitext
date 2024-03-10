@@ -15,12 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * aitext question renderer class. Based on core Moodle qtype_essay
- * which has its origins at the UK Open University
+ * Based on core Moodle qtype_essay originating at the UK Open University
  *
  * @package    qtype_aitext
  * @subpackage aitext
- * @author     2023 Marcus Green
+ * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Generates the output for aitext questions.
  *
- * @author     2023 Marcus Green
+ * @copyright  2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_renderer extends qtype_renderer {
@@ -247,10 +246,10 @@ class qtype_aitext_renderer extends qtype_renderer {
 
 
 /**
- * A base class to abstract out the differences between different type of
- * response format.
+ * Abstract out the differences between different type of response format.
  *
- * @copyright  2011 The Open University
+ *
+ * @copyright  2024
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
@@ -301,8 +300,7 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
 }
 
 /**
- * An aitext format renderer for aitexts where the student should use the HTML
- * editor without the file picker.
+ * Where the student use the HTML editor
  *
  * @author     Marcus Green 2024 building on work by the UK OU
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -480,8 +478,9 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
 
 
 /**
- * An aitext format renderer for aitexts where the student should use the HTML
- * editor with the file picker.
+ * Use the HTML editor with the file picker.
+ *
+ * @todo remove along with calls to it as file submission is not supported
  *
  * @copyright  2011 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -609,10 +608,9 @@ class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_
 
 
 /**
- * An aitext format renderer for aitexts where the student should use a plain
- * input box, but with a normal, proportional font.
+ * For aitexts with a plain text input box but with a proportional font
  *
- * @copyright  2011 The Open University
+ * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_base {
