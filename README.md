@@ -3,8 +3,9 @@
 This is a fork of the core essay question type which can use the ChatGPT Large language model to give automatic feedback and marking for submitted responses.
 
 
-It requires a paid for ChatGPT api account which will give access to ChatGPT4. Accounts are available from https://platform.openai.com. It depends on the the Chat GPT Connector plugin which is available from
-https://moodle.org/plugins/local_ai_connector
+It requires either a paid for ChatGPT api account which will give access to ChatGPT4 or Ollama hosted Large Language Model. Accounts are available from https://platform.openai.com, Ollama is available from https://github.com/ollama/ollama. It depends on the Moodle aiconnect tool which is available from 
+
+https://github.com/marcusgreen/moodle-tool_aiconnect
 
 ## Prompting
 It is currently limited to the immediate feedback quesiton behaviour. It requires the creation of a prompt to evaluate the text according to its purpose. For example to confirm the grammar in English the following can be used.
@@ -19,7 +20,7 @@ Although it is based on a clone of the core esssay question type with lots of in
 images in the question display may not work. It will only work with the immediate feedback question behaviour.
 
 ## Roadmap
-Support other LLM systems. Supporting a self hosted LLM will ensure data sovereignty
+~~Support other LLM systems. Supporting a self hosted LLM will ensure data sovereignty~~ done
 
 Cron based evaluation. Allow for slow LLM systems by marking on a cron timer
 
