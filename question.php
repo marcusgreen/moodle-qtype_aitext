@@ -134,7 +134,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return void
      */
     public function grade_response(array $response) : array {
-        $ai = new ai\ai('gpt-4');
+        $ai = new ai\ai();
         if (is_array($response)) {
             $prompt = 'in [[' . strip_tags($response['answer']) . ']]';
             $prompt .= ' analyse the part between [[ and ]] as follows: ';
@@ -156,7 +156,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $contentobject->feedback = preg_replace(array('/\[\[/', '/\]\]/'), '"', $contentobject->feedback);
 
         $contentobject->feedback .= ' '.$this->llm_translate(get_config('qtype_aitext', 'disclaimer'));
-
+        xdebug_break();
         // If there are no marks, write the feedback and set to needs grading .
         if (is_null($contentobject->marks)) {
             $grade = [0 => 0, question_state::$needsgrading];

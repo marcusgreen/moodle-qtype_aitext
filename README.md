@@ -3,7 +3,7 @@
 This is a fork of the core essay question type which can use the ChatGPT Large language model to give automatic feedback and marking for submitted responses.
 
 
-It requires either a paid for ChatGPT api account which will give access to ChatGPT4 or Ollama hosted Large Language Model. Accounts are available from https://platform.openai.com, Ollama is available from https://github.com/ollama/ollama. It depends on the Moodle aiconnect tool which is available from 
+It requires either a paid for ChatGPT api account which will give access to ChatGPT4 or Ollama hosted Large Language Model. Accounts are available from https://platform.openai.com, Ollama is available from https://github.com/ollama/ollama. It depends on the Moodle aiconnect tool which is available from
 
 https://github.com/marcusgreen/moodle-tool_aiconnect
 
@@ -21,6 +21,8 @@ images in the question display may not work. It will only work with the immediat
 
 ## Roadmap
 ~~Support other LLM systems. Supporting a self hosted LLM will ensure data sovereignty~~ done
+
+Moderation: Do not show ai feedback until previewed and approved by a teache
 
 Cron based evaluation. Allow for slow LLM systems by marking on a cron timer
 
