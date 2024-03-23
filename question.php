@@ -156,7 +156,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $contentobject->feedback = preg_replace(array('/\[\[/', '/\]\]/'), '"', $contentobject->feedback);
 
         $contentobject->feedback .= ' '.$this->llm_translate(get_config('qtype_aitext', 'disclaimer'));
-        xdebug_break();
         // If there are no marks, write the feedback and set to needs grading .
         if (is_null($contentobject->marks)) {
             $grade = [0 => 0, question_state::$needsgrading];

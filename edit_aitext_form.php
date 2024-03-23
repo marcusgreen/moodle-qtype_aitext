@@ -55,8 +55,11 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->setType('markscheme', PARAM_RAW);
         $mform->addHelpButton('markscheme', 'markscheme', 'qtype_aitext');
 
+        $mform->addElement('html', '<div class="hidden">');
         $mform->addElement('editor', 'generalfeedback', get_string('generalfeedback', 'question')
         , ['rows' => 10], $this->editoroptions);
+        $mform->addElement('html', '</div>');
+
         $mform->addElement('header', 'responseoptions', get_string('responseoptions', 'qtype_aitext'));
         $mform->setExpanded('responseoptions');
 
