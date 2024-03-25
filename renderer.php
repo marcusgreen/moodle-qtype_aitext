@@ -128,17 +128,30 @@ class qtype_aitext_renderer extends qtype_renderer {
      * @return string HTML fragment.
      */
     public function feedback(question_attempt $qa, question_display_options $options) {
-        global $DB;
-        $qaid = $qa->get_step(0)->get_id();
-        $data = [
-            'attemptstepid' => $qaid,
-            'name' => '-aicontent'
-        ];
+
         // Get data written in the question.php grade_response method.
         // This probably should be retrieved by an api call.
         $comment = $qa->get_current_manual_comment();
         if ($this->page->pagetype == 'question-bank-previewquestion-preview') {
-            return $comment[0];
+            if ($comment[0] > '') {
+                $prompt = $qa->get_last_qt_var('-aicontent');
+                $js = '<script>
+                function toggleVisibility(event) {
+                    event.preventDefault();
+                    var text = document.getElementById("fullprompt");
+                    if (text.className === "hidden") {
+                        text.className = "visible";
+                    } else {
+                        text.className = "hidden";
+                    }
+                }
+                </script>';
+                $showprompt = get_string('showprompt', 'qtype_aitext');
+                $js .= '<br/><button onclick="toggleVisibility(event)">'.$showprompt.'</button>';
+                $js .= '<div id="fullprompt" class="hidden">'.$prompt .'</div>';
+                $comment[0] = $comment[0].$js;
+            }
+             return $comment[0];
         }
         return '';
     }

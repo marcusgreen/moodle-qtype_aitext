@@ -135,7 +135,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function grade_response(array $response) : array {
         $ai = new ai\ai();
-        xdebug_break();
         if (is_array($response)) {
             $prompt = 'in [[' . strip_tags($response['answer']) . ']]';
             $prompt .= ' analyse the part between [[ and ]] as follows: ';
@@ -148,7 +147,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             }
             $prompt .= ' '.$this->get_json_prompt();
             $prompt .= ' respond in the language '.current_language();
-
             $llmresponse = $ai->prompt_completion($prompt);
             $content = $llmresponse['response']['choices'][0]['message']['content'];
         }
@@ -165,7 +163,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = array($fraction, question_state::graded_state_for_fraction($fraction));
         }
          // The -aicontent data is used in question preview. Only needs to happen in preview.
-        $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);
+        $this->insert_attempt_step_data('-aicontent', $prompt);
         $this->insert_attempt_step_data('-comment', $contentobject->feedback);
         $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
 
