@@ -135,6 +135,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function grade_response(array $response) : array {
         $ai = new ai\ai();
+        xdebug_break();
         if (is_array($response)) {
             $prompt = 'in [[' . strip_tags($response['answer']) . ']]';
             $prompt .= ' analyse the part between [[ and ]] as follows: ';
