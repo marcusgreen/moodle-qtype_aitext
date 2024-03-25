@@ -131,7 +131,6 @@ class qtype_aitext_renderer extends qtype_renderer {
 
         // Get data written in the question.php grade_response method.
         // This probably should be retrieved by an api call.
-        xdebug_break();
         $comment = $qa->get_current_manual_comment();
         if ($this->page->pagetype == 'question-bank-previewquestion-preview') {
             if ($comment[0] > '') {
