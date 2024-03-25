@@ -131,10 +131,11 @@ class qtype_aitext_renderer extends qtype_renderer {
 
         // Get data written in the question.php grade_response method.
         // This probably should be retrieved by an api call.
+        xdebug_break();
         $comment = $qa->get_current_manual_comment();
         if ($this->page->pagetype == 'question-bank-previewquestion-preview') {
             if ($comment[0] > '') {
-                $prompt = $qa->get_last_qt_var('-aicontent');
+                $prompt = $qa->get_last_qt_var('-aiprompt');
                 $js = '<script>
                 function toggleVisibility(event) {
                     event.preventDefault();
@@ -151,7 +152,7 @@ class qtype_aitext_renderer extends qtype_renderer {
                 $js .= '<div id="fullprompt" class="hidden">'.$prompt .'</div>';
                 $comment[0] = $comment[0].$js;
             }
-             return $comment[0];
+            return $comment[0];
         }
         return '';
     }
@@ -342,7 +343,6 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
         $labelbyid = $qa->get_qt_field_name($name) . '_label';
         $responselabel = $this->displayoptions->add_question_identifier_to_label(get_string('answertext', 'qtype_aitext'));
         $output = html_writer::tag('h4', $responselabel, ['id' => $labelbyid, 'class' => 'sr-only']);
-        xdebug_break();
         $output .= html_writer::tag('div', $this->prepare_response($name, $qa, $step, $context), [
             'role' => 'textbox',
             'aria-readonly' => 'true',

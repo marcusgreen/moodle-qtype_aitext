@@ -163,7 +163,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = array($fraction, question_state::graded_state_for_fraction($fraction));
         }
          // The -aicontent data is used in question preview. Only needs to happen in preview.
-        $this->insert_attempt_step_data('-aicontent', $prompt);
+        $this->insert_attempt_step_data('-aiprompt', $prompt);
+        $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);
+
         $this->insert_attempt_step_data('-comment', $contentobject->feedback);
         $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
 
