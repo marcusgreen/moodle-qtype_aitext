@@ -169,6 +169,14 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         return $grade;
     }
+    /**
+     *
+     * Convert string json returned from LLM call to an object,
+     * if it is not valid json apend as string to new object
+     *
+     * @param string $feedback
+     * @return \stdClass
+     */
     public function process_feedback(string $feedback) {
         $contentobject = json_decode($feedback);
         if (json_last_error() === JSON_ERROR_NONE) {
