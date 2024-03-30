@@ -148,13 +148,11 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $prompt .= ' '.$this->get_json_prompt();
             $prompt .= ' respond in the language '.current_language();
             $llmresponse = $ai->prompt_completion($prompt);
-            $content = $llmresponse['response']['choices'][0]['message']['content'];
+            $feedback = $llmresponse['response']['choices'][0]['message']['content'];
         }
-        $contentobject = json_decode($content);
-        $contentobject->feedback = trim($contentobject->feedback);
-        $contentobject->feedback = preg_replace(array('/\[\[/', '/\]\]/'), '"', $contentobject->feedback);
 
-        $contentobject->feedback .= ' '.$this->llm_translate(get_config('qtype_aitext', 'disclaimer'));
+        $contentobject = $this->process_feedback($feedback);
+
         // If there are no marks, write the feedback and set to needs grading .
         if (is_null($contentobject->marks)) {
             $grade = [0 => 0, question_state::$needsgrading];
@@ -170,6 +168,20 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
 
         return $grade;
+    }
+    public function process_feedback(string $feedback) {
+        $contentobject = json_decode($feedback);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $contentobject->feedback = trim($contentobject->feedback);
+            $contentobject->feedback = preg_replace(array('/\[\[/', '/\]\]/'), '"', $contentobject->feedback);
+            $contentobject->feedback .= ' '.$this->llm_translate(get_config('qtype_aitext', 'disclaimer'));
+        } else {
+            $contentobject = (object) [
+                                        "feedback" => $feedback,
+                                        "marks" => null
+                                        ];
+        }
+        return $contentobject;
     }
     /**
      * Get the LLM string that tells it to return the result as json

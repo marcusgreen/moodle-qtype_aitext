@@ -17,6 +17,8 @@
 namespace qtype_aitext;
 
 use coding_exception;
+use dml_exception;
+use moodle_exception;
 use PHPUnit\Framework\ExpectationFailedException;
 use question_attempt_step;
 use question_display_options;
@@ -28,6 +30,7 @@ global $CFG;
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 require_once($CFG->dirroot . '/question/type/aitext/tests/helper.php');
 use qtype_aitext_test_helper;
+use Random\RandomException;
 
 /**
  * Unit tests for the matching question definition class.
@@ -52,6 +55,29 @@ class question_test extends \advanced_testcase {
             $aitext = qtype_aitext_test_helper::make_aitext_question([]);
             $aitext->questiontext = 'Hello <img src="http://example.com/globe.png" alt="world" />';
             $this->assertEquals('Hello [world]', $aitext->get_question_summary());
+    }
+
+    /**
+     * Check that non valid json returned from the LLM is
+     * dealt with gracefully
+     * @covers ::process_feedback()
+     *
+     * @return void
+     */
+    public function test_get_feedback() {
+          // Create the aitext question under test.
+        $questiontext = 'AI question text';
+        $aitext = qtype_aitext_test_helper::make_aitext_question(['questiontext' => $questiontext]);
+        $testdata = [
+                "feedback" => "Feedback text",
+                "marks" => 0
+                ];
+        $goodjson = json_encode($testdata);
+        $feedback = $aitext->process_feedback($goodjson);
+        $this->assertIsObject($feedback);
+        $badjson = 'Some random string'. $goodjson;
+        $feedback = $aitext->process_feedback($badjson);
+        $this->assertIsObject($feedback);
     }
 
     /**

@@ -147,7 +147,7 @@ class qtype_aitext_renderer extends qtype_renderer {
                 }
                 </script>';
                 $showprompt = get_string('showprompt', 'qtype_aitext');
-                $js .= '<br/><button onclick="toggleVisibility(event)">'.$showprompt.'</button>';
+                $js .= '<br/><button class="rounded" onclick="toggleVisibility(event)">'.$showprompt.'</button>';
                 $js .= '<div id="fullprompt" class="hidden">'.$prompt .'</div>';
                 $comment[0] = $comment[0].$js;
             }
