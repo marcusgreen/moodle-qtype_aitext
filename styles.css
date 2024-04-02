@@ -18,7 +18,7 @@
     color:inherit;
 }
 
-.que.aitext textarea.qtype_essay_response.qtype_essay_monospaced {
+.que.aitext textarea.qtype_aitext_response.qtype_aitext_monospaced {
     white-space: pre;
     font-family: Andale Mono, Monaco, Courier New, DejaVu Sans Mono, monospace;
 }

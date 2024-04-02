@@ -8,7 +8,7 @@
   </question>
 
 <!-- question: 114000  -->
-  <question type="essay">
+  <question type="aitext">
     <name>
       <text>aitext-001</text>
     </name>

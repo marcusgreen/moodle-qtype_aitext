@@ -27,7 +27,7 @@ require_once($CFG->dirroot . '/question/type/aitext/questiontype.php');
 
 
 /**
- * Unit tests for the essay question type class.
+ * Unit tests for the aitext question type class.
  *
  * @package    qtype_aitext
  * @author     Marcus Green 2023
