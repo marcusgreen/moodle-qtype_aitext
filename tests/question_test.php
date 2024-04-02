@@ -109,7 +109,6 @@ class question_test extends \advanced_testcase {
      * @return void
      */
     public function test_is_same_response() {
-        $aitext = \test_question_maker::make_an_aitext_question();
 
         $aitext = qtype_aitext_test_helper::make_aitext_question([]);
 
