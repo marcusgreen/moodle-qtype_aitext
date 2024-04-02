@@ -89,7 +89,6 @@ class qtype_aitext extends question_type {
     public function save_question_options($formdata) {
         global $DB;
         $context = $formdata->context;
-
         $options = $DB->get_record('qtype_aitext', array('questionid' => $formdata->id));
         if (!$options) {
             $options = new stdClass();
@@ -121,6 +120,7 @@ class qtype_aitext extends question_type {
         $options->graderinfoformat = $formdata->graderinfo['format'];
         $options->responsetemplate = $formdata->responsetemplate['text'];
         $options->responsetemplateformat = $formdata->responsetemplate['format'];
+
         $DB->update_record('qtype_aitext', $options);
     }
     /**
@@ -278,6 +278,12 @@ class qtype_aitext extends question_type {
 
         foreach ($extraquestionfields as $field) {
             $qo->$field = $format->getpath($data, array('#', $field, 0, '#'), '');
+        }
+        // TODO add in other text fields.
+        $textfields = ['responsetemplate'];
+        foreach ($textfields as $field) {
+            $fmt = $format->get_format($format->getpath($data, array('#', $field.'format', 0, '#'), 0));
+            $qo->$field = $format->import_text_with_files($data, array('#', $field, 0), '', $fmt);
         }
 
         $extraanswersfields = $this->extra_answer_fields();
