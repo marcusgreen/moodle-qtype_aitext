@@ -102,6 +102,7 @@ class qtype_aitext extends question_type {
         $options->responsefieldlines = $formdata->responsefieldlines;
         $options->minwordlimit = isset($formdata->minwordenabled) ? $formdata->minwordlimit : null;
         $options->maxwordlimit = isset($formdata->maxwordenabled) ? $formdata->maxwordlimit : null;
+
         $options->maxbytes = $formdata->maxbytes ?? 0;
         if (is_array($formdata->graderinfo)) {
             // Today find out what it should save and ensure it is available as text not arrays.
@@ -284,6 +285,12 @@ class qtype_aitext extends question_type {
         foreach ($textfields as $field) {
             $fmt = $format->get_format($format->getpath($data, array('#', $field.'format', 0, '#'), 0));
             $qo->$field = $format->import_text_with_files($data, array('#', $field, 0), '', $fmt);
+        }
+        if (isset($qo->maxwordlimit) && $qo->maxwordlimit > "") {
+            $qo->maxwordenabled = true;
+        }
+        if (isset($qo->minwordlimit) && $qo->minwordlimit > "") {
+            $qo->minwordenabled = true;
         }
 
         $extraanswersfields = $this->extra_answer_fields();
