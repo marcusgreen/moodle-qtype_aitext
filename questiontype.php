@@ -24,7 +24,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/questionlib.php');
@@ -105,7 +104,7 @@ class qtype_aitext extends question_type {
 
         $options->maxbytes = $formdata->maxbytes ?? 0;
         if (is_array($formdata->graderinfo)) {
-            // Today find out what it should save and ensure it is available as text not arrays.
+            // TODO find out what it should save and ensure it is available as text not arrays.
             $formdata->graderinfo = [
                 'text' => '',
                 'format' => FORMAT_HTML

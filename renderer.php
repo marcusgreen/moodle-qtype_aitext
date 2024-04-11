@@ -48,15 +48,6 @@ class qtype_aitext_renderer extends qtype_renderer {
         /** @var qtype_aitext_question $question */
         $question = $qa->get_question();
 
-        $istestedwith = [
-            'immediatefeedback'
-        ];
-        $behaviour = $qa->get_behaviour_name();
-        if (!in_array($behaviour, $istestedwith)) {
-            $msg = get_string('untestedquestionbehaviour', 'qtype_aitext');
-            \core\notification::add($msg, \core\notification::WARNING);
-        }
-
         /** @var qtype_aitext_format_renderer_base $responseoutput */
         $responseoutput = $question->get_format_renderer($this->page);
         $responseoutput->set_displayoptions($options);
