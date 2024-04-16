@@ -136,17 +136,19 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     public function grade_response(array $response) : array {
         $ai = new ai\ai();
         if (is_array($response)) {
-            $prompt = 'in [[' . strip_tags($response['answer']) . ']]';
-            $prompt .= ' analyse the part between [[ and ]] as follows: ';
-            $prompt .= $this->aiprompt;
-
-            if ($this->markscheme > '') {
+            $responsetext = strip_tags($response['answer']);
+            $responsetext = '[['.$responsetext.']]';
+            $prompt = get_config('qtype_aitext','prompt');
+            $prompt = preg_replace("/\[responsetext\]/", $responsetext, $prompt);
+            $prompt .= ' '.trim($this->aiprompt);            if ($this->markscheme > '') {
                 $prompt .= ' '.$this->markscheme;
             } else {
                 $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
             }
-            $prompt .= ' '.$this->get_json_prompt();
+
+            $prompt .= ' '.trim(get_config('qtype_aitext','jsonprompt'));
             $prompt .= ' respond in the language '.current_language();
+
             $llmresponse = $ai->prompt_completion($prompt);
             $feedback = $llmresponse['response']['choices'][0]['message']['content'];
         }
@@ -197,9 +199,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return string
      */
     protected function get_json_prompt() :string {
-        return 'Return only a JSON object which enumerates a set of 2  elements.
-        The elements should have properties of "feedback" and "marks".
-        The resulting JSON object should be in this format: {"feedback":"string","marks":"number"}
+        return 'Return only a JSON object where the JSON object is in the this format: {"feedback":"string","marks":"number"}
         where marks is a single value summing all marks.\n\n';
     }
     /**
