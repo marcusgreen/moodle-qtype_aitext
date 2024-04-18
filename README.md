@@ -2,6 +2,8 @@
 
 This is a fork of the core essay question type which can use the ChatGPT Large language model to give automatic feedback and marking for submitted responses. For custom development and consultancy contact Moodle Partner Catalyst EU (https://www.catalyst-eu.net/).
 
+If you are a Moodle developer and you use vscode/vscodium you should consider this plugin https://marketplace.visualstudio.com/items?itemName=LMSCloud.mdlcode
+
 It requires either a paid for ChatGPT api account which will give access to ChatGPT4 or Ollama hosted Large Language Model. Accounts are available from https://platform.openai.com, Ollama is available from https://github.com/ollama/ollama. It depends on the Moodle aiconnect tool which is available from
 
 https://github.com/marcusgreen/moodle-tool_aiconnect
