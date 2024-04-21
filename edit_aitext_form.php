@@ -48,11 +48,13 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addElement('textarea', 'aiprompt', get_string('aiprompt', 'qtype_aitext'),
              ['maxlen' => 50, 'rows' => 5, 'size' => 30]);
         $mform->setType('aiprompt', PARAM_RAW);
+        $mform->setDefault('aiprompt', get_config('qtype_aitext', 'thedefaultprompt'));
         $mform->addHelpButton('aiprompt', 'aiprompt', 'qtype_aitext');
 
         $mform->addElement('textarea', 'markscheme', get_string('markscheme', 'qtype_aitext'),
              ['maxlen' => 50, 'rows' => 6, 'size' => 30]);
         $mform->setType('markscheme', PARAM_RAW);
+        $mform->setDefault('markscheme', get_config('qtype_aitext', 'thedefaultmarksscheme'));
         $mform->addHelpButton('markscheme', 'markscheme', 'qtype_aitext');
 
         $mform->addElement('html', '<div class="hidden">');

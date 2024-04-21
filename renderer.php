@@ -83,7 +83,7 @@ class qtype_aitext_renderer extends qtype_renderer {
         }
 
         $files = '';
-        if ($question->attachments) {
+        if (isset($question->attachments) && $question->attachments) {
             if (empty($options->readonly)) {
                 $files = $this->files_input($qa, $question->attachments, $options);
 
