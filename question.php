@@ -141,6 +141,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $prompt .= $this->aiprompt;
 
             if ($this->markscheme > '') {
+                //Tell the LLM how to mark the submission
+                $prompt .= " The total score is: $this->defaultmark .";
                 $prompt .= ' '.$this->markscheme;
             } else {
                 $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
