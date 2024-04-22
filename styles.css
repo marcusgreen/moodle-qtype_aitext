@@ -38,3 +38,11 @@
 .que.aitext .ablock .filemanager .fp-restrictions {
     margin-top: 1em;
 }
+.qtype_aitext_sampleanswereval {
+    font-size: 12pt;
+    margin: 3px;
+    padding: 3px;
+    width: 100%;
+    max-width: 800px;
+    background-color: #DDDDDD;
+}

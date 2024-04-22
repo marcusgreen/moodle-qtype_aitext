@@ -15,20 +15,37 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for the essay question type.
+ * AI Text question type upgrade code.
  *
- * @package    qtype_aitext
- * @subpackage essay
- * @copyright  2005 Mark Nielsen
+ * @package    qtype
+ * @subpackage aitext
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'qtype_aitext';
-$plugin->version   = 2024042201;
-$plugin->requires  = 2020110900;
-$plugin->maturity  = MATURITY_BETA;
-$plugin->dependencies = [
-    'tool_aiconnect' => ANY_VERSION
-];
+/**
+ * Upgrade code for the aitext question type.
+ *
+ * @param int $oldversion the version we are upgrading from.
+ */
+function xmldb_qtype_aitext_upgrade($oldversion) {
+    global $CFG, $DB;
+
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2024042201) {
+
+        $table = new xmldb_table('qtype_aitext');
+        $field = new xmldb_field('sampleanswer', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // cloudpoodll savepoint reached
+        upgrade_plugin_savepoint(true, 2024042201, 'qtype', 'aitext');
+
+    }
+
+    return true;
+}

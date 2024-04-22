@@ -136,20 +136,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     public function grade_response(array $response) : array {
         $ai = new ai\ai();
         if (is_array($response)) {
-            $prompt = 'in [[' . strip_tags($response['answer']) . ']]';
-            $prompt .= ' analyse the part between [[ and ]] as follows: ';
-            $prompt .= $this->aiprompt;
-
-            if ($this->markscheme > '') {
-                //Tell the LLM how to mark the submission
-                $prompt .= " The total score is: $this->defaultmark .";
-                $prompt .= ' '.$this->markscheme;
-            } else {
-                $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
-            }
-            $prompt .= ' '.$this->get_json_prompt();
-            $prompt .= ' respond in the language '.current_language();
-            $llmresponse = $ai->prompt_completion($prompt);
+            $full_ai_prompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt, $this->defaultmark, $this->markscheme);
+            $llmresponse = $ai->prompt_completion($full_ai_prompt);
             $feedback = $llmresponse['response']['choices'][0]['message']['content'];
         }
 
@@ -163,13 +151,32 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = array($fraction, question_state::graded_state_for_fraction($fraction));
         }
          // The -aicontent data is used in question preview. Only needs to happen in preview.
-        $this->insert_attempt_step_data('-aiprompt', $prompt);
+        $this->insert_attempt_step_data('-aiprompt', $full_ai_prompt);
         $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);
 
         $this->insert_attempt_step_data('-comment', $contentobject->feedback);
         $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
 
         return $grade;
+    }
+
+    public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme) {
+
+        $prompt = 'in [[' . strip_tags($response) . ']]';
+        $prompt .= ' analyse the part between [[ and ]] as follows: ';
+        $prompt .= $aiprompt;
+
+        if ($markscheme > '') {
+            //Tell the LLM how to mark the submission
+            $prompt .= " The total score is: $defaultmark .";
+            $prompt .= ' '.$markscheme;
+        } else {
+            $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
+        }
+        $prompt .= ' '. $this->get_json_prompt();
+        $prompt .= ' respond in the language '.current_language();
+        return $prompt;
+
     }
     /**
      *
