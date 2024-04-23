@@ -138,16 +138,16 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (is_array($response)) {
             $responsetext = strip_tags($response['answer']);
             $responsetext = '[['.$responsetext.']]';
-            $prompt = get_config('qtype_aitext','prompt');
+            $prompt = get_config('qtype_aitext', 'prompt');
             $prompt = preg_replace("/\[responsetext\]/", $responsetext, $prompt);
             $prompt .= ' '.trim($this->aiprompt);            if ($this->markscheme > '') {
                 $prompt .= ' '.$this->markscheme;
             } else {
-                /** @todo should this be a plugin setting value? */
+                // Todo should this be a plugin setting value?.
                 $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
             }
 
-            $prompt .= ' '.trim(get_config('qtype_aitext','jsonprompt'));
+            $prompt .= ' '.trim(get_config('qtype_aitext', 'jsonprompt'));
             $prompt .= ' respond in the language '.current_language();
 
             $llmresponse = $ai->prompt_completion($prompt);
@@ -161,7 +161,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = [0 => 0, question_state::$needsgrading];
         } else {
             $fraction = $contentobject->marks / $this->defaultmark;
-            $grade = array($fraction, question_state::graded_state_for_fraction($fraction));
+            $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
          // The -aicontent data is used in question preview. Only needs to happen in preview.
         $this->insert_attempt_step_data('-aiprompt', $prompt);
@@ -189,7 +189,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         } else {
             $contentobject = (object) [
                                         "feedback" => $feedback,
-                                        "marks" => null
+                                        "marks" => null,
                                         ];
         }
         return $contentobject;

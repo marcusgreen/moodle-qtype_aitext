@@ -24,22 +24,30 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_configtext('qtype_aitext/disclaimer',
-            new lang_string('disclaimer', 'qtype_aitext'),
-            new lang_string('disclaimer_setting', 'qtype_aitext'),
-            '(Response provided by ChatGPT)'));
-    $settings->add(new admin_setting_configtextarea('qtype_aitext/prompt',
-            new lang_string('prompt', 'qtype_aitext'),
-            new lang_string('prompt_setting', 'qtype_aitext'),
-            'in [responsetext] analyse the part between [[ and ]] as follows.',
-			PARAM_RAW,20,3));
-	$settings->add(new admin_setting_configtextarea('qtype_aitext/jsonprompt',
-            new lang_string('jsonprompt', 'qtype_aitext'),
-            new lang_string('jsonprompt_setting', 'qtype_aitext'),
-            'Return only a JSON object which enumerates a set of 2 elements.The JSON object should be in
+    $settings->add(new admin_setting_configtext(
+        'qtype_aitext/disclaimer',
+        new lang_string('disclaimer', 'qtype_aitext'),
+        new lang_string('disclaimer_setting', 'qtype_aitext'),
+        '(Response provided by ChatGPT)'
+    ));
+    $settings->add(new admin_setting_configtextarea(
+        'qtype_aitext/prompt',
+        new lang_string('prompt', 'qtype_aitext'),
+        new lang_string('prompt_setting', 'qtype_aitext'),
+        'in [responsetext] analyse the part between [[ and ]] as follows.',
+        PARAM_RAW,
+        20,
+        3
+    ));
+    $settings->add(new admin_setting_configtextarea(
+        'qtype_aitext/jsonprompt',
+        new lang_string('jsonprompt', 'qtype_aitext'),
+        new lang_string('jsonprompt_setting', 'qtype_aitext'),
+        'Return only a JSON object which enumerates a set of 2 elements.The JSON object should be in
 			this format: {feedback":"string","marks":"number"} where marks is a single value summing all marks.',
-        	PARAM_RAW, 20, 6
-	));
-
+        PARAM_RAW,
+        20,
+        6
+    ));
 }
 
