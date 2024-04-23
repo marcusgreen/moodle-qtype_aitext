@@ -143,6 +143,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $prompt .= ' '.trim($this->aiprompt);            if ($this->markscheme > '') {
                 $prompt .= ' '.$this->markscheme;
             } else {
+                /** @todo should this be a plugin setting value? */
                 $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
             }
 
@@ -193,15 +194,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
         return $contentobject;
     }
-    /**
-     * Get the LLM string that tells it to return the result as json
-     *
-     * @return string
-     */
-    protected function get_json_prompt() :string {
-        return 'Return only a JSON object where the JSON object is in the this format: {"feedback":"string","marks":"number"}
-        where marks is a single value summing all marks.\n\n';
-    }
+
     /**
      * Translate into the current language and
      * store in a cache
