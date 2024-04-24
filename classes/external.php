@@ -66,7 +66,7 @@ class qtype_aitext_external extends external_api
     {
         return new external_single_structure([
             'feedback' => new external_value(PARAM_TEXT, 'text feedback for display to student', VALUE_DEFAULT),
-            'marks' => new external_value(PARAM_INT, 'AI grader awarded marks for student response', VALUE_DEFAULT),
+            'marks' => new external_value(PARAM_FLOAT, 'AI grader awarded marks for student response', VALUE_DEFAULT),
         ]);
 
     }
