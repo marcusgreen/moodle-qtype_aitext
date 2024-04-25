@@ -23,7 +23,7 @@ images in the question display may not work. It will only work with the immediat
 ## Roadmap
 ~~Support other LLM systems. Supporting a self hosted LLM will ensure data sovereignty~~ done
 
-Moderation: Do not show ai feedback until previewed and approved by a teache
+Moderation: Do not show ai feedback until previewed and approved by a teacher
 
 Cron based evaluation. Allow for slow LLM systems by marking on a cron timer
 
