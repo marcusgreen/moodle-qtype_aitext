@@ -24,14 +24,12 @@
  */
 
 $string['acceptedfiletypes'] = 'Accepted file types';
-$string['acceptedfiletypes_help'] = 'Accepted file types can be restricted by entering a list of file extensions. If the field is left empty, then all file types are allowed.';
 
 $string['aiprompt'] = 'AI Prompt';
 $string['aiprompt_help'] = 'A prompt for the Ai Grader. This is the guideline that AI uses to give feedback on the student response.';
 $string['answerfiles'] = 'Answer files';
 $string['answertext'] = 'Answer text';
 $string['attachmentsoptional'] = 'Attachments are optional';
-$string['attachmentsrequired'] = 'Require attachments';
 $string['cachedef_stringdata'] = 'Cachedef stringdata';
 $string['defaultmarksscheme'] = 'Marks scheme';
 $string['defaultmarksscheme_setting'] = 'This will be the default marks scheme for new questions. Questions authors should alter this to suit the question.';
@@ -41,7 +39,6 @@ $string['defaultprompt_setting'] = 'This will be the default AI prompt for new q
 $string['thedefaultprompt'] = 'Explain if there is anything wrong with the grammar and spelling in the text.';
 $string['disclaimer'] = 'Disclaimer';
 $string['disclaimer_setting'] = 'Text appended to each response indicating feedback is from a Large Language Model and not a human';
-$string['attachmentsrequired_help'] = 'This option specifies the minimum number of attachments required for a response to be considered gradable.';
 $string['err_maxminmismatch'] = 'Maximum word limit must be greater than minimum word limit';
 $string['err_maxwordlimit'] = 'Maximum word limit is enabled but is not set';
 $string['err_maxwordlimitnegative'] = 'Maximum word limit cannot be a negative number';
@@ -64,6 +61,10 @@ $string['minwordlimit'] = 'Minimum word limit';
 $string['minwordlimit_help'] = 'If the response requires that students enter text, this is the minimum number of words that each student will be allowed to submit.';
 $string['minwordlimitboundary'] = 'This question requires a response of at least {$a->limit} words and you are attempting to submit {$a->count} words. Please expand your response and try again.';
 $string['nlines'] = '{$a} lines';
+$string['prompt'] = 'Prompt';
+$string['prompt_setting'] = 'Wrapper text for the prompt set to the AI System, [responsetext] is whatever the student typed as an answer. The ai prompt value from the question will be appended to this';
+$string['jsonprompt'] = 'JSon prompt';
+$string['jsonprompt_setting'] = 'Instructions sent to convert the returned value into json';
 $string['pluginname'] = 'AI Text';
 $string['pluginname_help'] = 'In response to a question, the respondent enters text. A response template may be provided. Responses are given a preliminary grade by an AI system (e.g. ChatGPT) then can be graded manually.';
 $string['pluginname_link'] = 'question/type/AI Text';
@@ -81,7 +82,6 @@ $string['privacy:preference:maxbytes'] = 'Maximum file size.';
 $string['responsefieldlines'] = 'Input box size';
 $string['responseformat'] = 'Response format';
 $string['responseoptions'] = 'Response options';
-$string['responserequired'] = 'Require text';
 $string['responsenotrequired'] = 'Text input is optional';
 $string['responseisrequired'] = 'Require the student to enter text';
 $string['responsetemplate'] = 'Response template';

@@ -134,21 +134,27 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return void
      */
     public function grade_response(array $response) : array {
+        if(!$this->is_complete_response($response)) {
+            $grade = [0 => 0, question_state::$needsgrading];
+            return $grade;
+        }
         $ai = new ai\ai();
         if (is_array($response)) {
-            $prompt = 'in [[' . strip_tags($response['answer']) . ']]';
-            $prompt .= ' analyse the part between [[ and ]] as follows: ';
-            $prompt .= $this->aiprompt;
-
+            $responsetext = strip_tags($response['answer']);
+            $responsetext = '[['.$responsetext.']]';
+            $prompt = get_config('qtype_aitext', 'prompt');
+            $prompt = preg_replace("/\[responsetext\]/", $responsetext, $prompt);
+            $prompt .= ' '.trim($this->aiprompt);           
             if ($this->markscheme > '') {
-                // Tell the LLM how to mark the submission.
-                $prompt .= " The total score is: $this->defaultmark .";
                 $prompt .= ' '.$this->markscheme;
             } else {
+                // Todo should this be a plugin setting value?.
                 $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
             }
-            $prompt .= ' '.$this->get_json_prompt();
+
+            $prompt .= ' '.trim(get_config('qtype_aitext', 'jsonprompt'));
             $prompt .= ' respond in the language '.current_language();
+
             $llmresponse = $ai->prompt_completion($prompt);
             $feedback = $llmresponse['response']['choices'][0]['message']['content'];
         }
@@ -160,7 +166,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = [0 => 0, question_state::$needsgrading];
         } else {
             $fraction = $contentobject->marks / $this->defaultmark;
-            $grade = array($fraction, question_state::graded_state_for_fraction($fraction));
+            $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
          // The -aicontent data is used in question preview. Only needs to happen in preview.
         $this->insert_attempt_step_data('-aiprompt', $prompt);
@@ -180,6 +186,11 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return \stdClass
      */
     public function process_feedback(string $feedback) {
+        if (preg_match('/\{[^{}]*\}/', $feedback, $matches)) {
+            // $matches[1] contains the captured text inside the braces
+            $feedback = $matches[0];
+        }
+
         $contentobject = json_decode($feedback);
         if (json_last_error() === JSON_ERROR_NONE) {
             $contentobject->feedback = trim($contentobject->feedback);
@@ -188,22 +199,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         } else {
             $contentobject = (object) [
                                         "feedback" => $feedback,
-                                        "marks" => null
+                                        "marks" => null,
                                         ];
         }
         return $contentobject;
     }
-    /**
-     * Get the LLM string that tells it to return the result as json
-     *
-     * @return string
-     */
-    protected function get_json_prompt() :string {
-        return 'Return only a JSON object which enumerates a set of 2  elements.
-        The elements should have properties of "feedback" and "marks".
-        The resulting JSON object should be in this format: {"feedback":"string","marks":"number"}
-        where marks is a single value summing all marks.\n\n';
-    }
+
     /**
      * Translate into the current language and
      * store in a cache
