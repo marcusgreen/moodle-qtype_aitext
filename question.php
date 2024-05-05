@@ -134,7 +134,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return void
      */
     public function grade_response(array $response) : array {
-        if(!$this->is_complete_response($response)) {
+        if (!$this->is_complete_response($response)) {
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
         }
@@ -144,7 +144,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $responsetext = '[['.$responsetext.']]';
             $prompt = get_config('qtype_aitext', 'prompt');
             $prompt = preg_replace("/\[responsetext\]/", $responsetext, $prompt);
-            $prompt .= ' '.trim($this->aiprompt);           
+            $prompt .= ' '.trim($this->aiprompt);
             if ($this->markscheme > '') {
                 $prompt .= ' '.$this->markscheme;
             } else {
@@ -187,10 +187,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function process_feedback(string $feedback) {
         if (preg_match('/\{[^{}]*\}/', $feedback, $matches)) {
-            // $matches[1] contains the captured text inside the braces
+            // Array $matches[1] contains the captured text inside the braces.
             $feedback = $matches[0];
         }
-
         $contentobject = json_decode($feedback);
         if (json_last_error() === JSON_ERROR_NONE) {
             $contentobject->feedback = trim($contentobject->feedback);

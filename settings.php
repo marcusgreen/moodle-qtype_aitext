@@ -38,13 +38,12 @@ if ($ADMIN->fulltree) {
         new lang_string('defaultmarksscheme', 'qtype_aitext'),
         new lang_string('defaultmarksscheme_setting', 'qtype_aitext'),
         new lang_string('thedefaultmarksscheme', 'qtype_aitext')));
-   
         $settings->add(new admin_setting_configtext(
         'qtype_aitext/disclaimer',
         new lang_string('disclaimer', 'qtype_aitext'),
         new lang_string('disclaimer_setting', 'qtype_aitext'),
         '(Response provided by ChatGPT)'
-    ));
+        ));
     $settings->add(new admin_setting_configtextarea(
         'qtype_aitext/prompt',
         new lang_string('prompt', 'qtype_aitext'),
