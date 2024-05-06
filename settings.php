@@ -38,7 +38,7 @@ if ($ADMIN->fulltree) {
         new lang_string('defaultmarksscheme', 'qtype_aitext'),
         new lang_string('defaultmarksscheme_setting', 'qtype_aitext'),
         new lang_string('thedefaultmarksscheme', 'qtype_aitext')));
-   
+
         $settings->add(new admin_setting_configtext(
         'qtype_aitext/disclaimer',
         new lang_string('disclaimer', 'qtype_aitext'),
@@ -59,7 +59,7 @@ if ($ADMIN->fulltree) {
         new lang_string('jsonprompt', 'qtype_aitext'),
         new lang_string('jsonprompt_setting', 'qtype_aitext'),
         'Return only a JSON object which enumerates a set of 2 elements.The JSON object should be in
-			this format: {feedback":"string","marks":"number"} where marks is a single value summing all marks.',
+			this format: {feedback":"string","marks":"number"} where marks is a single number summing all marks.',
         PARAM_RAW,
         20,
         6
