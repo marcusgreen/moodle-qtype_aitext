@@ -55,6 +55,14 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     /** @var int indicates whether the maximum number of words required */
     public $maxwordlimit;
 
+
+    /**
+     * used in the question editing interface
+     *
+     * @var string
+     */
+    public $sampleanswer;
+
     /**
      * Information on how to manually grade
      *
@@ -140,8 +148,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
         $ai = new ai\ai();
         if (is_array($response)) {
-            $full_ai_prompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt, $this->defaultmark, $this->markscheme);
-            $llmresponse = $ai->prompt_completion($full_ai_prompt);
+            $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
+                 $this->defaultmark, $this->markscheme);
+            $llmresponse = $ai->prompt_completion($fullaiprompt);
             $feedback = $llmresponse['response']['choices'][0]['message']['content'];
         }
 
@@ -155,7 +164,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
          // The -aicontent data is used in question preview. Only needs to happen in preview.
-        $this->insert_attempt_step_data('-aiprompt', $full_ai_prompt);
+        $this->insert_attempt_step_data('-aiprompt', $fullaiprompt);
         $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);
 
         $this->insert_attempt_step_data('-comment', $contentobject->feedback);
@@ -173,7 +182,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $prompt .= ' '.trim($aiprompt);
 
         if ($markscheme > '') {
-            //Tell the LLM how to mark the submission
+            // Tell the LLM how to mark the submission.
             $prompt .= " The total score is: $defaultmark .";
             $prompt .= ' '.$markscheme;
         } else {

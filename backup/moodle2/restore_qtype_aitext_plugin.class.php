@@ -19,7 +19,8 @@
  *
  * @package    qtype_aitext
  * @subpackage backup-moodle2
- * @copyright  2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
+ * @copyright  2024 Marcus Green
+
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +31,7 @@
  * restore plugin class that provides the necessary information
  * needed to restore one aitext qtype plugin
  *
- * @copyright  2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
+ * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_qtype_aitext_plugin extends restore_qtype_plugin {
@@ -39,9 +40,9 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
      * Returns the paths to be handled by the plugin at question level
      */
     protected function define_question_plugin_structure() {
-        return array(
-            new restore_path_element('aitext', $this->get_pathfor('/aitext'))
-        );
+        return [
+            new restore_path_element('aitext', $this->get_pathfor('/aitext')),
+        ];
     }
 
     /**

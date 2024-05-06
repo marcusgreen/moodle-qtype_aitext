@@ -23,7 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 /**
  * aitext question type editing form.
  *
@@ -69,7 +68,8 @@ class qtype_aitext_edit_form extends question_edit_form {
             ['maxlen' => 50, 'rows' => 6, 'size' => 30]);
         $mform->setType('sampleanswer', PARAM_RAW);
         $mform->addHelpButton('sampleanswer', 'sampleanswer', 'qtype_aitext');
-        $mform->addElement('static','sampleanswereval','', '<a class="qtype_aitext_sampleanswerbtn btn btn-secondary" id="id_sampleanswerbtn">'
+        $mform->addElement('static', 'sampleanswereval', '',  '<a class="qtype_aitext_sampleanswerbtn btn btn-secondary"
+                id="id_sampleanswerbtn">'
             . get_string('sampleanswerevaluate', 'qtype_aitext') . '</a>' .
              '<div class="qtype_aitext_sampleanswereval" id="id_sampleanswereval"></div>');
 
@@ -115,7 +115,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addElement('editor', 'graderinfo', get_string('graderinfo', 'qtype_aitext'),
                 array('rows' => 10), $this->editoroptions);
 
-        //load any JS that we need to make things happen, specifically the prompt tester
+        // Load any JS that we need to make things happen, specifically the prompt tester.
         $PAGE->requires->js_call_amd('qtype_aitext/editformhelper', 'init', []);
     }
 

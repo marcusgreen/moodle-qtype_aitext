@@ -17,12 +17,10 @@
 /**
  * AI Text question type upgrade code.
  *
- * @package    qtype
- * @subpackage aitext
+ * @package    qtype_aitext
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Upgrade code for the aitext question type.
@@ -37,12 +35,13 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
     if ($oldversion < 2024050300) {
 
         $table = new xmldb_table('qtype_aitext');
+        // Used for prompt testing in the edit form.
         $field = new xmldb_field('sampleanswer', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-        // cloudpoodll savepoint reached
+        // Savepoint reached.
         upgrade_plugin_savepoint(true, 2024050300, 'qtype', 'aitext');
 
     }
