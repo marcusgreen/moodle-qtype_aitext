@@ -96,7 +96,7 @@ class qtype_aitext extends question_type {
         }
         $options->aiprompt = $formdata->aiprompt;
         $options->markscheme = $formdata->markscheme;
-
+        $options->sampleanswer = $formdata->sampleanswer;
         $options->responseformat = $formdata->responseformat;
         $options->responsefieldlines = $formdata->responsefieldlines;
         $options->minwordlimit = isset($formdata->minwordenabled) ? $formdata->minwordlimit : null;
@@ -143,6 +143,7 @@ class qtype_aitext extends question_type {
         $question->responsetemplateformat = $questiondata->options->responsetemplateformat;
         $question->aiprompt = $questiondata->options->aiprompt;
         $question->markscheme = $questiondata->options->markscheme;
+        $question->sampleanswer = $questiondata->options->sampleanswer;
     }
     /**
      * Delete a question from the database
@@ -238,7 +239,6 @@ class qtype_aitext extends question_type {
     public function extra_question_fields() {
         return [
             'qtype_aitext',
-            'aiprompt',
             'responseformat',
             'responsefieldlines',
             'minwordlimit',
@@ -248,7 +248,8 @@ class qtype_aitext extends question_type {
             'responsetemplate',
             'responsetemplateformat',
             'aiprompt',
-            'markscheme'
+            'markscheme',
+            'sampleanswer'
         ];
     }
     /**

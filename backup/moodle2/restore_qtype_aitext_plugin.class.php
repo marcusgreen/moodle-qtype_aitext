@@ -116,7 +116,9 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
         foreach ($aitextswithoutoptions as $q) {
             $defaultoptions = new stdClass();
             $defaultoptions->questionid = $q->id;
-            $defaultoptions->aimprompt = '';
+            $defaultoptions->aiprompt = '';
+            $defaultoptions->markscheme = '';
+            $defaultoptions->sampleanswer = '';
             $defaultoptions->responseformat = 'editor';
             $defaultoptions->responsefieldlines = 15;
             $defaultoptions->minwordlimit = null;

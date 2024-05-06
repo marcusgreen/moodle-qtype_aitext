@@ -124,23 +124,12 @@ class qtype_aitext_renderer extends qtype_renderer {
         // This probably should be retrieved by an api call.
         $comment = $qa->get_current_manual_comment();
         if ($this->page->pagetype == 'question-bank-previewquestion-preview') {
+            $this->page->requires->js_call_amd('qtype_aitext/showprompt', 'init', []);
             if ($comment[0] > '') {
                 $prompt = $qa->get_last_qt_var('-aiprompt');
-                $js = '<script>
-                function toggleVisibility(event) {
-                    event.preventDefault();
-                    var text = document.getElementById("fullprompt");
-                    if (text.className === "hidden") {
-                        text.className = "visible";
-                    } else {
-                        text.className = "hidden";
-                    }
-                }
-                </script>';
-                $showprompt = get_string('showprompt', 'qtype_aitext');
-                $js .= '<br/><button class="rounded" onclick="toggleVisibility(event)">'.$showprompt.'</button>';
-                $js .= '<div id="fullprompt" class="hidden">'.$prompt .'</div>';
-                $comment[0] = $comment[0].$js;
+                $showprompt = '<br/><button  id=showprompt class="rounded">'. get_string('showprompt', 'qtype_aitext').'</button>';
+                $showprompt .= '<div id="fullprompt" class="hidden">'.$prompt .'</div>';
+                $comment[0] = $comment[0].$showprompt;
             }
             return $comment[0];
         }

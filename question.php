@@ -134,28 +134,14 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return void
      */
     public function grade_response(array $response) : array {
-        if(!$this->is_complete_response($response)) {
+        if (!$this->is_complete_response($response)) {
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
         }
         $ai = new ai\ai();
         if (is_array($response)) {
-            $responsetext = strip_tags($response['answer']);
-            $responsetext = '[['.$responsetext.']]';
-            $prompt = get_config('qtype_aitext', 'prompt');
-            $prompt = preg_replace("/\[responsetext\]/", $responsetext, $prompt);
-            $prompt .= ' '.trim($this->aiprompt);           
-            if ($this->markscheme > '') {
-                $prompt .= ' '.$this->markscheme;
-            } else {
-                // Todo should this be a plugin setting value?.
-                $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
-            }
-
-            $prompt .= ' '.trim(get_config('qtype_aitext', 'jsonprompt'));
-            $prompt .= ' respond in the language '.current_language();
-
-            $llmresponse = $ai->prompt_completion($prompt);
+            $full_ai_prompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt, $this->defaultmark, $this->markscheme);
+            $llmresponse = $ai->prompt_completion($full_ai_prompt);
             $feedback = $llmresponse['response']['choices'][0]['message']['content'];
         }
 
@@ -169,13 +155,35 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
          // The -aicontent data is used in question preview. Only needs to happen in preview.
-        $this->insert_attempt_step_data('-aiprompt', $prompt);
+        $this->insert_attempt_step_data('-aiprompt', $full_ai_prompt);
         $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);
 
         $this->insert_attempt_step_data('-comment', $contentobject->feedback);
         $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
 
         return $grade;
+    }
+
+    public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme) {
+
+        $responsetext = strip_tags($response);
+            $responsetext = '[['.$responsetext.']]';
+            $prompt = get_config('qtype_aitext', 'prompt');
+            $prompt = preg_replace("/\[responsetext\]/", $responsetext, $prompt);
+            $prompt .= ' '.trim($aiprompt);
+
+        if ($markscheme > '') {
+            //Tell the LLM how to mark the submission
+            $prompt .= " The total score is: $defaultmark .";
+            $prompt .= ' '.$markscheme;
+        } else {
+            // Todo should this be a plugin setting value?.
+            $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
+        }
+        $prompt .= ' '.trim(get_config('qtype_aitext', 'jsonprompt'));
+        $prompt .= ' respond in the language '.current_language();
+        return $prompt;
+
     }
     /**
      *
@@ -187,10 +195,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function process_feedback(string $feedback) {
         if (preg_match('/\{[^{}]*\}/', $feedback, $matches)) {
-            // $matches[1] contains the captured text inside the braces
+            // Array $matches[1] contains the captured text inside the braces.
             $feedback = $matches[0];
         }
-
         $contentobject = json_decode($feedback);
         if (json_last_error() === JSON_ERROR_NONE) {
             $contentobject->feedback = trim($contentobject->feedback);

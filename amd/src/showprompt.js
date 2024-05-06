@@ -1,4 +1,3 @@
-<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,19 +14,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for the essay question type.
+ * Display a button in testing to reveal the prompt that was sent
  *
- * @package    qtype_aitext
+ * @module     qtype_aitext/showprompt
  * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+export const init = () => {
+    var button = document.getElementById('showprompt');
+    button.addEventListener('click', (event) => {
+        toggleFullPrompt(event);
+    });
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'qtype_aitext';
-$plugin->version   = 2024050300;
-$plugin->requires  = 2020110900;
-$plugin->maturity  = MATURITY_BETA;
-$plugin->dependencies = [
-    'tool_aiconnect' => ANY_VERSION
-];
+    /**
+     * Togle the visibility of the prompt that is sent to
+     * the AI System
+     * @param {*} event
+     */
+    function toggleFullPrompt(event) {
+        event.preventDefault();
+        var text = document.getElementById("fullprompt");
+        if (text.className === "hidden") {
+            text.className = "visible";
+        } else {
+            text.className = "hidden";
+        }
+    }
+};
