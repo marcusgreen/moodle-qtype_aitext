@@ -38,6 +38,8 @@ class qtype_aitext_edit_form extends question_edit_form {
      * @return void
      */
     protected function definition_inner($mform) {
+        global $PAGE;
+
         /** @var qtype_aitext $qtype */
         $qtype = question_bank::get_qtype('aitext');
         $mform->removeelement('generalfeedback');
@@ -61,6 +63,15 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addElement('editor', 'generalfeedback', get_string('generalfeedback', 'question')
         , ['rows' => 10], $this->editoroptions);
         $mform->addElement('html', '</div>');
+
+        $mform->addElement('header', 'prompttester', get_string('prompttester', 'qtype_aitext'));
+        $mform->addElement('textarea', 'sampleanswer', get_string('sampleanswer', 'qtype_aitext'),
+            ['maxlen' => 50, 'rows' => 6, 'size' => 30]);
+        $mform->setType('sampleanswer', PARAM_RAW);
+        $mform->addHelpButton('sampleanswer', 'sampleanswer', 'qtype_aitext');
+        $mform->addElement('static','sampleanswereval','', '<a class="qtype_aitext_sampleanswerbtn btn btn-secondary" id="id_sampleanswerbtn">'
+            . get_string('sampleanswerevaluate', 'qtype_aitext') . '</a>' .
+             '<div class="qtype_aitext_sampleanswereval" id="id_sampleanswereval"></div>');
 
         $mform->addElement('header', 'responseoptions', get_string('responseoptions', 'qtype_aitext'));
         $mform->setExpanded('responseoptions');
@@ -103,6 +114,9 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->setExpanded('graderinfoheader');
         $mform->addElement('editor', 'graderinfo', get_string('graderinfo', 'qtype_aitext'),
                 array('rows' => 10), $this->editoroptions);
+
+        //load any JS that we need to make things happen, specifically the prompt tester
+        $PAGE->requires->js_call_amd('qtype_aitext/editformhelper', 'init', []);
     }
 
     /**
