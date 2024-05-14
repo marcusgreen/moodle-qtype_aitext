@@ -78,6 +78,8 @@ class qtype_aitext extends question_type {
         $this->set_default_value('responseformat', $fromform->responseformat);
         $this->set_default_value('responsefieldlines', $fromform->responsefieldlines);
         $this->set_default_value('markscheme', $fromform->markscheme);
+        $this->set_default_value('sampleanswer', $fromform->sampleanswer);
+
     }
     /**
      * Write the question data from the editing form to the database
@@ -97,6 +99,7 @@ class qtype_aitext extends question_type {
         $options->aiprompt = $formdata->aiprompt;
         $options->markscheme = $formdata->markscheme;
         $options->sampleanswer = $formdata->sampleanswer;
+        $options->model = trim($formdata->model);
         $options->responseformat = $formdata->responseformat;
         $options->responsefieldlines = $formdata->responsefieldlines;
         $options->minwordlimit = isset($formdata->minwordenabled) ? $formdata->minwordlimit : null;
@@ -144,6 +147,7 @@ class qtype_aitext extends question_type {
         $question->aiprompt = $questiondata->options->aiprompt;
         $question->markscheme = $questiondata->options->markscheme;
         $question->sampleanswer = $questiondata->options->sampleanswer;
+        $question->model = $questiondata->options->model;
     }
     /**
      * Delete a question from the database
@@ -249,7 +253,8 @@ class qtype_aitext extends question_type {
             'responsetemplateformat',
             'aiprompt',
             'markscheme',
-            'sampleanswer'
+            'sampleanswer',
+            'model',
         ];
     }
     /**

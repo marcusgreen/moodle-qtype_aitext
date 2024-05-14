@@ -124,8 +124,8 @@ class qtype_aitext_renderer extends qtype_renderer {
         // This probably should be retrieved by an api call.
         $comment = $qa->get_current_manual_comment();
         if ($this->page->pagetype == 'question-bank-previewquestion-preview') {
-            $this->page->requires->js_call_amd('qtype_aitext/showprompt', 'init', []);
             if ($comment[0] > '') {
+                $this->page->requires->js_call_amd('qtype_aitext/showprompt', 'init', []);
                 $prompt = $qa->get_last_qt_var('-aiprompt');
                 $showprompt = '<br/><button  id=showprompt class="rounded">'. get_string('showprompt', 'qtype_aitext').'</button>';
                 $showprompt .= '<div id="fullprompt" class="hidden">'.$prompt .'</div>';

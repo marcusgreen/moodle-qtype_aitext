@@ -55,6 +55,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     /** @var int indicates whether the maximum number of words required */
     public $maxwordlimit;
 
+    /**
+     * LLM Model, will vary between AI systems, e.g. gpt4 or llama3
+     * @var stream_set_blocking
+     */
+    public $model;
+
 
     /**
      * used in the question editing interface
@@ -146,7 +152,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
         }
-        $ai = new ai\ai();
+        $ai = new ai\ai($this->model);
         if (is_array($response)) {
             $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
                  $this->defaultmark, $this->markscheme);
@@ -173,8 +179,16 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         return $grade;
     }
 
+    /**
+     * Used by prompttester in the editing form
+     *
+     * @param string $response
+     * @param string $aiprompt
+     * @param number $defaultmark
+     * @param string $markscheme
+     * @return void
+     */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme) {
-
         $responsetext = strip_tags($response);
             $responsetext = '[['.$responsetext.']]';
             $prompt = get_config('qtype_aitext', 'prompt');

@@ -5,6 +5,7 @@ Feature: Test creating an AIText question
     I need to be able to create an aitext question
 
   Background:
+
     Given the following "users" exist:
         | username |
         | teacher  |
@@ -14,9 +15,12 @@ Feature: Test creating an AIText question
     And the following "course enrolments" exist:
         | user    | course | role           |
         | teacher | C1     | editingteacher |
-
+    And the following config values are set as admin:
+      | model | gpt-4,gpt-4o  | tool_aiconnect |
+  @javascript
   Scenario: Create an AI text question with Response format set to 'HTML editor'
     When I am on the "Course 1" "core_question > course question bank" page logged in as teacher
+    # id_sampleanswer because it is collapsed when the form is opened for editing.
     And I add a "AI Text" question filling the form with:
         | Question name    | aitext-001                      |
         | Question text    | Write an aitext with 500 words. |
@@ -24,8 +28,9 @@ Feature: Test creating an AIText question
         | Response format  | HTML editor                     |
         | AI Prompt        | Evaluate this                   |
         | Mark scheme      | Give one mark if correct        |
+        | id_sampleanswer  | sample  answer                  |
 
-    Then I should see "aitext-001"
+  Then I should see "aitext-001"
 
   Scenario: Create an AI Text question with Response format set to 'HTML editor with the file picker'
     When I am on the "Course 1" "core_question > course question bank" page logged in as teacher
@@ -35,9 +40,12 @@ Feature: Test creating an AIText question
         | General feedback | This is general feedback        |
         | AI Prompt        | Evaluate this                   |
         | Mark scheme      | Give one mark if correct        |
+        | id_sampleanswer  | sample  answer                  |
+        | Model | gpt-4|
+
+
 
     Then I should see "aitext-002"
-
   @javascript
   Scenario: Create an AI Text question for testing some default options
     When I am on the "Course 1" "core_question > course question bank" page logged in as teacher
@@ -46,6 +54,10 @@ Feature: Test creating an AIText question
         | Question text         | Write an aitext with 500 words. |
         | General feedback      | This is general feedback        |
         | id_responsefieldlines | 15                              |
+        | id_sampleanswer         | sample  answer                |
+        | Model | gpt-4o|
+
+
     Then I should see "aitext-003"
     # Checking that the next new question form displays user preferences settings.
     And I press "Create a new question ..."

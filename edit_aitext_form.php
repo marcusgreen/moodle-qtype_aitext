@@ -57,7 +57,16 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->setType('markscheme', PARAM_RAW);
         $mform->setDefault('markscheme', get_config('qtype_aitext', 'defaultmarksscheme'));
         $mform->addHelpButton('markscheme', 'markscheme', 'qtype_aitext');
+        $models = explode(",", get_config('tool_aiconnect', 'model'));
+        if (count($models) > 1 ) {
+            $models = array_combine($models, $models);
+            $mform->addElement('select', 'model', get_string('model', 'qtype_aitext'), $models);
 
+        } else {
+            $mform->addElement('hidden', 'model', $models[0]);
+        }
+        $mform->setType('model', PARAM_RAW);
+        // The question_edit_form that this class extends expects a general feedback field.
         $mform->addElement('html', '<div class="hidden">');
         $mform->addElement('editor', 'generalfeedback', get_string('generalfeedback', 'question')
         , ['rows' => 10], $this->editoroptions);
@@ -67,12 +76,12 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addElement('textarea', 'sampleanswer', get_string('sampleanswer', 'qtype_aitext'),
             ['maxlen' => 50, 'rows' => 6, 'size' => 30]);
         $mform->setType('sampleanswer', PARAM_RAW);
+        $mform->setDefault('sampleanswer', '');
         $mform->addHelpButton('sampleanswer', 'sampleanswer', 'qtype_aitext');
         $mform->addElement('static', 'sampleanswereval', '',  '<a class="qtype_aitext_sampleanswerbtn btn btn-secondary"
                 id="id_sampleanswerbtn">'
             . get_string('sampleanswerevaluate', 'qtype_aitext') . '</a>' .
              '<div class="qtype_aitext_sampleanswereval" id="id_sampleanswereval"></div>');
-
         $mform->addElement('header', 'responseoptions', get_string('responseoptions', 'qtype_aitext'));
         $mform->setExpanded('responseoptions');
 
