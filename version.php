@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for the essay question type.
+ * Version information for the aitext question type.
  *
  * @package    qtype_aitext
  * @copyright  2024 Marcus Green

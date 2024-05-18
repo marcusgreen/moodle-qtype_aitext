@@ -225,7 +225,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (json_last_error() === JSON_ERROR_NONE) {
             $contentobject->feedback = trim($contentobject->feedback);
             $contentobject->feedback = preg_replace(array('/\[\[/', '/\]\]/'), '"', $contentobject->feedback);
-            $contentobject->feedback .= ' '.$this->llm_translate(get_config('qtype_aitext', 'disclaimer'));
+            $disclaimer = get_config('qtype_aitext', 'disclaimer');
+            $disclaimer = str_replace("[[model]]", $this->model, $disclaimer);
+            $contentobject->feedback .= ' '.$this->llm_translate($disclaimer);
         } else {
             $contentobject = (object) [
                                         "feedback" => $feedback,

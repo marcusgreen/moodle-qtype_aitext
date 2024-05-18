@@ -44,17 +44,14 @@ class qtype_aitext_test_helper extends question_test_helper {
      * @return qtype_aitext_question
      */
     public static function make_aitext_question(array $options) {
-        $optionsparam = [
-            'questiontext' => $options['questiontext'] ?? '',
-            'aiprompt' => $options['aiprompt'] ?? 0,
-            'markscheme' => $options['markscheme'] ?? 0,
-            'sampleanswer' => $options['sampleanswer'] ?? 0,
-            'model' => $options['model'] ?? '',
-        ];
-
-        $type = 'aitext';
-        question_bank::load_question_definition_classes($type);
+        question_bank::load_question_definition_classes('aitext');
         $question = new qtype_aitext_question();
+        $question->questiontext = $options['questiontext'] ?? '';
+        $question->model = $options['model'] ?? '';
+        $question->sampleanswer = $options['sampleanswer'] ?? '';
+        $question->markscheme = $options['markscheme'] ?? '';
+        $question->aiprompt = $options['aiprompt'] ?? '';
+
         test_question_maker::initialise_a_question($question);
         $question->qtype = question_bank::get_qtype('aitext');
         return $question;
