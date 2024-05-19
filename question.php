@@ -190,7 +190,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
         }
         $prompt .= ' '.trim(get_config('qtype_aitext', 'jsonprompt'));
-        $prompt .= ' respond in the language '.current_language();
+        $prompt .= ' translate to the language '.current_language();
         return $prompt;
 
     }
