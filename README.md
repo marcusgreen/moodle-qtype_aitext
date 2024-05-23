@@ -20,7 +20,7 @@ It may help to test prompts directly on the Chat GPT site to confirm they  work 
 
 ## Limitations
 
-HTML tags are stripped out from the text submitted to the AI System so evaluation.
+HTML tags are stripped out from the text submitted to the AI System so evaluation cannot consider HTML formatting.
 
 ## Roadmap
 
