@@ -20,10 +20,13 @@ It may help to test prompts directly on the Chat GPT site to confirm they  work 
 
 ## Limitations
 
-Although it is based on a clone of the core esssay question type with lots of inspiration from Gordon Batesons essay_autograde plugin, it is being built and tested mainly on text responses and so things like the inclusion of images in the question display may not work. It will only work with the immediate feedback question behaviour.
-
-If you are a Moodle developer and you use vscode/vscodium you should consider this plugin https://marketplace.visualstudio.com/items?itemName=LMSCloud.mdlcode.
+HTML tags are stripped out from the text submitted to the AI System so evaluation.
 
 ## Roadmap
 
 Cron based evaluation. Allow for slow LLM systems by marking on a cron timer
+
+## Promotion
+If you are a Moodle developer and you use vscode/vscodium you should consider this plugin https://marketplace.visualstudio.com/items?itemName=LMSCloud.mdlcode.
+It it very reasonably priced and will quickly save you time and frustration. It is the best Moodle development tool I have come accross in 20 years.
+
