@@ -6,8 +6,8 @@ Feature: Preview aitext questions
 
   Background:
     Given the following "users" exist:
-        | username |
-        | teacher  |
+        | username | firstname | lastname | email               |
+        | teacher  | user      | user | teacher@example.org |
     And the following "courses" exist:
         | fullname | shortname | category |
         | Course 1 | C1        | 0        |
@@ -22,14 +22,15 @@ Feature: Preview aitext questions
         | Test questions   | aitext | aitext-001 | editor   |
         | Test questions   | aitext | aitext-002 | plain    |
 
-  @javascript @_switch_window
+  @javascript
   Scenario: Preview an aitext question that uses the HTML editor.
+  # Testing with the HTML editor is a legacy of the essay fork
+  # as aitext strips html before sending it may be redundant
     When I am on the "aitext-001" "core_question > preview" page logged in as teacher
     And I expand all fieldsets
     And I set the field "How questions behave" to "Immediate feedback"
     # And I press "Start again with these options"
     And I press "saverestart"
-
     And I should see "Please write a story about a frog."
 
   @javascript @_switch_window

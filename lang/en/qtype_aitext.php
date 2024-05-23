@@ -60,6 +60,7 @@ $string['maxwordlimitboundary'] = 'The word limit for this question is {$a->limi
 $string['minwordlimit'] = 'Minimum word limit';
 $string['minwordlimit_help'] = 'If the response requires that students enter text, this is the minimum number of words that each student will be allowed to submit.';
 $string['minwordlimitboundary'] = 'This question requires a response of at least {$a->limit} words and you are attempting to submit {$a->count} words. Please expand your response and try again.';
+$string['model'] = 'Model';
 $string['nlines'] = '{$a} lines';
 $string['prompt'] = 'Prompt';
 $string['prompt_setting'] = 'Wrapper text for the prompt set to the AI System, [responsetext] is whatever the student typed as an answer. The ai prompt value from the question will be appended to this';
