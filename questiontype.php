@@ -52,7 +52,7 @@ class qtype_aitext extends question_type {
      * @return array
      */
     public function response_file_areas() {
-        return array('attachments', 'answer');
+        return ['attachments', 'answer'];
     }
     /**
      * Loads the question type specific options for the question
@@ -63,7 +63,7 @@ class qtype_aitext extends question_type {
     public function get_question_options($question) {
         global $DB;
         $question->options = $DB->get_record('qtype_aitext',
-                array('questionid' => $question->id), '*', MUST_EXIST);
+                ['questionid' => $question->id], '*', MUST_EXIST);
         parent::get_question_options($question);
     }
 
@@ -90,7 +90,7 @@ class qtype_aitext extends question_type {
     public function save_question_options($formdata) {
         global $DB;
         $context = $formdata->context;
-        $options = $DB->get_record('qtype_aitext', array('questionid' => $formdata->id));
+        $options = $DB->get_record('qtype_aitext', ['questionid' => $formdata->id]);
         if (!$options) {
             $options = new stdClass();
             $options->questionid = $formdata->id;
@@ -110,7 +110,7 @@ class qtype_aitext extends question_type {
             // TODO find out what it should save and ensure it is available as text not arrays.
             $formdata->graderinfo = [
                 'text' => '',
-                'format' => FORMAT_HTML
+                'format' => FORMAT_HTML,
             ];
             $options->responsetemplate = $formdata->responsetemplate['text'];
             $options->responsetemplateformat = $formdata->responsetemplate['format'];
@@ -147,7 +147,13 @@ class qtype_aitext extends question_type {
         $question->aiprompt = $questiondata->options->aiprompt;
         $question->markscheme = $questiondata->options->markscheme;
         $question->sampleanswer = $questiondata->options->sampleanswer;
-        $question->model = $questiondata->options->model;
+        /* Legacy quesitons may not have a model set, so assign the first in the settings */
+        if (empty($question->model)) {
+            $model = explode(",", get_config('tool_aiconnect', 'model'))[0];
+            $question->model = $model;
+        } else {
+            $question->model = $questiondata->options->model;
+        }
     }
     /**
      * Delete a question from the database
@@ -159,7 +165,7 @@ class qtype_aitext extends question_type {
     public function delete_question($questionid, $contextid) {
         global $DB;
 
-        $DB->delete_records('qtype_aitext', array('questionid' => $questionid));
+        $DB->delete_records('qtype_aitext', ['questionid' => $questionid]);
         parent::delete_question($questionid, $contextid);
     }
 
@@ -170,11 +176,11 @@ class qtype_aitext extends question_type {
      * @return array
      */
     public function response_formats() {
-        return array(
+        return [
             'editor' => get_string('formateditor', 'qtype_aitext'),
             'plain' => get_string('formatplain', 'qtype_aitext'),
             'monospaced' => get_string('formatmonospaced', 'qtype_aitext'),
-        );
+        ];
     }
 
     /**
@@ -183,10 +189,10 @@ class qtype_aitext extends question_type {
      * @return array
      */
     public function response_required_options() {
-        return array(
+        return [
             1 => get_string('responseisrequired', 'qtype_aitext'),
             0 => get_string('responsenotrequired', 'qtype_aitext'),
-        );
+        ];
     }
 
     /**
@@ -212,13 +218,13 @@ class qtype_aitext extends question_type {
      * @return array
      */
     public function attachment_options() {
-        return array(
+        return [
             0 => get_string('no'),
             1 => '1',
             2 => '2',
             3 => '3',
             -1 => get_string('unlimited'),
-        );
+        ];
     }
 
     /**
@@ -228,12 +234,12 @@ class qtype_aitext extends question_type {
      * @return array
      */
     public function attachments_required_options() {
-        return array(
+        return [
             0 => get_string('attachmentsoptional', 'qtype_aitext'),
             1 => '1',
             2 => '2',
-            3 => '3'
-        );
+            3 => '3',
+        ];
     }
 
     /**
@@ -283,13 +289,13 @@ class qtype_aitext extends question_type {
         $qo->qtype = $questiontype;
 
         foreach ($extraquestionfields as $field) {
-            $qo->$field = $format->getpath($data, array('#', $field, 0, '#'), '');
+            $qo->$field = $format->getpath($data, ['#', $field, 0, '#'], '');
         }
         // TODO add in other text fields.
         $textfields = ['responsetemplate'];
         foreach ($textfields as $field) {
-            $fmt = $format->get_format($format->getpath($data, array('#', $field.'format', 0, '#'), 0));
-            $qo->$field = $format->import_text_with_files($data, array('#', $field, 0), '', $fmt);
+            $fmt = $format->get_format($format->getpath($data, ['#', $field.'format', 0, '#'], 0));
+            $qo->$field = $format->import_text_with_files($data, ['#', $field, 0], '', $fmt);
         }
         if (isset($qo->maxwordlimit) && $qo->maxwordlimit > "") {
             $qo->maxwordenabled = true;
@@ -354,7 +360,7 @@ class qtype_aitext extends question_type {
                 'responsesample',
                 'correctfeedback',
                 'incorrectfeedback',
-                'partiallycorrectfeedback'
+                'partiallycorrectfeedback',
         ];
     }
     /**

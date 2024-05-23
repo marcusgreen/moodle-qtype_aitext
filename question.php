@@ -186,7 +186,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param string $aiprompt
      * @param number $defaultmark
      * @param string $markscheme
-     * @return void
+     * @return string;
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme) {
         $responsetext = strip_tags($response);
