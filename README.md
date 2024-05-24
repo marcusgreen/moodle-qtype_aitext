@@ -24,7 +24,10 @@ HTML tags are stripped out from the text submitted to the AI System so evaluatio
 
 ## Roadmap
 
+Mobile app compatibility
+
 Cron based evaluation. Allow for slow LLM systems by marking on a cron timer
+
 
 ## Promotion
 If you are a Moodle developer and you use vscode/vscodium you should consider this plugin https://marketplace.visualstudio.com/items?itemName=LMSCloud.mdlcode.
