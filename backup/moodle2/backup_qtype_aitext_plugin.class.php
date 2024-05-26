@@ -49,7 +49,7 @@ class backup_qtype_aitext_plugin extends backup_qtype_plugin {
 
         $aitext = new backup_nested_element('aitext', ['id'], [
                 'aiprompt', 'markscheme', 'sampleanswer', 'responseformat', 'responsefieldlines', 'minwordlimit', 'maxwordlimit',
-                'graderinfo', 'graderinfoformat', 'responsetemplate',
+                'graderinfo', 'graderinfoformat', 'responsetemplate', 'model',
                 'responsetemplateformat', 'maxbytes']);
 
         // Now the own qtype tree.

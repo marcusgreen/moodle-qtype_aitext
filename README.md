@@ -1,12 +1,14 @@
 ###  Moodle AI Text Quiz Question type by Marcus Green
 
-This is a fork of the core essay question type which can use the ChatGPT Large language model to give automatic feedback and marking for submitted responses. For custom development and consultancy contact Moodle Partner Catalyst EU (https://www.catalyst-eu.net/).
+This Moodle question type accepts free text which is then evaluated by a remote Large Language Model AI system such as ChatGPT. Each question can have its own feedback and grading prompts. For custom development and consultancy contact Moodle Partner Catalyst EU (https://www.catalyst-eu.net/).
 
-If you are a Moodle developer and you use vscode/vscodium you should consider this plugin https://marketplace.visualstudio.com/items?itemName=LMSCloud.mdlcode
+It requires either a paid for ChatGPT api account which will give access to ChatGPT4 or 
+other Large Language Model such as Ollama or https://groq.com.
 
-It requires either a paid for ChatGPT api account which will give access to ChatGPT4 or Ollama hosted Large Language Model. Accounts are available from https://platform.openai.com, Ollama is available from https://github.com/ollama/ollama. It depends on the Moodle aiconnect tool which is available from
-
+It depends on this plugin for the api calls to work.
 https://github.com/marcusgreen/moodle-tool_aiconnect
+
+Additional documentation can be found here https://github.com/marcusgreen/moodle-qtype_aitext/wiki
 
 ## Prompting
 It is currently limited to the immediate feedback quesiton behaviour. It requires the creation of a prompt to evaluate the text according to its purpose. For example to confirm the grammar in English the following can be used.
@@ -15,16 +17,19 @@ It is currently limited to the immediate feedback quesiton behaviour. It require
 
 It may help to test prompts directly on the Chat GPT site to confirm they  work as expected.
 
+
 ## Limitations
 
-Although it is based on a clone of the core esssay question type with lots of inspiration from Gordon Batesons essay_autograde plugin, it is being built and tested mainly on text responses and so things like the inclusion of
-images in the question display may not work. It will only work with the immediate feedback question behaviour.
+HTML tags are stripped out from the text submitted to the AI System so evaluation cannot consider HTML formatting.
 
 ## Roadmap
-~~Support other LLM systems. Supporting a self hosted LLM will ensure data sovereignty~~ done
 
-Moderation: Do not show ai feedback until previewed and approved by a teacher
+Mobile app compatibility
 
 Cron based evaluation. Allow for slow LLM systems by marking on a cron timer
 
-Allow it to work with other question behaviour types such as Interactive with multiple tries.
+
+## Promotion
+If you are a Moodle developer and you use vscode/vscodium you should consider this plugin https://marketplace.visualstudio.com/items?itemName=LMSCloud.mdlcode.
+It it very reasonably priced and will quickly save you time and frustration. It is the best Moodle development tool I have come accross in 20 years.
+

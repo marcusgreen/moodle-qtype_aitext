@@ -18,7 +18,7 @@
  * External
  *
  * @package    qtype_aitext
- * @author     Justin Hunt - poodll.com
+ * @copyright  Justin Hunt - poodll.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();

@@ -127,6 +127,7 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
             $defaultoptions->attachments = 0;
             $defaultoptions->attachmentsrequired = 0;
             $defaultoptions->graderinfo = '';
+            $defaultoptions->model = '';
             $defaultoptions->graderinfoformat = FORMAT_HTML;
             $defaultoptions->responsetemplate = '';
             $defaultoptions->responsetemplateformat = FORMAT_HTML;

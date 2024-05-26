@@ -22,6 +22,12 @@ Feature: Test duplicating a quiz containing an aitext question
         | aitext-001 | 1 |
         | aitext-002 | 1 |
 
+    # Without this it will show the pending progress bar and the back
+    # to course button introduced in Moodle 4.3
+    # https://docs.moodle.org/403/en/Course_backup#Asynchronous_course_backups
+    And the following config values are set as admin:
+      | enableasyncbackup | 0 |
+
   @javascript
   Scenario: Backup and restore a course containing 3 aitext questions
     When I am on the "Course 1" course page logged in as admin

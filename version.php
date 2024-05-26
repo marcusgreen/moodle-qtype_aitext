@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for the essay question type.
+ * Version information for the aitext question type.
  *
  * @package    qtype_aitext
  * @copyright  2024 Marcus Green
@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_aitext';
-$plugin->version   = 2024050300;
+$plugin->version   = 2024051100;
 $plugin->requires  = 2020110900;
 $plugin->release = '0.01';
 $plugin->maturity  = MATURITY_BETA;

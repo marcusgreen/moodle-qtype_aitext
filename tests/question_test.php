@@ -67,12 +67,13 @@ class question_test extends \advanced_testcase {
     public function test_get_feedback() {
         // Create the aitext question under test.
         $questiontext = 'AI question text';
-        $aitext = qtype_aitext_test_helper::make_aitext_question(['questiontext' => $questiontext]);
+        $aitext = qtype_aitext_test_helper::make_aitext_question(['questiontext' => $questiontext, 'model' => 'llama3']);
         $testdata = [
                 "feedback" => "Feedback text",
                 "marks" => 0
                 ];
         $goodjson = json_encode($testdata);
+
         $feedback = $aitext->process_feedback($goodjson);
         $this->assertIsObject($feedback);
         $badjson = 'Some random string'. $goodjson;

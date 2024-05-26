@@ -18,6 +18,7 @@
  * AI Text question type upgrade code.
  *
  * @package    qtype_aitext
+ * @copyright  Marcus Green 2024
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -44,6 +45,21 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         // Savepoint reached.
         upgrade_plugin_savepoint(true, 2024050300, 'qtype', 'aitext');
 
+    }
+
+    if ($oldversion < 2024051100) {
+
+        // Define field model to be added to qtype_aitext.
+        $table = new xmldb_table('qtype_aitext');
+        $field = new xmldb_field('model', XMLDB_TYPE_CHAR, '60', null, null, null, null, 'sampleanswer');
+
+        // Conditionally launch add field model.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2024051100, 'qtype', 'aitext');
     }
 
     return true;

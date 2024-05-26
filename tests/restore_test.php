@@ -48,10 +48,10 @@ class restore_test extends \restore_date_testcase {
         $contexts = new \core_question\local\bank\question_edit_contexts(\context_course::instance($course->id));
         $category = question_make_default_categories($contexts->all());
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $essay = $questiongenerator->create_question('aitext', null, array('category' => $category->id));
+        $aitext = $questiongenerator->create_question('aitext', null, array('category' => $category->id));
 
         // Remove the options record, which means that the backup will look like a backup made in an old Moodle.
-        $DB->delete_records('qtype_aitext', ['questionid' => $essay->id]);
+        $DB->delete_records('qtype_aitext', ['questionid' => $aitext->id]);
 
         // Do backup and restore.
         $newcourseid = $this->backup_and_restore($course);
