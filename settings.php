@@ -58,7 +58,8 @@ if ($ADMIN->fulltree) {
         new lang_string('jsonprompt', 'qtype_aitext'),
         new lang_string('jsonprompt_setting', 'qtype_aitext'),
         'Return only a JSON object which enumerates a set of 2 elements.The JSON object should be in
-			this format: {feedback":"string","marks":"number"} where marks is a single number summing all marks. Also show the marks as part of the feedback.',
+	this format: {feedback":"string","marks":"number"} where marks is a single number summing all marks. 
+   	Also show the marks as part of the feedback.',
         PARAM_RAW,
         20,
         6
