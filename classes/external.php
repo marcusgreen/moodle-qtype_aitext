@@ -27,7 +27,7 @@ global $CFG;
 require_once($CFG->libdir . '/externallib.php');
 require_once($CFG->dirroot . '/question/engine/bank.php');
 
-use tool_aiconnect\ai;
+use local_ai_manager\manager;
 
 /**
  * External class.
@@ -51,6 +51,7 @@ class qtype_aitext_external extends external_api {
         );
 
     }
+
     /**
      * Similar to clicking the submit button.
      *
@@ -58,13 +59,11 @@ class qtype_aitext_external extends external_api {
      * @param integer $defaultmark
      * @param string $prompt
      * @param string $marksscheme
-     * @return void
+     * @return array the response array
      */
-    public static function fetch_ai_grade($response, $defaultmark, $prompt, $marksscheme) {
+    public static function fetch_ai_grade($response, $defaultmark, $prompt, $marksscheme): stdClass {
         // Get our AI helper.
-        xdebug_break();
-
-        $ai = new ai\ai();
+        $ai = new local_ai_manager\manager('feedback');
 
         // Build an aitext question instance so we can call the same code that the question type uses when it grades.
         $type = 'aitext';
@@ -74,11 +73,14 @@ class qtype_aitext_external extends external_api {
         // Make sure we have the right data for AI to work with.
         if (!empty($response) && !empty($prompt) && $defaultmark > 0) {
             $fullaiprompt = $aiquestion->build_full_ai_prompt($response, $prompt, $defaultmark, $marksscheme);
-            $llmresponse = $ai->prompt_completion($fullaiprompt);
-            $feedback = $llmresponse['response']['choices'][0]['message']['content'];
+            $llmresponse = $ai->perform_request($fullaiprompt);
+            if ($llmresponse->get_code() !== 200) {
+                throw new moodle_exception('Could not retrieve the translation from the AI tool');
+            }
+            $feedback = $llmresponse->get_content();
             $contentobject = $aiquestion->process_feedback($feedback);
         } else {
-            $contentobject = ["feedback" => "Invalid parameters. Check that you have a sample answer and prompt", "marks" => 0];
+            $contentobject = (object)["feedback" => "Invalid parameters. Check that you have a sample answer and prompt", "marks" => 0];
         }
 
         // Return whatever we have got.

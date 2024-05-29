@@ -27,7 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/questionbase.php');
-use tool_aiconnect\ai;
+use local_ai_manager\manager;
 /**
  * Represents an aitext question.
  *
@@ -152,12 +152,16 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
         }
-        $ai = new ai\ai($this->model);
+        $ai = new local_ai_manager\manager('feedback');
         if (is_array($response)) {
             $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
                  $this->defaultmark, $this->markscheme);
-            $llmresponse = $ai->prompt_completion($fullaiprompt);
-            $feedback = $llmresponse['response']['choices'][0]['message']['content'];
+            $llmresponse = $ai->perform_request($fullaiprompt);
+            if ($llmresponse->get_code() !== 200) {
+                throw new moodle_exception('Could not provide feedback by AI tool', '', '', '',
+                        $llmresponse->get_errormessage() . ' ' . $llmresponse->get_debuginfo());
+            }
+            $feedback = $llmresponse->get_content();
         }
 
         $contentobject = $this->process_feedback($feedback);
@@ -217,6 +221,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return \stdClass
      */
     public function process_feedback(string $feedback) {
+        preg_match_all('#\{(?:[^{}]|(?R))*\}#s', $feedback, $feedbackjsonstrings);
+        if (empty($feedbackjsonstrings)) {
+            throw new moodle_exception('Could not parse feedback of AI tool');
+        }
         if (preg_match('/\{[^{}]*\}/', $feedback, $matches)) {
             // Array $matches[1] contains the captured text inside the braces.
             $feedback = $matches[0];
@@ -248,12 +256,15 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (current_language() == 'en') {
             return $text;
         }
-        $ai = new ai\ai();
+        $ai = new local_ai_manager\manager('translate');
         $cache = cache::make('qtype_aitext', 'stringdata');
         if (($translation = $cache->get(current_language().'_'.$text)) === false) {
             $prompt = 'translate "'.$text .'" into '.current_language();
-            $llmresponse = $ai->prompt_completion($prompt);
-            $translation = $llmresponse['response']['choices'][0]['message']['content'];
+            $llmresponse = $ai->perform_request($prompt);
+            if ($llmresponse->get_code() !== 200) {
+                throw new moodle_exception('Could not retrieve the translation from the AI tool');
+            }
+            $translation = $llmresponse->get_content();
             $translation = trim($translation, '"');
             $cache->set(current_language().'_'.$text, $translation);
         }

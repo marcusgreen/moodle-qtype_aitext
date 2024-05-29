@@ -30,5 +30,5 @@ $plugin->requires  = 2020110900;
 $plugin->release = '0.01';
 $plugin->maturity  = MATURITY_BETA;
 $plugin->dependencies = [
-    'tool_aiconnect' => ANY_VERSION,
+    'local_ai_manager' => ANY_VERSION,
 ];
