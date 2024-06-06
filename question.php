@@ -156,7 +156,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (is_array($response)) {
             $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
                  $this->defaultmark, $this->markscheme);
-            $llmresponse = $ai->perform_request($fullaiprompt);
+            $llmresponse = $ai->perform_request($fullaiprompt, ['component' => 'qtype_aitext', 'contextid' => $this->contextid]);
             if ($llmresponse->get_code() !== 200) {
                 throw new moodle_exception('Could not provide feedback by AI tool', '', '', '',
                         $llmresponse->get_errormessage() . ' ' . $llmresponse->get_debuginfo());
@@ -234,7 +234,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $contentobject->feedback = trim($contentobject->feedback);
             $contentobject->feedback = preg_replace(array('/\[\[/', '/\]\]/'), '"', $contentobject->feedback);
             $disclaimer = get_config('qtype_aitext', 'disclaimer');
-            $disclaimer = str_replace("[[model]]", $this->model, $disclaimer);
+            // TODO Model currently is only used for connecting and at this point I believe. We need to remove all the model
+            //  selection logic or make local_ai_manager support the selection of models.
+            $disclaimer = str_replace("[[model]]",
+                    \local_ai_manager\ai_manager_utils::get_connector_instance_by_purpose('feedback')->get_model(), $disclaimer);
             $contentobject->feedback .= ' '.$this->llm_translate($disclaimer);
         } else {
             $contentobject = (object) [

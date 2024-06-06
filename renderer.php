@@ -42,7 +42,7 @@ class qtype_aitext_renderer extends qtype_renderer {
      */
     public function formulation_and_controls(question_attempt $qa,
             question_display_options $options) {
-        global $CFG;
+        global $CFG, $PAGE, $USER;
 
         /** @var qtype_aitext_question $question */
         $question = $qa->get_question();
@@ -92,6 +92,9 @@ class qtype_aitext_renderer extends qtype_renderer {
         }
 
         $result = '';
+        $result .= html_writer::tag('div', '', ['data-content' => 'local_ai_manager_infobox']);
+        $PAGE->requires->js_call_amd('local_ai_manager/render_infobox', 'renderInfoBox',
+                ['qtype_aitext', $USER->id, '[data-content="local_ai_manager_infobox"]', ['feedback']]);
         $result .= html_writer::tag('div', $question->format_questiontext($qa),
                 array('class' => 'qtext'));
 
