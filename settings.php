@@ -48,7 +48,7 @@ if ($ADMIN->fulltree) {
         'qtype_aitext/prompt',
         new lang_string('prompt', 'qtype_aitext'),
         new lang_string('prompt_setting', 'qtype_aitext'),
-        'in [responsetext] analyse the part between [[ and ]] as follows:',
+        'in [responsetext] analyse but do not mention the part between [[ and ]] as follows:',
         PARAM_RAW,
         20,
         3
