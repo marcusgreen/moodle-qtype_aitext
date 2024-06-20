@@ -23,13 +23,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use Random\RandomException;
 
 defined('MOODLE_INTERNAL') || die();
 /**
  * Generates the output for aitext questions.
  *
- * @copyright  2023 Marcus Green
+ * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_renderer extends qtype_renderer {

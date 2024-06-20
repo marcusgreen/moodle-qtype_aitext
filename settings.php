@@ -60,5 +60,12 @@ if ($ADMIN->fulltree) {
         20,
         6
     ));
+    $settings->add(new admin_setting_configselect(
+        'qtype_aitext/responseformat',
+        new lang_string('responseformat', 'qtype_aitext'),
+        new lang_string('responseformat_setting', 'qtype_aitext'),
+        0, ['plain' => 'plain', 'editor' => 'editor', 'monospaced' => 'monospaced']
+    ));
+
 }
 

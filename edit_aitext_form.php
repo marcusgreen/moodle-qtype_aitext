@@ -87,7 +87,7 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         $mform->addElement('select', 'responseformat',
                 get_string('responseformat', 'qtype_aitext'), $qtype->response_formats());
-        $mform->setDefault('responseformat', $this->get_default_value('responseformat', 'editor'));
+        $mform->setDefault('responseformat', get_config('qtype_aitext', 'responseformat'));
 
         $mform->addElement('select', 'responsefieldlines',
                 get_string('responsefieldlines', 'qtype_aitext'), $qtype->response_sizes());
