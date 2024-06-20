@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO describe file settings
+ * Default settings for the aitext question type
  *
  * @package    qtype_aitext
  * @copyright  2024 Marcus Green
@@ -24,10 +24,6 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_configtext('qtype_aitext/disclaimer',
-            new lang_string('disclaimer', 'qtype_aitext'),
-            new lang_string('disclaimer_setting', 'qtype_aitext'),
-            "(Response provided by [[model]])"));
 
     $settings->add(new admin_setting_configtextarea('qtype_aitext/defaultprompt',
         new lang_string('defaultprompt', 'qtype_aitext'),
@@ -38,7 +34,7 @@ if ($ADMIN->fulltree) {
         new lang_string('defaultmarksscheme', 'qtype_aitext'),
         new lang_string('defaultmarksscheme_setting', 'qtype_aitext'),
         new lang_string('thedefaultmarksscheme', 'qtype_aitext')));
-        $settings->add(new admin_setting_configtext(
+    $settings->add(new admin_setting_configtext(
         'qtype_aitext/disclaimer',
         new lang_string('disclaimer', 'qtype_aitext'),
         new lang_string('disclaimer_setting', 'qtype_aitext'),
