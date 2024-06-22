@@ -41,8 +41,7 @@ class mobile {
     public static function mobile_get_aitext($args) {
         global $CFG;
         $args = (object) $args;
-        $folder = $args->appversioncode >= 3950 ? 'latest' : 'ionic3';
-        $templatepath = $CFG->dirroot."/question/type/aitext/mobile/$folder/addon-qtype-aitext.html";
+        $templatepath = $CFG->dirroot."/question/type/aitext/mobile/qtype_aitext.html";
         return [
             'templates' => [
                 [

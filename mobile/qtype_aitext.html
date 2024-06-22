@@ -1,8 +1,10 @@
-<section class="list qtype-aitext-container qtype_aitext" ion-list *ngIf="question.text || question.text === ''">
-    <ion-item><p>
-        <core-format-text [component]="component" [componentId]="componentId"
-        [text]="question.text"></core-format-text>
-    </p></ion-item>
+<section class="list qtype-aitext-container qtype_aitext">
+    <ion-item>
+        <p>
+            <core-format-text [component]="component" [componentId]="componentId"
+            [text]="question.text"></core-format-text>
+        </p>
+    </ion-item>
     <ion-item>
         <core-format-text [component]="component" [componentId]="componentId"
         [text]="question.textarea"></core-format-text>
