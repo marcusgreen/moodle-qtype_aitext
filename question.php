@@ -188,7 +188,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param string $markscheme
      * @return string;
      */
-    public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme) {
+    public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
         $responsetext = strip_tags($response);
             $responsetext = '[['.$responsetext.']]';
             $prompt = get_config('qtype_aitext', 'prompt');
@@ -204,7 +204,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
         }
         $prompt .= ' '.trim(get_config('qtype_aitext', 'jsonprompt'));
-        $prompt .= ' translate to the language '.current_language();
+        $prompt .= ' translate the feedback to the language '.current_language();
         return $prompt;
 
     }
@@ -244,7 +244,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param string $text
      * @return string
      */
-    protected function llm_translate(string $text) :string {
+    protected function llm_translate(string $text): string {
         if (current_language() == 'en') {
             return $text;
         }

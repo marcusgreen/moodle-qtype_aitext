@@ -83,6 +83,7 @@ $string['privacy:preference:maxbytes'] = 'Maximum file size.';
 $string['prompttester'] = 'Prompt Tester';
 $string['responsefieldlines'] = 'Input box size';
 $string['responseformat'] = 'Response format';
+$string['responseformat_setting'] = 'The editor the student uses when responding';
 $string['responseoptions'] = 'Response options';
 $string['responsenotrequired'] = 'Text input is optional';
 $string['responseisrequired'] = 'Require the student to enter text';
