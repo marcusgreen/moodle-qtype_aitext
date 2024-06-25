@@ -125,6 +125,8 @@ class qtype_aitext extends question_type {
         $options->responsetemplateformat = $formdata->responsetemplate['format'];
 
         $DB->update_record('qtype_aitext', $options);
+        xdebug_break();
+        $this->save_hints($formdata, true);
     }
     /**
      * Called when previewing a question or when displayed in a quiz

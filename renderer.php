@@ -507,6 +507,10 @@ class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_
         return format_text($text, $step->get_qt_var($name . 'format'), $formatoptions);
     }
 
+    public function specific_feedback(question_attempt $qa) {
+        return $this->combined_feedback($qa);
+    }
+
     /**
      * Process any images included with the text (?)
      *

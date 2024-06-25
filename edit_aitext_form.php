@@ -123,7 +123,8 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->setExpanded('graderinfoheader');
         $mform->addElement('editor', 'graderinfo', get_string('graderinfo', 'qtype_aitext'),
                 array('rows' => 10), $this->editoroptions);
-
+        // Adds hinting features.
+        $this->add_interactive_settings(true, true);
         // Load any JS that we need to make things happen, specifically the prompt tester.
         $PAGE->requires->js_call_amd('qtype_aitext/editformhelper', 'init', []);
     }
@@ -153,7 +154,7 @@ class qtype_aitext_edit_form extends question_edit_form {
             'text' => $question->options->responsetemplate,
             'format' => $question->options->responsetemplateformat,
         );
-
+        $question = $this->data_preprocessing_hints($question, true, true);
         return $question;
     }
 
