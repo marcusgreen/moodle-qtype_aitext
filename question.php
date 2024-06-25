@@ -467,7 +467,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             'minwordlimit' => $this->minwordlimit,
             'maxwordlimit' => $this->maxwordlimit,
         ];
-
+        xdebug_break();
+        $hint = $qa->get_applicable_hint();
         return $settings;
     }
 

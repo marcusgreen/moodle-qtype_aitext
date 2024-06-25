@@ -120,8 +120,8 @@ class qtype_aitext_renderer extends qtype_renderer {
     public function feedback(question_attempt $qa, question_display_options $options) {
 
         // Get data written in the question.php grade_response method.
-        // This probably should be retrieved by an api call.
-        $comment = $qa->get_current_manual_comment();
+        // This probably should be retrieved by a $comment = $qa->get_current_manual_comment();
+        $hint = $qa->get_applicable_hint() ?? ((object) ['hint' => '']);
         if ($this->page->pagetype == 'question-bank-previewquestion-preview') {
             if ($comment[0] > '') {
                 $this->page->requires->js_call_amd('qtype_aitext/showprompt', 'init', []);
@@ -130,9 +130,9 @@ class qtype_aitext_renderer extends qtype_renderer {
                 $showprompt .= '<div id="fullprompt" class="hidden">'.$prompt .'</div>';
                 $comment[0] = $comment[0].$showprompt;
             }
-            return $comment[0];
+            return $hint->hint.$comment[0];
         }
-        return '';
+        return $hint->hint;
     }
 
     /**
@@ -244,7 +244,7 @@ class qtype_aitext_renderer extends qtype_renderer {
  * @copyright  2024
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
+abstract class qtype_aitext_format_renderer_base extends qtype_with_combined_feedback_renderer {
 
     /** @var question_display_options Question display options instance for any necessary information for rendering the question. */
     protected $displayoptions;
