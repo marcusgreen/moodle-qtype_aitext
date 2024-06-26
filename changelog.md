@@ -1,4 +1,4 @@
-Release 0.01 of the Moodle AIText question type May 2024
+### Release 0.01 of the Moodle AIText question type May 2024
 
 Version 2024050300
 
