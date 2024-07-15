@@ -27,6 +27,7 @@ $string['acceptedfiletypes'] = 'Accepted file types';
 
 $string['aiprompt'] = 'AI Prompt';
 $string['aiprompt_help'] = 'A prompt for the Ai Grader. This is the guideline that AI uses to give feedback on the student response.';
+$string['aipromptmissing'] = 'The ai prompt is missing. Please enter a prompt on the basis of which the feedback is generated.';
 $string['answerfiles'] = 'Answer files';
 $string['answertext'] = 'Answer text';
 $string['attachmentsoptional'] = 'Attachments are optional';
@@ -54,6 +55,7 @@ $string['get_llmmfeedback'] = 'Get LLM feedback';
 $string['graderinfoheader'] = 'Grader information';
 $string['markscheme'] = 'Mark scheme';
 $string['markscheme_help'] = 'This will tell the AI grader how to give a numerical grade to the student response. The total possible score is this question\'s \'Default mark\'';
+$string['markschememissing'] = 'The marke scheme is missing. Please enter a prompt, how to mark the users input';
 $string['maxwordlimit'] = 'Maximum word limit';
 $string['maxwordlimit_help'] = 'If the response requires that students enter text, this is the maximum number of words that each student will be allowed to submit.';
 $string['maxwordlimitboundary'] = 'The word limit for this question is {$a->limit} words and you are attempting to submit {$a->count} words. Please shorten your response and try again.';
