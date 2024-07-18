@@ -147,7 +147,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param array $response
      * @return void
      */
-    public function grade_response(array $response) : array {
+    public function grade_response(array $response): array {
         if (!$this->is_complete_response($response)) {
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
@@ -224,7 +224,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $contentobject = json_decode($feedback);
         if (json_last_error() === JSON_ERROR_NONE) {
             $contentobject->feedback = trim($contentobject->feedback);
-            $contentobject->feedback = preg_replace(array('/\[\[/', '/\]\]/'), '"', $contentobject->feedback);
+            $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"', $contentobject->feedback);
             $disclaimer = get_config('qtype_aitext', 'disclaimer');
             $disclaimer = str_replace("[[model]]", $this->model, $disclaimer);
             $contentobject->feedback .= ' '.$this->llm_translate($disclaimer);
@@ -266,12 +266,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param string $value
      * @return void
      */
-    protected function insert_attempt_step_data(string $name, string $value ) :void {
+    protected function insert_attempt_step_data(string $name, string $value ): void {
         global $DB;
         $data = [
             'attemptstepid' => $this->step->get_id(),
             'name' => $name,
-            'value' => $value
+            'value' => $value,
         ];
         $DB->insert_record('question_attempt_step_data', $data);
     }

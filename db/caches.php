@@ -30,5 +30,5 @@ defined('MOODLE_INTERNAL') || die();
 $definitions = [
     'stringdata' => [
         'mode' => cache_store::MODE_SESSION,
-    ]
+    ],
 ];

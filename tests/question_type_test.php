@@ -30,10 +30,11 @@ require_once($CFG->dirroot . '/question/type/aitext/questiontype.php');
  * Unit tests for the aitext question type class.
  *
  * @package    qtype_aitext
+ * @copyright  2013 The Open University
  * @author     Marcus Green 2023
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class question_type_test extends \advanced_testcase {
+final class question_type_test extends \advanced_testcase {
     /**
      * Always aitext
      *
@@ -70,7 +71,7 @@ class question_type_test extends \advanced_testcase {
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      */
-    public function test_name() {
+    public function test_name(): void {
         $this->assertEquals($this->qtype->name(), 'aitext');
     }
     /**
@@ -80,7 +81,7 @@ class question_type_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_can_analyse_responses() {
+    public function test_can_analyse_responses(): void {
         $this->assertFalse($this->qtype->can_analyse_responses());
     }
 
@@ -93,7 +94,7 @@ class question_type_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_get_random_guess_score() {
+    public function test_get_random_guess_score(): void {
         $q = $this->get_test_question_data();
         $this->assertEquals(0, $this->qtype->get_random_guess_score($q));
     }
@@ -104,9 +105,9 @@ class question_type_test extends \advanced_testcase {
      * @return void
      * @covers ::get_possible_responses()
      */
-    public function test_get_possible_responses() {
+    public function test_get_possible_responses(): void {
         $q = $this->get_test_question_data();
-        $this->assertEquals(array(), $this->qtype->get_possible_responses($q));
+        $this->assertEquals([], $this->qtype->get_possible_responses($q));
 
     }
 }
