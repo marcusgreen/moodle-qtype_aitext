@@ -14,3 +14,5 @@ is more than one model the question editor form will show a dropdown with availa
 
 Add model name to disclaimer if configured in settings as [[model]]
 
+Many thanks to Peter Mayer for fixes to coding standards and for code to make the prompt field required. Also for being generally very encouraging.
+
