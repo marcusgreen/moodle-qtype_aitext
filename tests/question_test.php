@@ -39,7 +39,7 @@ use Random\RandomException;
  * @author  Marcus Green 2024
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class question_test extends \advanced_testcase {
+final class question_test extends \advanced_testcase {
 
 
     /**
@@ -51,7 +51,7 @@ class question_test extends \advanced_testcase {
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      */
-    public function test_get_question_summary() {
+    public function test_get_question_summary(): void {
             $aitext = qtype_aitext_test_helper::make_aitext_question([]);
             $aitext->questiontext = 'Hello <img src="http://example.com/globe.png" alt="world" />';
             $this->assertEquals('Hello [world]', $aitext->get_question_summary());
@@ -64,13 +64,13 @@ class question_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_get_feedback() {
+    public function test_get_feedback(): void {
         // Create the aitext question under test.
         $questiontext = 'AI question text';
         $aitext = qtype_aitext_test_helper::make_aitext_question(['questiontext' => $questiontext, 'model' => 'llama3']);
         $testdata = [
                 "feedback" => "Feedback text",
-                "marks" => 0
+                "marks" => 0,
                 ];
         $goodjson = json_encode($testdata);
 
@@ -109,7 +109,7 @@ class question_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_is_same_response() {
+    public function test_is_same_response(): void {
 
         $aitext = qtype_aitext_test_helper::make_aitext_question([]);
 
@@ -118,40 +118,40 @@ class question_test extends \advanced_testcase {
         $aitext->start_attempt(new question_attempt_step(), 1);
 
         $this->assertTrue($aitext->is_same_response(
-                array(),
-                array('answer' => '')));
+                [],
+                ['answer' => '']));
 
         $this->assertTrue($aitext->is_same_response(
-                array('answer' => ''),
-                array('answer' => '')));
+                ['answer' => ''],
+                ['answer' => '']));
 
         $this->assertTrue($aitext->is_same_response(
-                array('answer' => ''),
-                array()));
+                ['answer' => ''],
+                []));
 
         $this->assertFalse($aitext->is_same_response(
-                array('answer' => 'Hello'),
-                array()));
+                ['answer' => 'Hello'],
+                []));
 
         $this->assertFalse($aitext->is_same_response(
-                array('answer' => 'Hello'),
-                array('answer' => '')));
+                ['answer' => 'Hello'],
+                ['answer' => '']));
 
         $this->assertFalse($aitext->is_same_response(
-                array('answer' => 0),
-                array('answer' => '')));
+                ['answer' => 0],
+                ['answer' => '']));
 
         $this->assertFalse($aitext->is_same_response(
-                array('answer' => ''),
-                array('answer' => 0)));
+                ['answer' => ''],
+                ['answer' => 0]));
 
         $this->assertFalse($aitext->is_same_response(
-                array('answer' => '0'),
-                array('answer' => '')));
+                ['answer' => '0'],
+                ['answer' => '']));
 
         $this->assertFalse($aitext->is_same_response(
-                array('answer' => ''),
-                array('answer' => '0')));
+                ['answer' => ''],
+                ['answer' => '0']));
     }
 
 
@@ -160,7 +160,7 @@ class question_test extends \advanced_testcase {
      *
      * @covers ::is_same_response_with_template()
      */
-    public function test_is_same_response_with_template() {
+    public function test_is_same_response_with_template(): void {
         $aitext = qtype_aitext_test_helper::make_aitext_question([]);
 
         $aitext->responsetemplate = 'Once upon a time';
@@ -168,40 +168,40 @@ class question_test extends \advanced_testcase {
         $aitext->start_attempt(new question_attempt_step(), 1);
 
         $this->assertTrue($aitext->is_same_response(
-                array(),
-                array('answer' => 'Once upon a time')));
+                [],
+                ['answer' => 'Once upon a time']));
 
         $this->assertTrue($aitext->is_same_response(
-                array('answer' => ''),
-                array('answer' => 'Once upon a time')));
+                ['answer' => ''],
+                ['answer' => 'Once upon a time']));
 
         $this->assertTrue($aitext->is_same_response(
-                array('answer' => 'Once upon a time'),
-                array('answer' => '')));
+                ['answer' => 'Once upon a time'],
+                ['answer' => '']));
 
         $this->assertTrue($aitext->is_same_response(
-                array('answer' => ''),
-                array()));
+                ['answer' => ''],
+                []));
 
         $this->assertTrue($aitext->is_same_response(
-                array('answer' => 'Once upon a time'),
-                array()));
+                ['answer' => 'Once upon a time'],
+                []));
 
         $this->assertFalse($aitext->is_same_response(
-                array('answer' => 0),
-                array('answer' => '')));
+                ['answer' => 0],
+                ['answer' => '']));
 
         $this->assertFalse($aitext->is_same_response(
-                array('answer' => ''),
-                array('answer' => 0)));
+                ['answer' => ''],
+                ['answer' => 0]));
 
         $this->assertFalse($aitext->is_same_response(
-                array('answer' => '0'),
-                array('answer' => '')));
+                ['answer' => '0'],
+                ['answer' => '']));
 
         $this->assertFalse($aitext->is_same_response(
-                array('answer' => ''),
-                array('answer' => '0')));
+                ['answer' => ''],
+                ['answer' => '0']));
     }
 
 }

@@ -124,7 +124,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addElement('header', 'graderinfoheader', get_string('graderinfoheader', 'qtype_aitext'));
         $mform->setExpanded('graderinfoheader');
         $mform->addElement('editor', 'graderinfo', get_string('graderinfo', 'qtype_aitext'),
-                array('rows' => 10), $this->editoroptions);
+                ['rows' => 10], $this->editoroptions);
 
         // Load any JS that we need to make things happen, specifically the prompt tester.
         $PAGE->requires->js_call_amd('qtype_aitext/editformhelper', 'init', []);
@@ -151,10 +151,10 @@ class qtype_aitext_edit_form extends question_edit_form {
         $question->maxwordlimit = $question->options->maxwordlimit;
         $question->aiprompt = $question->options->aiprompt;
 
-        $question->responsetemplate = array(
+        $question->responsetemplate = [
             'text' => $question->options->responsetemplate,
             'format' => $question->options->responsetemplateformat,
-        );
+        ];
 
         return $question;
     }
