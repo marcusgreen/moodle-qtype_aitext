@@ -27,6 +27,7 @@ $string['acceptedfiletypes'] = 'Accepted file types';
 
 $string['aiprompt'] = 'AI Prompt';
 $string['aiprompt_help'] = 'A prompt for the Ai Grader. This is the guideline that AI uses to give feedback on the student response.';
+$string['aipromptmissing'] = 'The ai prompt is missing. Please enter a prompt on the basis of which the feedback is generated.';
 $string['answerfiles'] = 'Answer files';
 $string['answertext'] = 'Answer text';
 $string['attachmentsoptional'] = 'Attachments are optional';
