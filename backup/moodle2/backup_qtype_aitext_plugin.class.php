@@ -57,7 +57,7 @@ class backup_qtype_aitext_plugin extends backup_qtype_plugin {
 
         // Set source to populate the data.
         $aitext->set_source_table('qtype_aitext',
-                array('questionid' => backup::VAR_PARENTID));
+                ['questionid' => backup::VAR_PARENTID]);
 
         // Don't need to annotate ids nor files.
 
@@ -71,8 +71,8 @@ class backup_qtype_aitext_plugin extends backup_qtype_plugin {
      * files to be processed both in backup and restore.
      */
     public static function get_qtype_fileareas() {
-        return array(
+        return [
             'graderinfo' => 'question_created',
-        );
+        ];
     }
 }

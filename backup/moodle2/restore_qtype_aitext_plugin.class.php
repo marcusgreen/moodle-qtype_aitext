@@ -91,9 +91,9 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
      * Return the contents of this qtype to be processed by the links decoder
      */
     public static function define_decode_contents() {
-        return array(
+        return [
             new restore_decode_content('qtype_aitext', 'graderinfo', 'qtype_aitext'),
-        );
+        ];
     }
 
     /**
@@ -112,7 +112,7 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
                        AND qeo.id IS NULL
                        AND bi.backupid = ?
                        AND bi.itemname = ?
-                ", array('aitext', $this->get_restoreid(), 'question_created'));
+                ", ['aitext', $this->get_restoreid(), 'question_created']);
 
         foreach ($aitextswithoutoptions as $q) {
             $defaultoptions = new stdClass();

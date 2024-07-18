@@ -57,7 +57,7 @@ class qtype_aitext_renderer extends qtype_renderer {
 
         if (!$step->has_qt_var('answer') && empty($options->readonly)) {
             // Question has never been answered, fill it with response template.
-            $step = new question_attempt_step(array('answer' => $question->responsetemplate));
+            $step = new question_attempt_step(['answer' => $question->responsetemplate]);
         }
 
         if (empty($options->readonly)) {
@@ -94,17 +94,17 @@ class qtype_aitext_renderer extends qtype_renderer {
 
         $result = '';
         $result .= html_writer::tag('div', $question->format_questiontext($qa),
-                array('class' => 'qtext'));
+                ['class' => 'qtext']);
 
-        $result .= html_writer::start_tag('div', array('class' => 'ablock'));
-        $result .= html_writer::tag('div', $answer, array('class' => 'answer'));
+        $result .= html_writer::start_tag('div', ['class' => 'ablock']);
+        $result .= html_writer::tag('div', $answer, ['class' => 'answer']);
 
         // If there is a response and min/max word limit is set in the form then check the response word count.
         if ($qa->get_state() == question_state::$invalid) {
             $result .= html_writer::nonempty_tag('div',
                 $question->get_validation_error($step->get_qt_data()), ['class' => 'validationerror']);
         }
-        $result .= html_writer::tag('div', $files, array('class' => 'attachments'));
+        $result .= html_writer::tag('div', $files, ['class' => 'attachments']);
         $result .= html_writer::end_tag('div');
 
         return $result;
@@ -152,7 +152,7 @@ class qtype_aitext_renderer extends qtype_renderer {
         foreach ($files as $file) {
             $out = html_writer::link($qa->get_response_file_url($file),
                 $this->output->pix_icon(file_file_icon($file), get_mimetype_description($file),
-                    'moodle', array('class' => 'icon')) . ' ' . s($file->get_filename()));
+                    'moodle', ['class' => 'icon']) . ' ' . s($file->get_filename()));
             if (!empty($CFG->enableplagiarism)) {
                 require_once($CFG->libdir . '/plagiarismlib.php');
 
@@ -373,16 +373,16 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
             'class' => 'sr-only',
             'for' => $id,
         ]);
-        $output .= html_writer::start_tag('div', array('class' =>
-                $this->class_name() . ' qtype_aitext_response'));
+        $output .= html_writer::start_tag('div', ['class' =>
+                $this->class_name() . ' qtype_aitext_response']);
         $output .= html_writer::tag('div', html_writer::tag('textarea', s($response),
-                array('id' => $id, 'name' => $inputname, 'rows' => $lines, 'cols' => 60, 'class' => 'form-control')));
+                ['id' => $id, 'name' => $inputname, 'rows' => $lines, 'cols' => 60, 'class' => 'form-control']));
 
         $output .= html_writer::start_tag('div');
         if (count($formats) == 1) {
             reset($formats);
-            $output .= html_writer::empty_tag('input', array('type' => 'hidden',
-                    'name' => $inputname . 'format', 'value' => key($formats)));
+            $output .= html_writer::empty_tag('input', ['type' => 'hidden',
+                    'name' => $inputname . 'format', 'value' => key($formats)]);
 
         } else {
             $output .= html_writer::label(get_string('format'), 'menu' . $inputname . 'format', false);
@@ -438,7 +438,7 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
      */
     protected function get_editor_options($context) {
         // Disable the text-editor autosave because quiz has it's own auto save function.
-        return array('context' => $context, 'autosave' => false);
+        return ['context' => $context, 'autosave' => false];
     }
 
     /**
@@ -451,7 +451,7 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
      * @return array filepicker options for the editor.
      */
     protected function get_filepicker_options($context, $draftitemid) {
-        return array('return_types'  => FILE_INTERNAL | FILE_EXTERNAL);
+        return ['return_types'  => FILE_INTERNAL | FILE_EXTERNAL];
     }
 
     /**
@@ -580,21 +580,21 @@ class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_
      * @return string
      */
     protected function filepicker_html($inputname, $draftitemid) {
-        $nonjspickerurl = new moodle_url('/repository/draftfiles_manager.php', array(
+        $nonjspickerurl = new moodle_url('/repository/draftfiles_manager.php', [
             'action' => 'browse',
             'env' => 'editor',
             'itemid' => $draftitemid,
             'subdirs' => false,
             'maxfiles' => -1,
             'sesskey' => sesskey(),
-        ));
+        ]);
 
-        return html_writer::empty_tag('input', array('type' => 'hidden',
-                'name' => $inputname . ':itemid', 'value' => $draftitemid)) .
+        return html_writer::empty_tag('input', ['type' => 'hidden',
+                'name' => $inputname . ':itemid', 'value' => $draftitemid]) .
                 html_writer::tag('noscript', html_writer::tag('div',
-                    html_writer::tag('object', '', array('type' => 'text/html',
+                    html_writer::tag('object', '', ['type' => 'text/html',
                         'data' => $nonjspickerurl, 'height' => 160, 'width' => 600,
-                        'style' => 'border: 1px solid #000;'))));
+                        'style' => 'border: 1px solid #000;'])));
     }
 }
 

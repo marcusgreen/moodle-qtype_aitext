@@ -46,7 +46,7 @@ class qtype_aitext_external extends external_api {
             ['response' => new external_value(PARAM_TEXT, 'The students response to question'),
                 'defaultmark' => new external_value(PARAM_INT, 'The total possible score'),
                 'prompt' => new external_value(PARAM_TEXT, 'The AI Prompt'),
-                'marksscheme' => new external_value(PARAM_TEXT, 'The marks scheme')
+                'marksscheme' => new external_value(PARAM_TEXT, 'The marks scheme'),
             ]
         );
 

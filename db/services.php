@@ -30,13 +30,13 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$functions = array(
-        'qtype_aitext_fetch_ai_grade' => array(
+$functions = [
+        'qtype_aitext_fetch_ai_grade' => [
                 'classname'   => 'qtype_aitext_external',
                 'methodname'  => 'fetch_ai_grade',
                 'description' => 'checks a response with the AI grader' ,
                 'capabilities' => 'mod/quiz:grade',
                 'type'        => 'read',
                 'ajax'        => true,
-        ),
-);
+        ],
+];

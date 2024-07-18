@@ -36,7 +36,7 @@ class qtype_aitext_test_helper extends question_test_helper {
      * @return array
      */
     public function get_test_questions() {
-        return array('editor', 'plain', 'monospaced', 'responsetemplate', 'noinline');
+        return ['editor', 'plain', 'monospaced', 'responsetemplate', 'noinline'];
     }
     /**
      * Make an aitext question for testing
@@ -99,15 +99,15 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform = new stdClass();
 
         $fromform->name = 'aitext question (HTML editor)';
-        $fromform->questiontext = array('text' => 'Please write a story about a frog.', 'format' => FORMAT_HTML);
+        $fromform->questiontext = ['text' => 'Please write a story about a frog.', 'format' => FORMAT_HTML];
         $fromform->defaultmark = 1.0;
-        $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.',
-             'format' => FORMAT_HTML);
+        $fromform->generalfeedback = ['text' => 'I hope your story had a beginning, a middle and an end.',
+             'format' => FORMAT_HTML];
         $fromform->responseformat = 'editor';
         $fromform->responsefieldlines = 10;
         $fromform->attachments = 0;
-        $fromform->graderinfo = array('text' => '', 'format' => FORMAT_HTML);
-        $fromform->responsetemplate = array('text' => '', 'format' => FORMAT_HTML);
+        $fromform->graderinfo = ['text' => '', 'format' => FORMAT_HTML];
+        $fromform->responsetemplate = ['text' => '', 'format' => FORMAT_HTML];
         $fromform->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
         $fromform->aiprompt = 'A prompt for the LLM';
         $fromform->markscheme = 'Give one mark if the answer is correct';
@@ -137,17 +137,17 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform = new stdClass();
 
         $fromform->name = 'aitext question with filepicker and attachments';
-        $fromform->questiontext = array('text' => 'Please write a story about a frog.', 'format' => FORMAT_HTML);
+        $fromform->questiontext = ['text' => 'Please write a story about a frog.', 'format' => FORMAT_HTML];
         $fromform->defaultmark = 1.0;
-        $fromform->generalfeedback = array('text' => 'I hope your story had a beginning, a middle and an end.',
-             'format' => FORMAT_HTML);
+        $fromform->generalfeedback = ['text' => 'I hope your story had a beginning, a middle and an end.',
+             'format' => FORMAT_HTML];
         $fromform->responseformat = 'plain';
         $fromform->responsefieldlines = 10;
         $fromform->aiprompt = 'Evaluate this';
         $fromform->markscheme = 'One mark if correct';
         $fromform->maxbytes = 0;
-        $fromform->graderinfo = array('text' => '', 'format' => FORMAT_HTML);
-        $fromform->responsetemplate = array('text' => '', 'format' => FORMAT_HTML);
+        $fromform->graderinfo = ['text' => '', 'format' => FORMAT_HTML];
+        $fromform->responsetemplate = ['text' => '', 'format' => FORMAT_HTML];
         $fromform->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
         $fromform->sampleanswer = '';
         $fromform->model = 'gpt-4';
