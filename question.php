@@ -141,6 +141,31 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     }
 
     /**
+     * Get the spellchecking response.
+     *
+     * @param array $response
+     * @return string
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
+    private function get_spellchecking(array $response):string {
+        $fullaiprompt = $this->build_full_ai_spellchecking_prompt($response['answer']);
+        $ai = new local_ai_manager\manager('feedback');
+        $llmresponse = $ai->perform_request($fullaiprompt, ['component' => 'qtype_aitext', 'contextid' => $this->contextid]);
+        if ($llmresponse->get_code() !== 200) {
+            throw new moodle_exception(
+                'Could not provide feedback by AI tool',
+                '',
+                '',
+                '',
+                $llmresponse->get_errormessage() . ' ' . $llmresponse->get_debuginfo()
+            );
+        }
+        return $llmresponse->get_content();
+    }
+
+    /**
      * Grade response by making a call to external
      * large language model such as ChatGPT
      *
@@ -148,6 +173,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return void
      */
     public function grade_response(array $response): array {
+
+        if($this->spellcheck) {
+            $spellcheckresponse = $this->get_spellchecking($response);
+            $this->insert_attempt_step_data('-spellcheckresponse', $spellcheckresponse);
+        }
+
         if (!$this->is_complete_response($response)) {
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
@@ -212,6 +243,19 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         return $prompt;
 
     }
+
+    /**
+     * Build the full ai spellchecking prompt.
+     *
+     * @param string $response
+     * @return string
+     * @throws coding_exception
+     */
+    public function build_full_ai_spellchecking_prompt(string $response): string {
+        // $response = strip_tags($response);
+        return get_string('spellcheck_prompt', 'qtype_aitext') . ($response);
+    }
+
     /**
      *
      * Convert string json returned from LLM call to an object,
@@ -273,6 +317,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
         return $translation;
     }
+
     /**
      * Fake manual grading
      *

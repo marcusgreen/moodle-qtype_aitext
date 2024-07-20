@@ -46,6 +46,11 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addElement('editor', 'questiontext', get_string('questiontext', 'mod_quiz'),
             ['maxlen' => 50, 'rows' => 8, 'size' => 30], $this->editoroptions);
 
+        // Spelling correction.
+        $mform->addElement('checkbox', 'spellcheck', get_string('automatic_spellcheck', 'qtype_aitext'));
+        $mform->addRule('spellcheck', get_string('aipromptmissing', 'qtype_aitext'), 'required');
+
+        // Ai prompt.
         $mform->addElement('textarea', 'aiprompt', get_string('aiprompt', 'qtype_aitext'),
              ['maxlen' => 50, 'rows' => 5, 'size' => 30]);
         $mform->setType('aiprompt', PARAM_RAW);
@@ -53,6 +58,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addHelpButton('aiprompt', 'aiprompt', 'qtype_aitext');
         $mform->addRule('aiprompt', get_string('aipromptmissing', 'qtype_aitext'), 'required');
 
+        // Markscheme.
         $mform->addElement('textarea', 'markscheme', get_string('markscheme', 'qtype_aitext'),
              ['maxlen' => 50, 'rows' => 6, 'size' => 30]);
         $mform->setType('markscheme', PARAM_RAW);
@@ -68,6 +74,7 @@ class qtype_aitext_edit_form extends question_edit_form {
             $mform->addElement('hidden', 'model', $models[0]);
         }
         $mform->setType('model', PARAM_RAW);
+
         // The question_edit_form that this class extends expects a general feedback field.
         $mform->addElement('html', '<div class="hidden">');
         $mform->addElement('editor', 'generalfeedback', get_string('generalfeedback', 'question')
@@ -150,6 +157,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $question->maxwordenabled = $question->options->maxwordlimit ? 1 : 0;
         $question->maxwordlimit = $question->options->maxwordlimit;
         $question->aiprompt = $question->options->aiprompt;
+        $question->spellcheck = $question->options->spellcheck;
 
         $question->responsetemplate = [
             'text' => $question->options->responsetemplate,

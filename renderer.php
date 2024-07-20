@@ -23,6 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use qtype_aitext\form\edit_spellchek;
 
 defined('MOODLE_INTERNAL') || die();
 /**
@@ -323,16 +324,58 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
      * @throws coding_exception
      */
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
+        global $OUTPUT;
+
+        \local_debugger\performance\debugger::print_debug('test' , 'test' ,$qa->get_question()->spellcheck);
+
+        if ($qa->get_question()->spellcheck) {
+            // $this->page->requires->js('/question/type/aitext/jslibs/diff.js');
+            $this->page->requires->js_call_amd('qtype_aitext/diff');
+            $this->page->requires->js_call_amd('qtype_aitext/getSpellcheck', 'init', []);
+            $stepspellcheck = $qa->get_last_step_with_qt_var('-spellcheckresponse');
+            $stepanswer = $qa->get_last_step_with_qt_var('answer');
+        }
+        // Lib to display the spellcheck diff.
         $labelbyid = $qa->get_qt_field_name($name) . '_label';
         $responselabel = $this->displayoptions->add_question_identifier_to_label(get_string('answertext', 'qtype_aitext'));
         $output = html_writer::tag('h4', $responselabel, ['id' => $labelbyid, 'class' => 'sr-only']);
-        $output .= html_writer::tag('div', $this->prepare_response($name, $qa, $step, $context), [
+
+        $divoptions = [
+            'id' => 'aitext_readonly_area',
             'role' => 'textbox',
             'aria-readonly' => 'true',
             'aria-labelledby' => $labelbyid,
             'class' => $this->class_name() . ' qtype_aitext_response readonly',
             'style' => 'min-height: ' . ($lines * 1.25) . 'em;',
-        ]);
+        ];
+
+        if ($qa->get_question()->spellcheck) {
+            $divoptions['data-spellcheck'] = $this->prepare_response('-spellcheckresponse', $qa, $stepspellcheck, $context);
+            $divoptions['data-spellcheckattemptstepid'] = $stepspellcheck->get_id();
+            $divoptions['data-spellcheckattemptstepanswerid'] = $stepanswer->get_id();
+            $divoptions['data-answer'] = $this->prepare_response($name, $qa, $step, $context);
+        }
+
+        $output .= html_writer::tag('div', $this->prepare_response($name, $qa, $step, $context), $divoptions);
+
+        if (
+            $qa->get_question()->spellcheck &&
+            (
+                has_capability('mod/quiz:grade', $context) ||
+                has_capability('mod/quiz:regrade', $context)
+            )
+        ) {
+            $btnoptions = ['id' => 'aitext_spellcheckedit', 'class' => 'btn btn-link'];
+            $output .= html_writer::tag(
+                'button',
+                $OUTPUT->pix_icon(
+                    'i/edit',
+                    get_string('spellcheckedit', 'qtype_aitext'),
+                    'moodle'
+                ) . " " . get_string('spellcheckedit', 'qtype_aitext'),
+                $btnoptions
+            );
+        }
         // Height $lines * 1.25 because that is a typical line-height on web pages.
         // That seems to give results that look OK.
 
