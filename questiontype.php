@@ -96,6 +96,7 @@ class qtype_aitext extends question_type {
             $options->questionid = $formdata->id;
             $options->id = $DB->insert_record('qtype_aitext', $options);
         }
+        $options->spellcheck = $formdata->spellcheck;
         $options->aiprompt = $formdata->aiprompt;
         $options->markscheme = $formdata->markscheme;
         $options->sampleanswer = $formdata->sampleanswer;
@@ -261,6 +262,7 @@ class qtype_aitext extends question_type {
             'markscheme',
             'sampleanswer',
             'model',
+            'spellcheck',
         ];
     }
     /**
