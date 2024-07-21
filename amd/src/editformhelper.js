@@ -53,10 +53,7 @@ export const init = () => {
         strings.sampleanswerempty = s[i++];
     });
 
-
     document.querySelector(Selectors.fields.sampleanswerbtn).addEventListener('click', e => {
-
-
 
         const form = e.target.closest('form');
         const sampleanswer = form.querySelector(Selectors.fields.sampleanswer);
