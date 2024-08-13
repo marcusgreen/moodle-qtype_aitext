@@ -516,7 +516,7 @@ class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_
      * @return void
      */
     protected function prepare_response_for_editing($name,
-            question_attempt_step $step, $context) {
+            question_attempt_step $step, $context): array {
         return $step->prepare_response_files_draft_itemid_with_text(
                 $name, $context->id, $step->get_qt_var($name));
     }

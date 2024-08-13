@@ -147,10 +147,21 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param array $response
      * @return void
      */
-    public function grade_response(array $response): array {
+    public function grade_response(array $response) {
+        global $DB;
         if (!$this->is_complete_response($response)) {
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
+        }
+
+        if (get_config('qtype_aitext', 'batchmode')) {
+            $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
+                 $this->defaultmark, $this->markscheme);
+
+            $DB->insert_record('tool_aiconnect_queue', ['prompttext' => $fullaiprompt, 'timecreated' => time()]);
+            $grade = [0 => 0, question_state::$needsgrading];
+            return $grade;
+
         }
         $ai = new ai\ai($this->model);
         if (is_array($response)) {
