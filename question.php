@@ -169,18 +169,30 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $fraction = $contentobject->marks / $this->defaultmark;
             $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
-        $this->insert_feedback_and_prompt($fullaiprompt,$contentobject);
+        $this->insert_feedback_and_prompt($fullaiprompt, $contentobject);
 
         return $grade;
     }
-    public function insert_feedback_and_prompt($fullaiprompt, $contentobject) :void  {
-                 // The -aicontent data is used in question preview. Only needs to happen in preview.
-                 $this->insert_attempt_step_data('-aiprompt', $fullaiprompt);
-                 $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);
+    /**
+     * Inserts the AI feedback and prompt into the attempt step data.
+     *
+     * This method is used to insert the AI generated prompt and feedback
+     * into the attempt step data, which is used during question preview.
+     * It also adds the feedback as a comment in HTML format.
+     *
+     * @param string $fullaiprompt The full AI-generated prompt.
+     * @param object $contentobject An object containing the feedback.
+     * @return void
+     */
+    public function insert_feedback_and_prompt($fullaiprompt, $contentobject): void {
+        // The -aicontent data is used in question preview. Only needs to happen in preview.
+        $this->insert_attempt_step_data('-aiprompt', $fullaiprompt);
+        $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);
 
-                 $this->insert_attempt_step_data('-comment', $contentobject->feedback);
-                 $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
+        $this->insert_attempt_step_data('-comment', $contentobject->feedback);
+        $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
     }
+
     /**
      * Used by prompttester in the editing form
      *
