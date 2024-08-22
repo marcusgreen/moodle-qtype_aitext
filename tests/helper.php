@@ -18,7 +18,7 @@
  * Test helpers for the aitext question type.
  *
  * @package    qtype_aitext
- * @copyright  2013 The Open University
+ * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,7 +27,7 @@ use Random\RandomException;
 /**
  * Test helper class for the aitext question type.
  *
- * @copyright  2013 The Open University
+ * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_test_helper extends question_test_helper {
