@@ -157,8 +157,13 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (get_config('qtype_aitext', 'batchmode')) {
             $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
                  $this->defaultmark, $this->markscheme);
+            $data = [
+                'prompttext' => $fullaiprompt,
+                'timecreated' => time(),
+                'data' => $this->step->get_id(),
+            ];
 
-            $DB->insert_record('tool_aiconnect_queue', ['prompttext' => $fullaiprompt, 'timecreated' => time()]);
+            $DB->insert_record('tool_aiconnect_queue', $data);
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
 
