@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace qtype_aitext\task;
+use tool_aiconnect\ai;
 
 /**
  * Class llm_feedback
@@ -39,5 +40,8 @@ class llm_feedback extends \core\task\scheduled_task {
      */
     public function execute() {
         mtrace('get_llmfeedback is running');
+        $ai = new ai\ai();
+        $records = $DB->get_records('tool_aiconnect_queue', $data);
+
     }
 }

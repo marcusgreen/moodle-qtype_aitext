@@ -57,7 +57,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
     /**
      * LLM Model, will vary between AI systems, e.g. gpt4 or llama3
-     * @var stream_set_blocking
+     * @var \stdClass
      */
     public $model;
 
@@ -154,6 +154,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             return $grade;
         }
 
+        xdebug_break();
         if (get_config('qtype_aitext', 'batchmode')) {
             $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
                  $this->defaultmark, $this->markscheme);

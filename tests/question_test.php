@@ -56,6 +56,20 @@ final class question_test extends \advanced_testcase {
             $aitext->questiontext = 'Hello <img src="http://example.com/globe.png" alt="world" />';
             $this->assertEquals('Hello [world]', $aitext->get_question_summary());
     }
+    /**
+     * Summary of setup_batch_queue
+     * @return void
+     */
+    public function test_batch_queue() {
+        xdebug_break();
+        global $CFG;
+        set_config('batchmode', '1','qtype_aitext');
+        set_config('apikey', TEST_LLM_APIKEY, 'tool_aiconnect');
+        $question = qtype_aitext_test_helper::make_aitext_question([]);
+        $response = ['answer' => 'Yesterday I go park', 'answerformat' => 1];
+        list($fraction, $state) = $question->grade_response($response);
+
+    }
 
     /**
      * Check that non valid json returned from the LLM is

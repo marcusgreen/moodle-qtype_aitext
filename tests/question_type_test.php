@@ -50,6 +50,7 @@ final class question_type_test extends \advanced_testcase {
         $this->qtype = null;
     }
 
+
     /**
      * Get data skeleton
      * @todo consolidate into another earlier function
