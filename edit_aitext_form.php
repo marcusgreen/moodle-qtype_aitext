@@ -48,7 +48,6 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         // Spelling correction.
         $mform->addElement('checkbox', 'spellcheck', get_string('automatic_spellcheck', 'qtype_aitext'));
-        $mform->addRule('spellcheck', get_string('aipromptmissing', 'qtype_aitext'), 'required');
 
         // Ai prompt.
         $mform->addElement('textarea', 'aiprompt', get_string('aiprompt', 'qtype_aitext'),
