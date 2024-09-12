@@ -16,6 +16,7 @@ import {get_strings} from 'core/str';
 import Ajax from 'core/ajax';
 import Log from 'core/log';
 import Notify from 'core/notification';
+import {exception as displayException} from 'core/notification';
 
 /**
  * Question AI Text Edit Form Helper
@@ -84,6 +85,9 @@ export const init = () => {
             if (airesponse.feedback) {
                 sampleanswereval.textContent = airesponse.feedback + ' (GRADE: ' + airesponse.marks + '/' + defaultmark.value + ')';
             }
+        }).fail(error => {
+            displayException(error);
+            sampleanswereval.innerHTML = '';
         });
     });//end of click
 };

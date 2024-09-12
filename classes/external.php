@@ -75,12 +75,13 @@ class qtype_aitext_external extends external_api {
             $fullaiprompt = $aiquestion->build_full_ai_prompt($response, $prompt, $defaultmark, $marksscheme);
             $llmresponse = $ai->perform_request($fullaiprompt);
             if ($llmresponse->get_code() !== 200) {
-                throw new moodle_exception('Could not retrieve the translation from the AI tool');
+                throw new moodle_exception('err_retrievingtranslation', 'qtype_aitext', '',
+                        $llmresponse->get_errormessage());
             }
             $feedback = $llmresponse->get_content();
             $contentobject = $aiquestion->process_feedback($feedback);
         } else {
-            $contentobject = (object)["feedback" => "Invalid parameters. Check that you have a sample answer and prompt", "marks" => 0];
+            $contentobject = (object)["feedback" => get_string('error_parammissing', 'qtype_aitext'), "marks" => 0];
         }
 
         // Return whatever we have got.

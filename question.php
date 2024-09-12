@@ -189,8 +189,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                  $this->defaultmark, $this->markscheme);
             $llmresponse = $ai->perform_request($fullaiprompt, ['component' => 'qtype_aitext', 'contextid' => $this->contextid]);
             if ($llmresponse->get_code() !== 200) {
-                throw new moodle_exception('Could not provide feedback by AI tool', '', '', '',
-                        $llmresponse->get_errormessage() . ' ' . $llmresponse->get_debuginfo());
+                throw new moodle_exception('err_retrievingfeedback', 'qtype_aitext', '', $llmresponse->get_errormessage(),
+                        $llmresponse->get_debuginfo());
             }
             $feedback = $llmresponse->get_content();
         }
