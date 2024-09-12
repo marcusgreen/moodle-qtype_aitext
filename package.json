@@ -1,0 +1,9 @@
+{
+  "name": "moodle-qtype_aitext",
+  "scripts": {
+    "deployJsDiff": ""
+  },
+  "dependencies": {
+    "diff": "^5.2.0"
+  }
+}
