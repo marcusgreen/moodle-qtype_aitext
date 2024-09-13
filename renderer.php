@@ -715,7 +715,6 @@ class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_ba
         $output = html_writer::tag('label', $responselabel, ['class' => 'sr-only', 'for' => $id]);
         $output .= $this->textarea($step->get_qt_var($name), $lines, ['name' => $inputname, 'id' => $id]);
         $output .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $inputname . 'format', 'value' => FORMAT_PLAIN]);
-        $output .= "BLABLA";
         return $output;
     }
 }
