@@ -145,29 +145,18 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * large language model such as ChatGPT
      *
      * @param array $response
-     * @return void
-     */
-    public function grade_response(array $response) {
+     * @return array An array containing the grade fraction and the question state.
+    *
+    */
+    public function grade_response(array $response): array {
         global $DB;
         if (!$this->is_complete_response($response)) {
-            $grade = [0 => 0, question_state::$needsgrading];
-            return $grade;
+            return [0 => 0, question_state::$needsgrading];
         }
-
-        xdebug_break();
+        $ai = new ai\ai($this->model);
         if (get_config('qtype_aitext', 'batchmode')) {
-            $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
-                 $this->defaultmark, $this->markscheme);
-            $data = [
-                'prompttext' => $fullaiprompt,
-                'timecreated' => time(),
-                'data' => $this->step->get_id(),
-            ];
-
-            $DB->insert_record('tool_aiconnect_queue', $data);
-            $grade = [0 => 0, question_state::$needsgrading];
-            return $grade;
-
+                $this->queue_ai_processing($response['answer'], $this->aiprompt, $this->defaultmark, $this->markscheme);
+                return [0 => 0, question_state::$needsgrading];
         }
         $ai = new ai\ai($this->model);
         if (is_array($response)) {
@@ -190,6 +179,30 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         return $grade;
     }
+    /**
+ * Queues the AI processing in batch mode.
+ *
+ * @param string $answer The student's answer.
+ * @param string $aiprompt The AI prompt.
+ * @param float $defaultmark The default mark.
+ * @param string $markscheme The mark scheme.
+ */
+private function queue_ai_processing(string $answer, string $aiprompt, float $defaultmark, string $markscheme): void {
+    global $DB;
+    xdebug_break();
+    $data = [
+        'activity' => 'qtype_aitext',
+        'status' => 0,
+        'tries' => 0,
+        'prompttext' => $this->build_full_ai_prompt($answer, $aiprompt, $defaultmark, $markscheme),
+        'actiondata' => $this->step->get_id(),
+        'timecreated' => time(),
+        'timemodified' => time()
+
+    ];
+
+    $DB->insert_record('tool_aiconnect_queue', $data);
+}
     /**
      * Inserts the AI feedback and prompt into the attempt step data.
      *
