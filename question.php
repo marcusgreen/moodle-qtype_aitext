@@ -119,6 +119,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
     /** @var array The string array of file types accepted upon file submission. */
     public $filetypeslist;
+
+    /** @var bool $spellcheck if spellcheck is enabled */
+    public bool $spellcheck;
+
     /**
      * Required by the interface question_automatically_gradable_with_countback.
      *

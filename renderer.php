@@ -93,9 +93,11 @@ class qtype_aitext_renderer extends qtype_renderer {
         }
 
         $result = '';
-        $result .= html_writer::tag('div', '', ['data-content' => 'local_ai_manager_infobox']);
+        $uniqid = uniqid();
+        $result .= html_writer::tag('div', '',
+                ['data-content' => 'local_ai_manager_infobox', 'data-boxid' => $uniqid]);
         $PAGE->requires->js_call_amd('local_ai_manager/infobox', 'renderInfoBox',
-                ['qtype_aitext', $USER->id, '[data-content="local_ai_manager_infobox"]', ['feedback']]);
+                ['qtype_aitext', $USER->id, '[data-content="local_ai_manager_infobox"][data-boxid="' . $uniqid . '"]', ['feedback']]);
         $result .= html_writer::tag('div', $question->format_questiontext($qa),
                 ['class' => 'qtext']);
 
@@ -109,9 +111,10 @@ class qtype_aitext_renderer extends qtype_renderer {
         }
         $result .= html_writer::tag('div', $files, ['class' => 'attachments']);
         $result .= html_writer::end_tag('div');
-        $result .= html_writer::tag('div', '', ['data-content' => 'local_ai_manager_warningbox']);
+        $result .= html_writer::tag('div', '',
+                ['data-content' => 'local_ai_manager_warningbox', 'data-boxid' => $uniqid]);
         $PAGE->requires->js_call_amd('local_ai_manager/warningbox', 'renderWarningBox',
-                ['[data-content="local_ai_manager_warningbox"]']);
+                ['[data-content="local_ai_manager_warningbox"][data-boxid="' . $uniqid . '"]']);
 
         return $result;
     }
@@ -325,13 +328,15 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
      */
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
         global $OUTPUT;
+        $question = $qa->get_question();
+        $uniqid = uniqid();
+        $readonlyareaid = 'aitext_readonly_area' . $uniqid;
+        $spellcheckeditbuttonid = 'aitext_spellcheckedit' . $uniqid;
 
-        \local_debugger\performance\debugger::print_debug('test' , 'test' ,$qa->get_question()->spellcheck);
-
-        if ($qa->get_question()->spellcheck) {
-            // $this->page->requires->js('/question/type/aitext/jslibs/diff.js');
+        if ($question->spellcheck) {
             $this->page->requires->js_call_amd('qtype_aitext/diff');
-            $this->page->requires->js_call_amd('qtype_aitext/getSpellcheck', 'init', []);
+            $this->page->requires->js_call_amd('qtype_aitext/spellcheck', 'init',
+                    [$this->get_page()->cm->id, '#' . $readonlyareaid, '#' . $spellcheckeditbuttonid]);
             $stepspellcheck = $qa->get_last_step_with_qt_var('-spellcheckresponse');
             $stepanswer = $qa->get_last_step_with_qt_var('answer');
         }
@@ -341,7 +346,7 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
         $output = html_writer::tag('h4', $responselabel, ['id' => $labelbyid, 'class' => 'sr-only']);
 
         $divoptions = [
-            'id' => 'aitext_readonly_area',
+            'id' => $readonlyareaid,
             'role' => 'textbox',
             'aria-readonly' => 'true',
             'aria-labelledby' => $labelbyid,
@@ -365,7 +370,7 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
                 has_capability('mod/quiz:regrade', $context)
             )
         ) {
-            $btnoptions = ['id' => 'aitext_spellcheckedit', 'class' => 'btn btn-link'];
+            $btnoptions = ['id' => $spellcheckeditbuttonid, 'class' => 'btn btn-link'];
             $output .= html_writer::tag(
                 'button',
                 $OUTPUT->pix_icon(
@@ -376,8 +381,6 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
                 $btnoptions
             );
         }
-        // Height $lines * 1.25 because that is a typical line-height on web pages.
-        // That seems to give results that look OK.
 
         return $output;
     }
@@ -688,11 +691,64 @@ class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_ba
      * @throws coding_exception
      */
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
-        $id = $qa->get_qt_field_name($name) . '_id';
+        // CARE: This is basically duplicating response_area_read_only from qtype_aitext_format_editor_renderer.
+        global $OUTPUT;
+        $question = $qa->get_question();
+        $uniqid = uniqid();
+        $readonlyareaid = 'aitext_readonly_area' . $uniqid;
+        $spellcheckeditbuttonid = 'aitext_spellcheckedit' . $uniqid;
 
+        if ($question->spellcheck) {
+            $this->page->requires->js_call_amd('qtype_aitext/diff');
+            $this->page->requires->js_call_amd('qtype_aitext/spellcheck', 'init',
+                    [$this->get_page()->cm->id, '#' . $readonlyareaid, '#' . $spellcheckeditbuttonid]);
+            $stepspellcheck = $qa->get_last_step_with_qt_var('-spellcheckresponse');
+            $stepanswer = $qa->get_last_step_with_qt_var('answer');
+        }
+        // Lib to display the spellcheck diff.
+        $labelbyid = $qa->get_qt_field_name($name) . '_label';
         $responselabel = $this->displayoptions->add_question_identifier_to_label(get_string('answertext', 'qtype_aitext'));
-        $output = html_writer::tag('label', $responselabel, ['class' => 'sr-only', 'for' => $id]);
-        $output .= $this->textarea($step->get_qt_var($name), $lines, ['id' => $id, 'readonly' => 'readonly']);
+        $output = html_writer::tag('h4', $responselabel, ['id' => $labelbyid, 'class' => 'sr-only']);
+
+        $divoptions = [
+                'id' => $readonlyareaid,
+                'role' => 'textbox',
+                'aria-readonly' => 'true',
+                'aria-labelledby' => $labelbyid,
+                'class' => $this->class_name() . ' qtype_aitext_response readonly',
+                'style' => 'min-height: ' . ($lines * 1.25) . 'em;',
+        ];
+
+        if ($qa->get_question()->spellcheck) {
+            $divoptions['data-spellcheck'] = $this->prepare_response('-spellcheckresponse', $qa, $stepspellcheck, $context);
+            $divoptions['data-spellcheckattemptstepid'] = $stepspellcheck->get_id();
+            $divoptions['data-spellcheckattemptstepanswerid'] = $stepanswer->get_id();
+            $divoptions['data-answer'] = $this->prepare_response($name, $qa, $step, $context);
+        }
+
+        $output .= html_writer::tag('div', $this->prepare_response($name, $qa, $step, $context), $divoptions);
+
+        if (
+                $qa->get_question()->spellcheck &&
+                (
+                        has_capability('mod/quiz:grade', $context) ||
+                        has_capability('mod/quiz:regrade', $context)
+                )
+        ) {
+            $btnoptions = ['id' => $spellcheckeditbuttonid, 'class' => 'btn btn-link'];
+            $output .= html_writer::tag(
+                    'button',
+                    $OUTPUT->pix_icon(
+                            'i/edit',
+                            get_string('spellcheckedit', 'qtype_aitext'),
+                            'moodle'
+                    ) . " " . get_string('spellcheckedit', 'qtype_aitext'),
+                    $btnoptions
+            );
+        }
+        // Height $lines * 1.25 because that is a typical line-height on web pages.
+        // That seems to give results that look OK.
+
         return $output;
     }
 
@@ -716,6 +772,24 @@ class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_ba
         $output .= $this->textarea($step->get_qt_var($name), $lines, ['name' => $inputname, 'id' => $id]);
         $output .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $inputname . 'format', 'value' => FORMAT_PLAIN]);
         return $output;
+    }
+
+    /**
+     * Prepare the response for read-only display.
+     * @param string $name the variable name this input edits.
+     * @param question_attempt $qa the question
+     *  being display.
+     * @param question_attempt_step $step the current step.
+     * @param object $context the context the attempt belongs to.
+     * @return string the response prepared for display.
+     */
+    protected function prepare_response($name, question_attempt $qa,
+            question_attempt_step $step, $context) {
+        if (!$step->has_qt_var($name)) {
+            return '';
+        }
+
+        return format_text($step->get_qt_var($name), FORMAT_PLAIN);
     }
 }
 

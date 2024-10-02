@@ -69,7 +69,11 @@ class edit_spellchek extends dynamic_form {
      */
     protected function get_context_for_dynamic_submission(): context {
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
-        list($course, $cm) = get_course_and_cm_from_cmid($cmid);
+        if (empty($cmid)) {
+            $cmid = $this->_ajaxformdata['cmid'];
+        }
+        // Verify cm exists.
+        [, $cm] = get_course_and_cm_from_cmid($cmid);
         return context_module::instance($cm->id);
     }
 
