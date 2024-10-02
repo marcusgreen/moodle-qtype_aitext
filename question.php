@@ -119,6 +119,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
     /** @var array The string array of file types accepted upon file submission. */
     public $filetypeslist;
+
+    /** @var bool $spellcheck if spellcheck is enabled */
+    public bool $spellcheck;
+
     /**
      * Required by the interface question_automatically_gradable_with_countback.
      *
@@ -155,11 +159,11 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $llmresponse = $ai->perform_request($fullaiprompt, ['component' => 'qtype_aitext', 'contextid' => $this->contextid]);
         if ($llmresponse->get_code() !== 200) {
             throw new moodle_exception(
-                'Could not provide feedback by AI tool',
+                'err_airesponsefailed',
+                'qtype_aitext',
                 '',
-                '',
-                '',
-                $llmresponse->get_errormessage() . ' ' . $llmresponse->get_debuginfo()
+                $llmresponse->get_errormessage(),
+                $llmresponse->get_debuginfo()
             );
         }
         return $llmresponse->get_content();

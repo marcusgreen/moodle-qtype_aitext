@@ -78,7 +78,7 @@ class qtype_aitext_external extends external_api {
                 throw new moodle_exception('err_retrievingtranslation', 'qtype_aitext', '',
                         $llmresponse->get_errormessage());
             }
-            $feedback = $llmresponse->get_content();
+            $feedback = format_text($llmresponse->get_content(), FORMAT_HTML);
             $contentobject = $aiquestion->process_feedback($feedback);
         } else {
             $contentobject = (object)["feedback" => get_string('error_parammissing', 'qtype_aitext'), "marks" => 0];
@@ -96,7 +96,7 @@ class qtype_aitext_external extends external_api {
      */
     public static function fetch_ai_grade_returns(): external_single_structure {
         return new external_single_structure([
-            'feedback' => new external_value(PARAM_CLEANHTML, 'text feedback for display to student', VALUE_DEFAULT),
+            'feedback' => new external_value(PARAM_RAW, 'text feedback for display to student', VALUE_DEFAULT),
             'marks' => new external_value(PARAM_FLOAT, 'AI grader awarded marks for student response', VALUE_DEFAULT),
         ]);
 

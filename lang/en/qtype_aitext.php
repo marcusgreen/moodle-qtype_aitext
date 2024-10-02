@@ -38,6 +38,7 @@ $string['defaultprompt'] = 'AI Prompt';
 $string['defaultprompt_setting'] = 'This will be the default AI prompt for new questions. It tells the AI grader how to analyse the student response. It is the guideline that AI uses to give feedback on the student response. Question authors should alter this to suit the question.';
 $string['disclaimer'] = 'Disclaimer';
 $string['disclaimer_setting'] = 'Text appended to each response indicating feedback is from a Large Language Model and not a human';
+$string['err_airesponsefailed'] = 'Error: {$a}';
 $string['err_maxminmismatch'] = 'Maximum word limit must be greater than minimum word limit';
 $string['err_maxwordlimit'] = 'Maximum word limit is enabled but is not set';
 $string['err_maxwordlimitnegative'] = 'Maximum word limit cannot be a negative number';
