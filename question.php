@@ -42,6 +42,14 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public $responseformat;
 
+
+    /**
+     *  LLM Model, will vary between AI systems, e.g. gpt4 or llama3
+    
+     * @var mixed $model Store the llm model used for the question.
+     */
+    public $model;
+
     /**
      * Count of lines of text
      *
@@ -54,12 +62,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
     /** @var int indicates whether the maximum number of words required */
     public $maxwordlimit;
-
-    /**
-     * LLM Model, will vary between AI systems, e.g. gpt4 or llama3
-     * @var stream_set_blocking
-     */
-    public $model;
 
 
     /**
@@ -145,22 +147,45 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * large language model such as ChatGPT
      *
      * @param array $response
-     * @return void
+     * @return array An array containing the grade fraction and the question state.
+     *
      */
     public function grade_response(array $response): array {
+        global $DB;
         if (!$this->is_complete_response($response)) {
-            $grade = [0 => 0, question_state::$needsgrading];
-            return $grade;
+            return [0 => 0, question_state::$needsgrading];
         }
-        $ai = new ai\ai($this->model);
-        if (is_array($response)) {
+        if (get_config('qtype_aitext', 'usecoreai')) {
             $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
-                 $this->defaultmark, $this->markscheme);
-            $llmresponse = $ai->prompt_completion($fullaiprompt);
-            $feedback = $llmresponse['response']['choices'][0]['message']['content'];
-        }
+            -                 $this->defaultmark, $this->markscheme);
 
-        $contentobject = $this->process_feedback($feedback);
+            global $USER;
+            $contextid = 1;
+            $action = new \core_ai\aiactions\summarise_text(
+                contextid: $contextid,
+                userid: $USER->id,
+                prompttext: $fullaiprompt,
+            );
+            $manager = new \core_ai\manager();
+            $result = $manager->process_action($action);
+            $data = (object) $result->get_response_data();
+            $contentobject = json_decode($data->generatedcontent);
+
+        } else {
+            $ai = new ai\ai($this->model);
+            if (get_config('qtype_aitext', 'batchmode')) {
+                $this->queue_ai_processing($response['answer'], $this->aiprompt, $this->defaultmark, $this->markscheme);
+                return [0 => 0, question_state::$needsgrading];
+            }
+            if (is_array($response)) {
+                $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
+                 $this->defaultmark, $this->markscheme);
+                $llmresponse = $ai->prompt_completion($fullaiprompt);
+                $feedback = $llmresponse['response']['choices'][0]['message']['content'];
+            }
+
+            $contentobject = $this->process_feedback($feedback);
+        }
 
         // If there are no marks, write the feedback and set to needs grading .
         if (is_null($contentobject->marks)) {
@@ -173,6 +198,31 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         return $grade;
     }
+    /**
+     * Queues the AI processing in batch mode.
+     *
+     * @param string $answer The student's answer.
+     * @param string $aiprompt The AI prompt.
+     * @param float $defaultmark The default mark.
+     * @param string $markscheme The mark scheme.
+     * @package qtype_aitext
+     */
+    private function queue_ai_processing(string $answer, string $aiprompt, float $defaultmark, string $markscheme): void{
+        global $DB;
+        $data = [
+            'activity' => 'qtype_aitext',
+            'status' => 0,
+            'tries' => 0,
+            'prompttext' => $this->build_full_ai_prompt($answer, $aiprompt, $defaultmark, $markscheme),
+            'actiondata' => $this->step->get_id(),
+            'timecreated' => time(),
+            'timemodified' => time(),
+
+        ];
+
+        $DB->insert_record('tool_aiconnect_queue', $data);
+    }
+
     /**
      * Inserts the AI feedback and prompt into the attempt step data.
      *
@@ -238,7 +288,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $contentobject = json_decode($feedback);
         if (json_last_error() === JSON_ERROR_NONE) {
             $contentobject->feedback = trim($contentobject->feedback);
-            $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"', $contentobject->feedback);
+            $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"',
+                $contentobject->feedback);
             $disclaimer = get_config('qtype_aitext', 'disclaimer');
             $disclaimer = str_replace("[[model]]", $this->model, $disclaimer);
             $contentobject->feedback .= ' '.$this->llm_translate($disclaimer);

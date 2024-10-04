@@ -67,5 +67,17 @@ if ($ADMIN->fulltree) {
         0, ['plain' => 'plain', 'editor' => 'editor', 'monospaced' => 'monospaced']
     ));
 
+    $settings->add(new admin_setting_configcheckbox(
+        'qtype_aitext/batchmode',
+        new lang_string('batchmode', 'qtype_aitext'),
+        new lang_string('batchmode_setting', 'qtype_aitext'),
+        0
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'qtype_aitext/usecoreai',
+        new lang_string('usecoreai', 'qtype_aitext'),
+        new lang_string('usecoreai_setting', 'qtype_aitext'),
+        0));
+
 }
 
