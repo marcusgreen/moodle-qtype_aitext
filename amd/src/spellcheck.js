@@ -62,15 +62,20 @@ export const renderDiff = (readonlyareaselector) => {
     let fullspellcheck = '';
 
     diff.forEach(part => {
+        // We need to replace the whitespaces, because otherwise they will be removed by
+        // calling parseFromString of the DOMParser.
+        part.value = part.value.replace(/ /g, '&nbsp;');
+        const parser = new DOMParser();
+        part.value = parser.parseFromString(part.value, 'text/html');
         var cls = part.added ? 'qtype_aitext_spellcheck_new' :
             part.removed ? 'qtype_aitext_spellcheck_wrong' : '';
         if (part.added || part.removed) {
             span = document.createElement('span');
             span.classList = cls;
-            span.appendChild(document.createTextNode(part.value));
+            span.appendChild(part.value.documentElement);
             fullspellcheck += span.outerHTML;
         } else {
-            fullspellcheck += part.value;
+            fullspellcheck += part.value.documentElement.textContent;
         }
     });
 
