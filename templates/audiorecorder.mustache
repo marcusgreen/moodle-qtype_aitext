@@ -1,0 +1,19 @@
+<div id="audiorec_container_{{id}}" class="qtype_aitext_therec_waveButtonContainer audiorec_container_{{safeid}}" style="height: {{waveheight}}px; margin-bottom:10px">
+    <input type="hidden" id='{{id}}' name="{{inputname}}" class="{{safeid}}" value="{{response}}"/>
+    <canvas id="{{id}}_waveform" class="qtype_aitext_therec_waveForm {{safeid}}_waveform" style="height:100%;width:100%"></canvas>
+
+    <div id="{{id}}_recorderdiv" style="pointer-events: auto; background: green" class="qtype_aitext_therec_waveButton {{safeid}}_recorderdiv" data-waveheight="{{waveheight}}"
+         data-region="{{region}}" data-lang="{{language}}" data-asrurl="{{{asrurl}}}" data-maxtime="{{maxtime}}">
+        <i class="fa fa-microphone"></i>
+    </div>
+</div>
+<div>Current word count: <span class="{{safeid}}_currentwordcount"></span></div>
+{{^element.frozen}}
+{{#js}}
+require(['jquery','qtype_aitext/transcriptmanager'], function ($,transcriber) {
+    var opts=[];
+    opts['uniqueid']="{{safeid}}";
+    transcriber.init(opts);
+});
+{{/js}}
+{{/element.frozen}}

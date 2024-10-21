@@ -62,5 +62,27 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024051100, 'qtype', 'aitext');
     }
 
+    if ($oldversion < 2024051102) {
+
+        // Define field model to be added to qtype_aitext.
+        $table = new xmldb_table('qtype_aitext');
+        $fields = [];
+        $fields[] = new xmldb_field('responselanguage', XMLDB_TYPE_CHAR, '16', null, XMLDB_NOTNULL, null, 'en-us');
+        $fields[] = new xmldb_field('feedbacklanguage', XMLDB_TYPE_CHAR, '16', null, XMLDB_NOTNULL, null, 'en-us');
+        $fields[] = new xmldb_field('maxtime', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $fields[] = new xmldb_field('relevance', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $fields[] = new xmldb_field('relevanceanswer', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
+
+        // Conditionally add fields
+        foreach($fields as $field) {
+          if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+          }
+        }
+
+        // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2024051102, 'qtype', 'aitext');
+    }
+
     return true;
 }

@@ -370,9 +370,11 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function summarise_response(array $response) {
         $output = null;
-        if (isset($response['answer'])) {
-            $output .= question_utils::to_plain_text($response['answer'],
+        if (isset($response['answer']) && isset($response['answerformat'])) {
+            $output = question_utils::to_plain_text($response['answer'],
                 $response['answerformat'], ['para' => false]);
+        }else if(isset($response['answer'])){
+            $output = $response['answer'];
         }
 
         return $output;
@@ -525,12 +527,15 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         // ideally, we should return as much as settings as possible (depending on the state and display options).
 
         $settings = [
+            'feedbacklanguage' => $this->feedbacklanguage,
+            'responselanguage' => $this->responselanguage,
             'responseformat' => $this->responseformat,
             'responsefieldlines' => $this->responsefieldlines,
             'responsetemplate' => $this->responsetemplate,
             'responsetemplateformat' => $this->responsetemplateformat,
             'minwordlimit' => $this->minwordlimit,
             'maxwordlimit' => $this->maxwordlimit,
+            'maxtime' => $this->maxtime,
         ];
 
         return $settings;

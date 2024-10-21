@@ -23,6 +23,8 @@
  */
 defined('MOODLE_INTERNAL') || die;
 
+use qtype_aitext\constants;
+
 if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configtextarea('qtype_aitext/defaultprompt',
@@ -60,11 +62,12 @@ if ($ADMIN->fulltree) {
         20,
         6
     ));
+
     $settings->add(new admin_setting_configselect(
         'qtype_aitext/responseformat',
         new lang_string('responseformat', 'qtype_aitext'),
         new lang_string('responseformat_setting', 'qtype_aitext'),
-        0, ['plain' => 'plain', 'editor' => 'editor', 'monospaced' => 'monospaced']
+        'plain',constants::get_response_formats()
     ));
 
     $settings->add(new admin_setting_configcheckbox(
@@ -78,6 +81,34 @@ if ($ADMIN->fulltree) {
         new lang_string('usecoreai', 'qtype_aitext'),
         new lang_string('usecoreai_setting', 'qtype_aitext'),
         0));
+
+    $settings->add(new admin_setting_configselect(
+        'qtype_aitext/responselanguage',
+        new lang_string('responselanguage', 'qtype_aitext'),
+        new lang_string('responselanguage_setting', 'qtype_aitext'),
+        'en-us',constants::get_languages()
+    ));
+
+    $settings->add(new admin_setting_configselect(
+        'qtype_aitext/feedbacklanguage',
+        new lang_string('feedbacklanguage', 'qtype_aitext'),
+        new lang_string('feedbacklanguage_setting', 'qtype_aitext'),
+        'en-us',constants::get_languages()
+    ));
+
+    $settings->add(new admin_setting_configselect(
+        'qtype_aitext/maxtime',
+        new lang_string('maxtime', 'qtype_aitext'),
+        new lang_string('maxtime_setting', 'qtype_aitext'),
+        0,constants::get_time_limits()
+    ));
+
+    $settings->add(new admin_setting_configselect(
+        'qtype_aitext/relevance',
+        new lang_string('relevance', 'qtype_aitext'),
+        new lang_string('relevance_setting', 'qtype_aitext'),
+        0,constants::get_relevance_opts()
+    ));
 
 }
 

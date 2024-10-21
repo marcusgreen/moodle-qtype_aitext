@@ -26,6 +26,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use qtype_aitext\constants;
+
 require_once($CFG->libdir . '/questionlib.php');
 
 /**
@@ -124,6 +126,14 @@ class qtype_aitext extends question_type {
         $options->responsetemplate = $formdata->responsetemplate['text'];
         $options->responsetemplateformat = $formdata->responsetemplate['format'];
 
+        //audior recording related options
+        $options->responselanguage = $formdata->responselanguage;
+        $options->feedbacklanguage = $formdata->feedbacklanguage;
+        $options->maxtime = $formdata->maxtime;
+        $options->relevance = $formdata->relevance;
+        $options->relevanceanswer = isset($formdata->relevanceanswer) ? $formdata->relevanceanswer : null;
+
+
         $DB->update_record('qtype_aitext', $options);
     }
     /**
@@ -136,23 +146,13 @@ class qtype_aitext extends question_type {
     protected function initialise_question_instance(question_definition $question, $questiondata) {
         parent::initialise_question_instance($question, $questiondata);
         /**@var qtype_aitext_question  $question */
-        $question->responseformat = $questiondata->options->responseformat;
-        $question->responsefieldlines = $questiondata->options->responsefieldlines;
-        $question->minwordlimit = $questiondata->options->minwordlimit;
-        $question->maxwordlimit = $questiondata->options->maxwordlimit;
-        $question->graderinfo = $questiondata->options->graderinfo;
-        $question->graderinfoformat = $questiondata->options->graderinfoformat;
-        $question->responsetemplate = $questiondata->options->responsetemplate;
-        $question->responsetemplateformat = $questiondata->options->responsetemplateformat;
-        $question->aiprompt = $questiondata->options->aiprompt;
-        $question->markscheme = $questiondata->options->markscheme;
-        $question->sampleanswer = $questiondata->options->sampleanswer;
-        /* Legacy quesitons may not have a model set, so assign the first in the settings */
-        if (empty($question->model)) {
+        foreach (constants::EXTRA_FIELDS as $field) {
+            $question->{$field} = $questiondata->options->{$field};
+        }
+        /* Legacy questions may not have a model set, so assign the first in the settings */
+        if (empty($questiondata->options->model)) {
             $model = explode(",", get_config('tool_aiconnect', 'model'))[0];
             $question->model = $model;
-        } else {
-            $question->model = $questiondata->options->model;
         }
     }
     /**
@@ -170,21 +170,7 @@ class qtype_aitext extends question_type {
     }
 
     /**
-     * The different response formats that the question type supports.
-     * internal name => human-readable name.
-     *
-     * @return array
-     */
-    public function response_formats() {
-        return [
-            'editor' => get_string('formateditor', 'qtype_aitext'),
-            'plain' => get_string('formatplain', 'qtype_aitext'),
-            'monospaced' => get_string('formatmonospaced', 'qtype_aitext'),
-        ];
-    }
-
-    /**
-     * The choices that should be offerd when asking if a response is required
+     * The choices that should be offered when asking if a response is required
      *
      * @return array
      */
@@ -247,21 +233,7 @@ class qtype_aitext extends question_type {
      * @return array
      */
     public function extra_question_fields() {
-        return [
-            'qtype_aitext',
-            'responseformat',
-            'responsefieldlines',
-            'minwordlimit',
-            'maxwordlimit',
-            'graderinfo',
-            'graderinfoformat',
-            'responsetemplate',
-            'responsetemplateformat',
-            'aiprompt',
-            'markscheme',
-            'sampleanswer',
-            'model',
-        ];
+        return ['qtype_aitext'] + constants::EXTRA_FIELDS;
     }
     /**
      * Create a question from reading in a file in Moodle xml format
@@ -323,8 +295,7 @@ class qtype_aitext extends question_type {
         $fs = get_file_storage();
         $textfields = $this->get_text_fields();;
         $formatfield = '/^('.implode('|', $textfields).')format$/';
-        $fields = $this->extra_question_fields();
-        array_shift($fields); // Remove table name.
+        $fields = constants::EXTRA_FIELDS;
 
         $output = '';
         foreach ($fields as $field) {

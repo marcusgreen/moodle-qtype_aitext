@@ -46,3 +46,48 @@
     max-width: 800px;
     background-color: #DDDDDD;
 }
+
+/*TT Recorder Styles */
+.qtype_aitext_therec_waveButtonContainer {
+    position: relative;
+    margin: auto;
+    border: 2px solid darkgray;
+    border-radius: 10px;
+    width: 200px;
+}
+
+.qtype_aitext_therec_waveForm {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: white;
+    border-radius: 10px;
+}
+
+.qtype_aitext_therec_waveButton {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    box-shadow: inset 0px 1px 3px #ffccbd, inset 0px -1px 3px #9c282e;
+    color: #000;
+    font-size: 26px;
+    text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.3);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    margin: auto;
+    color: white;
+    border: none;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: red;
+}
