@@ -374,7 +374,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $output = question_utils::to_plain_text($response['answer'],
                 $response['answerformat'], ['para' => false]);
         }else if(isset($response['answer'])){
-            $output = $response['answer'];
+            $output = question_utils::to_plain_text($response['answer'],
+             FORMAT_HTML, ['para' => false]);
         }
 
         return $output;
