@@ -127,13 +127,13 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         // timelimit
         $mform->addElement('select', 'maxtime', get_string('maxtime', 'qtype_aitext'), constants::get_time_limits());
-        $mform->setDefault('maxtime', 60);
+        $mform->setDefault('maxtime',  get_config('qtype_aitext', 'maxtime'));
         $mform->hideIf('maxtime', 'responseformat', 'neq', 'audio');
 
-        //Relevance
+        // Relevance
         $mform->addElement('select', 'relevance', get_string('relevance', 'qtype_aitext'), constants::get_relevance_opts());
-        $mform->setDefault('relevance', constants::RELEVANCE_NONE);
-        //Relevance answer
+        $mform->setDefault('relevance',  get_config('qtype_aitext', 'relevance'));
+        // Relevance answer
         $mform->addElement('textarea', 'relevanceanswer', get_string('relevanceanswer', 'qtype_aitext'),
             ['maxlen' => 50, 'rows' => 6, 'size' => 30]);
         $mform->hideIf('relevanceanswer', 'relevance', 'neq', constants::RELEVANCE_COMPARISON);
@@ -174,7 +174,7 @@ class qtype_aitext_edit_form extends question_edit_form {
                     $question->maxwordenabled = $question->options->maxwordlimit ? 1 : 0;
                     break;
                 case 'responsetemplate':
-                    $question->responsetemplate =  [
+                    $question->responsetemplate = [
                         'text' => $question->options->responsetemplate,
                         'format' => $question->options->responsetemplateformat,
                     ];

@@ -532,9 +532,9 @@ class qtype_aitext_format_audio_renderer extends qtype_aitext_format_renderer_ba
         list($draftitemid, $response) = $this->prepare_response_for_editing(
             $name, $step, $context);
 
-        //response - is the existing transcript, right now we are not saving audio
-        //inputname - is the name of the input field (hidden in this case)
-        //id - is the id of the input field (hidden in this case)
+        // Var response - is the existing transcript, right now we are not saving audio.
+        // Var inputname - is the name of the input field (hidden in this case).
+        // Var id - is the id of the input field (hidden in this case).
 
 
         $responselabel = $this->displayoptions->add_question_identifier_to_label(get_string('answeraudio', 'qtype_aitext'));
@@ -554,9 +554,9 @@ class qtype_aitext_format_audio_renderer extends qtype_aitext_format_renderer_ba
             'response' => $response,
             'waveheight' => 75,
             'asrurl' => 'https://useast.ls.poodll.com/transcribe',//TO DO - wire this up
-            'region'=> 'useast1',//TO DO - wire this up
+            'region' => 'useast1', //TO DO - wire this up
             'language' => $responselanguage,
-            'maxtime' => 60 * 10000,//TO DO - wire this up
+            'maxtime' => $question->maxtime,
         ]);
 
         $output .= html_writer::end_tag('div');

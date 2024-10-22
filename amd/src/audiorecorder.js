@@ -1,5 +1,5 @@
-define(['jquery', 'core/log','core/notification', 'qtype_aitext/audiohelper','qtype_aitext/browserrec','core/str' ],
-    function ($, log, notification, audioHelper, browserRec,str) {
+define(['jquery', 'core/log','core/notification', 'qtype_aitext/audiohelper','qtype_aitext/browserrec','core/str','qtype_aitext/timer' ],
+    function ($, log, notification, audioHelper, browserRec,str, timer) {
     "use strict"; // jshint ;_;
     /*
     *  The TT recorder
@@ -50,8 +50,19 @@ define(['jquery', 'core/log','core/notification', 'qtype_aitext/audiohelper','qt
             this.controls.recordercontainer.show();
             this.register_events();
 
+            // Callbacks.
 
-            //callbacks
+            // Callback: Timer updates.
+            var handle_timer_update = function(){
+                var displaytime = that.timer.fetch_display_time();
+                that.controls.timerstatus.html(displaytime);
+                if (that.timer.seconds == 0 && that.timer.initseconds > 0) {
+                    that.update_audio('isRecognizing', true);
+                    that.audiohelper.stop();
+                }
+            };
+
+            // Callback: Recorder device errors.
             var on_error = function(error) {
                 switch (error.name) {
                     case 'PermissionDeniedError':
@@ -69,8 +80,9 @@ define(['jquery', 'core/log','core/notification', 'qtype_aitext/audiohelper','qt
                 }
             };
 
+            // Callback: Recording stopped.
             var on_stopped = function(blob) {
-                clearInterval(that.interval);
+                that.timer.stop()
 
                 //if the blob is undefined then the user is super clicking or something
                 if(blob===undefined){
@@ -99,28 +111,16 @@ define(['jquery', 'core/log','core/notification', 'qtype_aitext/audiohelper','qt
 
             };
 
-            //set up events
+            // Callback: Recorder device got stream - start recording
             var on_gotstream=  function(stream) {
-                //clear any existing interval
-                if(that.interval!==undefined){
-                    clearInterval(that.interval);
-                }
-
                 var newaudio={stream: stream, isRecording: true};
                 that.update_audio(newaudio);
-                that.currentTime = 0;
-                //if we have a time limit run an interval to check ever 10ms if we should stop
-                if (that.maxtime>0) {
-                    that.interval = setInterval(function () {
-                        if (that.currentTime < that.maxtime) {
-                            that.currentTime += 10;
-                        } else {
-                            that.update_audio('isRecognizing', true);
-                            // vm.isRecognizing = true;
-                            that.audiohelper.stop();
-                        }
-                    }, 10);
-                }
+
+                //TO DO - conditionally start timer here (not toggle recording)
+                //so a device error does not cause timer disaster
+                // that.timer.reset();
+                // that.timer.start();
+                
             };
 
             //If browser rec (Chrome Speech Rec) (and ds is optiona)
@@ -163,6 +163,12 @@ define(['jquery', 'core/log','core/notification', 'qtype_aitext/audiohelper','qt
                 that.audiohelper.onStream = on_gotstream;
 
             }//end of setting up recorders
+
+            // Setting up timer.
+            this.timer = timer.clone();
+            this.timer.init(this.maxtime, handle_timer_update);
+            // Init the timer readout
+            handle_timer_update();
         },
 
         init_strings: function(){
@@ -183,6 +189,7 @@ define(['jquery', 'core/log','core/notification', 'qtype_aitext/audiohelper','qt
         prepare_html: function(){
             this.controls.recordercontainer =$('.audiorec_container_' + this.uniqueid);
             this.controls.recorderbutton = $('.' + this.uniqueid + '_recorderdiv');
+            this.controls.timerstatus = $('.' + this.uniqueid + '_timerstatus');
             this.passagehash = this.controls.recorderbutton.data('passagehash');
             this.region=this.controls.recorderbutton.data('region');
             this.lang=this.controls.recorderbutton.data('lang');
@@ -293,9 +300,10 @@ define(['jquery', 'core/log','core/notification', 'qtype_aitext/audiohelper','qt
 
             //If we are current recording
             if (this.audio.isRecording) {
+                that.timer.stop();
+
                 //If using Browser Rec (chrome speech)
-                if(this.usebrowserrec){
-                    clearInterval(that.interval);
+                if(this.usebrowserrec){    
                     that.update_audio('isRecording',false);
                     that.update_audio('isRecognizing',true);
                     this.browserrec.stop();
@@ -308,25 +316,16 @@ define(['jquery', 'core/log','core/notification', 'qtype_aitext/audiohelper','qt
 
              //If we are NOT currently recording
             } else {
+                // Run the timer
+                that.currentTime = 0;
+                that.timer.reset();
+                that.timer.start();
+                
 
                 //If using Browser Rec (chrome speech)
                 if(this.usebrowserrec){
                     this.update_audio('isRecording',true);
                     this.browserrec.start();
-                    that.currentTime = 0;
-                    //if we have a time limit run an interval to check ever 10ms if we should stop
-                    if(that.maxtime>0) {
-                        this.interval = setInterval(function () {
-                            if (that.currentTime < that.maxtime) {
-                                that.currentTime += 10;
-                            } else {
-                                that.update_audio('isRecording', false);
-                                that.update_audio('isRecognizing', true);
-                                clearInterval(that.interval);
-                                that.browserrec.stop();
-                            }
-                        }, 10);
-                    }
 
                 //If using DS Rec
                 }else {

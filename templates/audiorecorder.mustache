@@ -7,7 +7,8 @@
         <i class="fa fa-microphone"></i>
     </div>
 </div>
-<div>Current word count: <span class="{{safeid}}_currentwordcount"></span></div>
+<div class="qtype_aitext_currentwordcount">Current word count: <span class="{{safeid}}_currentwordcount">0</span></div>
+<div class="qtype_aitext_timerstatus {{safeid}}_timerstatus">00:00:00</div>
 {{^element.frozen}}
 {{#js}}
 require(['jquery','qtype_aitext/transcriptmanager'], function ($,transcriber) {
