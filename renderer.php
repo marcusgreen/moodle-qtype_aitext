@@ -528,9 +528,13 @@ class qtype_aitext_format_audio_renderer extends qtype_aitext_format_renderer_ba
         $inputname = $qa->get_qt_field_name($name);
         $id = $inputname . '_id';
 
-
-        list($draftitemid, $response) = $this->prepare_response_for_editing(
-            $name, $step, $context);
+        //get existing response and its wordcount
+        list($draftitemid, $response) = $this->prepare_response_for_editing($name, $step, $context);
+        if(!empty($response)) {
+            $wordcount = str_word_count($response); //fetch this from existing response
+        }else{
+            $wordcount = 0;
+        }
 
         // Var response - is the existing transcript, right now we are not saving audio.
         // Var inputname - is the name of the input field (hidden in this case).
@@ -551,12 +555,14 @@ class qtype_aitext_format_audio_renderer extends qtype_aitext_format_renderer_ba
             'id' => $id,
             'inputname' => $inputname,
             'safeid' => str_replace(':', '_', $id),
+            'haveresponse' => empty($response) ? false :  true,
             'response' => $response,
             'waveheight' => 75,
             'asrurl' => 'https://useast.ls.poodll.com/transcribe',//TO DO - wire this up
             'region' => 'useast1', //TO DO - wire this up
             'language' => $responselanguage,
             'maxtime' => $question->maxtime,
+            'wordcount' => $wordcount,
         ]);
 
         $output .= html_writer::end_tag('div');

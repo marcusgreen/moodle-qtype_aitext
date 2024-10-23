@@ -86,9 +86,8 @@ define(['jquery', 'core/log'], function ($, log) {
             that.interval = setInterval(function() {
                 that.drawWave();
             }, 100);
-
-
         },
+
         stop: function () {
             var that=this;
             this.recognizing = false;

@@ -91,3 +91,18 @@
     cursor: pointer;
     background-color: red;
 }
+
+.qtype_aitext_audiosummary {
+    text-align: center;
+    margin: auto;
+    border: 2px solid darkgray;
+    border-radius: 10px;
+    width: 200px;
+    background-color: #DDDDDD;
+}
+.qtype_aitext_currentwordcount,
+.qtype_aitext_timer {
+    text-align: center;
+    margin: auto;
+}
+

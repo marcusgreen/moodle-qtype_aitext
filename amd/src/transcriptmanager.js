@@ -27,6 +27,10 @@ define(['jquery',
 
     register_events: function(opts) {
       var self = this;
+      $('.retry_' + opts.uniqueid).on('click', function() {
+        $('.qtype_aitext_audiorecorder_' + opts.uniqueid).removeClass('hidden');
+        $('.qtype_aitext_audiosummary_' + opts.uniqueid).addClass('hidden');
+      });
     },//end of register events
 
     init_components: function(opts) {
@@ -43,7 +47,12 @@ define(['jquery',
                 case 'speech':
                     log.debug("speech at multiaudio");
                     var speechtext = message.capturedspeech;
+                    //set speech text to the hidden input
                     $('.' + opts.uniqueid).val(speechtext);
+                    //hide the recorder and show the summary
+                    $('.qtype_aitext_audiorecorder_' + opts.uniqueid).addClass('hidden');
+                    $('.qtype_aitext_audiosummary_' + opts.uniqueid).removeClass('hidden');
+
                     log.debug('speechtext:',speechtext);
             } //end of switch message type
         };

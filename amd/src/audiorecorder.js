@@ -47,7 +47,6 @@ define(['jquery', 'core/log','core/notification', 'qtype_aitext/audiohelper','qt
             this.stt_guided = opts['stt_guided'] ? opts['stt_guided'] : false;
             this.init_strings();
             this.prepare_html();
-            this.controls.recordercontainer.show();
             this.register_events();
 
             // Callbacks.
@@ -189,7 +188,7 @@ define(['jquery', 'core/log','core/notification', 'qtype_aitext/audiohelper','qt
         prepare_html: function(){
             this.controls.recordercontainer =$('.audiorec_container_' + this.uniqueid);
             this.controls.recorderbutton = $('.' + this.uniqueid + '_recorderdiv');
-            this.controls.timerstatus = $('.' + this.uniqueid + '_timerstatus');
+            this.controls.timerstatus = $('.timerstatus_' + this.uniqueid);
             this.passagehash = this.controls.recorderbutton.data('passagehash');
             this.region=this.controls.recorderbutton.data('region');
             this.lang=this.controls.recorderbutton.data('lang');

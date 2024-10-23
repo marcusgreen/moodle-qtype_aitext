@@ -1,14 +1,24 @@
-<div id="audiorec_container_{{id}}" class="qtype_aitext_therec_waveButtonContainer audiorec_container_{{safeid}}" style="height: {{waveheight}}px; margin-bottom:10px">
-    <input type="hidden" id='{{id}}' name="{{inputname}}" class="{{safeid}}" value="{{response}}"/>
-    <canvas id="{{id}}_waveform" class="qtype_aitext_therec_waveForm {{safeid}}_waveform" style="height:100%;width:100%"></canvas>
+<div class="qtype_aitext_audiorecorder qtype_aitext_audiorecorder_{{safeid}} {{#haveresponse}}hidden{{/haveresponse}}">
+    <div id="audiorec_container_{{id}}" class="qtype_aitext_therec_waveButtonContainer audiorec_container_{{safeid}}" style="height: {{waveheight}}px; margin-bottom:10px">
+        <input type="hidden" id='{{id}}' name="{{inputname}}" class="{{safeid}}" value="{{response}}"/>
+        <canvas id="{{id}}_waveform" class="qtype_aitext_therec_waveForm {{safeid}}_waveform" style="height:100%;width:100%"></canvas>
 
-    <div id="{{id}}_recorderdiv" style="pointer-events: auto; background: green" class="qtype_aitext_therec_waveButton {{safeid}}_recorderdiv" data-waveheight="{{waveheight}}"
-         data-region="{{region}}" data-lang="{{language}}" data-asrurl="{{{asrurl}}}" data-maxtime="{{maxtime}}">
-        <i class="fa fa-microphone"></i>
+        <div id="{{id}}_recorderdiv" style="pointer-events: auto; background: green" class="qtype_aitext_therec_waveButton {{safeid}}_recorderdiv" data-waveheight="{{waveheight}}"
+             data-region="{{region}}" data-lang="{{language}}" data-asrurl="{{{asrurl}}}" data-maxtime="{{maxtime}}">
+            <i class="fa fa-microphone"></i>
+        </div>
     </div>
+    <div class="qtype_aitext_timer timerstatus_{{safeid}}">00:00:00</div>
 </div>
-<div class="qtype_aitext_currentwordcount">Current word count: <span class="{{safeid}}_currentwordcount">0</span></div>
-<div class="qtype_aitext_timerstatus {{safeid}}_timerstatus">00:00:00</div>
+<div class="qtype_aitext_audiosummary qtype_aitext_audiosummary_{{safeid}} {{^haveresponse}}hidden{{/haveresponse}}">
+    <div class="qtype_aitext_questionanswered">{{#str}} questionanswered , qtype_aitext {{/str}}</div>
+    <div class="qtype_aitext_retry_{{id}} retry_{{safeid}} btn btn-secondary">{{#str}} retry , qtype_aitext {{/str}}</div>
+</div>
+<div class="qtype_aitext_currentwordcount">{{#str}} currentwordcount , qtype_aitext {{/str}}: <span class="{{safeid}}_currentwordcount">{{wordcount}}</span></div>
+
+
+
+</div>
 {{^element.frozen}}
 {{#js}}
 require(['jquery','qtype_aitext/transcriptmanager'], function ($,transcriber) {

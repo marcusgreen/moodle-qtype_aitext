@@ -185,3 +185,6 @@ $string['onemin'] = '1 minute';
 $string['xmins'] = '{$a} minutes';
 $string['oneminxsecs'] = '1 minutes {$a} seconds';
 $string['xminsecs'] = '{$a->minutes} minutes {$a->seconds} seconds';
+$string['questionanswered'] = 'Question answered';
+$string['retry'] = 'Retry';
+$string['currentwordcount'] = 'Current word count';
