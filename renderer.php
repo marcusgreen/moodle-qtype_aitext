@@ -531,7 +531,7 @@ class qtype_aitext_format_audio_renderer extends qtype_aitext_format_renderer_ba
         //get existing response and its wordcount
         list($draftitemid, $response) = $this->prepare_response_for_editing($name, $step, $context);
         if(!empty($response)) {
-            $wordcount = str_word_count($response); //fetch this from existing response
+            $wordcount = count_words($response); //fetch this from existing response
         }else{
             $wordcount = 0;
         }
@@ -558,8 +558,8 @@ class qtype_aitext_format_audio_renderer extends qtype_aitext_format_renderer_ba
             'haveresponse' => empty($response) ? false :  true,
             'response' => $response,
             'waveheight' => 75,
-            'asrurl' => 'https://useast.ls.poodll.com/transcribe',//TO DO - wire this up
-            'region' => 'useast1', //TO DO - wire this up
+            'asrurl' => 'https://useast.ls.poodll.com/transcribe',//TO DO - get the selected region from the question settings
+            'region' => 'useast1', //TO DO - wire this up with settings from the question
             'language' => $responselanguage,
             'maxtime' => $question->maxtime,
             'wordcount' => $wordcount,

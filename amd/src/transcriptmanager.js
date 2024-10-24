@@ -47,6 +47,7 @@ define(['jquery',
                 case 'speech':
                     log.debug("speech at multiaudio");
                     var speechtext = message.capturedspeech;
+                    log.debug('speechtext:',speechtext);
 
                     //set speech text to the hidden input
                     $('.' + opts.uniqueid).val(speechtext);
@@ -59,7 +60,7 @@ define(['jquery',
                     $('.qtype_aitext_audiorecorder_' + opts.uniqueid).addClass('hidden');
                     $('.qtype_aitext_audiosummary_' + opts.uniqueid).removeClass('hidden');
 
-                    log.debug('speechtext:',speechtext);
+
             } //end of switch message type
         };
 

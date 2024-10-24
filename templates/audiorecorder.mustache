@@ -24,6 +24,7 @@
 require(['jquery','qtype_aitext/transcriptmanager'], function ($,transcriber) {
     var opts=[];
     opts['uniqueid']="{{safeid}}";
+    opts['lang']="{{language}}";
     transcriber.init(opts);
 });
 {{/js}}

@@ -14,6 +14,7 @@ define(['jquery', 'core/log'], function ($, log) {
         start_timestamp: 0,
         lang: 'en-US',
         interval: 0,
+        browsertype: '',
 
 
         //for making multiple instances
@@ -22,20 +23,38 @@ define(['jquery', 'core/log'], function ($, log) {
         },
 
         will_work_ok: function(opts){
-            //Edge and Safari both have browser recognition, but it's not good enough and we need to test it better (2021-11-21)
+            //Brave looks like it does speech rec, but it doesnt
             var brave = typeof navigator.brave !== 'undefined';
-            if(brave){return false;}
+            if(brave){
+                this.browsertype = 'brave';
+               // return false;
+            }
 
+            //Edge may or may not work, but its hard to tell from the browser agent
             var edge = navigator.userAgent.toLowerCase().indexOf("edg/") > -1;
-            if(edge){return false;}
+           if(edge && this.browsertype === ''){
+               this.browsertype = 'edge';
+               //return false;
+           }
 
+            //Safari may or may not work, but its hard to tell from the browser agent
             var has_chrome = navigator.userAgent.indexOf('Chrome') > -1;
             var has_safari = navigator.userAgent.indexOf("Safari") > -1;
             var safari = has_safari && !has_chrome;
-            if(safari){return false;}
+            if(safari && this.browsertype === ''){
+                this.browsertype = 'safari';
+                //return false;
+            }
 
-            //This is feature detection, and for chrome its ok. the others might say they do speech rec, but its hard to be sure
-            return ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
+            //This is feature detection, and for chrome it can be trusted.
+            var hasspeechrec = ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
+            if(hasspeechrec && this.browsertype === '' && has_chrome){
+                this.browsertype = 'chrome';
+            }
+
+            //This is feature detection, and for chrome it can be trusted.
+            // The others might say they do speech rec, but that does not mean it works
+            return hasspeechrec;
 
         },
 
