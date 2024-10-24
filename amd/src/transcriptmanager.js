@@ -47,8 +47,14 @@ define(['jquery',
                 case 'speech':
                     log.debug("speech at multiaudio");
                     var speechtext = message.capturedspeech;
+
                     //set speech text to the hidden input
                     $('.' + opts.uniqueid).val(speechtext);
+
+                    //update the wordcount
+                    var wordcount = app.count_words(message.capturedspeech);
+                    $('.' + opts.uniqueid + '_currentwordcount').text(wordcount);
+
                     //hide the recorder and show the summary
                     $('.qtype_aitext_audiorecorder_' + opts.uniqueid).addClass('hidden');
                     $('.qtype_aitext_audiosummary_' + opts.uniqueid).removeClass('hidden');

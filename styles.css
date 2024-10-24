@@ -98,8 +98,14 @@
     border: 2px solid darkgray;
     border-radius: 10px;
     width: 200px;
-    background-color: #DDDDDD;
+    background-color: #EEEEEE;
+    padding: 10px;
 }
+
+.qtype_aitext_questionanswered {
+    margin-bottom: 10px;
+}
+
 .qtype_aitext_currentwordcount,
 .qtype_aitext_timer {
     text-align: center;
