@@ -36,7 +36,7 @@ use Random\RandomException;
  * Unit tests for the matching question definition class.
  *
  * @package qtype_aitext
- * @author  Marcus Green 2024
+ * @copyright 2024 Marcus Green
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class question_test extends \advanced_testcase {

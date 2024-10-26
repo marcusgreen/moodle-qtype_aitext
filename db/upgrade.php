@@ -77,6 +77,5 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024051101, 'qtype', 'aitext');
     }
 
-
     return true;
 }

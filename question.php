@@ -153,7 +153,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @throws dml_exception
      * @throws moodle_exception
      */
-    private function get_spellchecking(array $response):string {
+    private function get_spellchecking(array $response): string {
         $fullaiprompt = $this->build_full_ai_spellchecking_prompt($response['answer']);
         $ai = new local_ai_manager\manager('feedback');
         $llmresponse = $ai->perform_request($fullaiprompt, ['component' => 'qtype_aitext', 'contextid' => $this->contextid]);
@@ -178,7 +178,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function grade_response(array $response): array {
 
-        if($this->spellcheck) {
+        if ($this->spellcheck) {
             $spellcheckresponse = $this->get_spellchecking($response);
             $this->insert_attempt_step_data('-spellcheckresponse', $spellcheckresponse);
         }
@@ -256,7 +256,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @throws coding_exception
      */
     public function build_full_ai_spellchecking_prompt(string $response): string {
-        // $response = strip_tags($response);
         return get_string('spellcheck_prompt', 'qtype_aitext') . ($response);
     }
 
@@ -282,8 +281,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $contentobject->feedback = trim($contentobject->feedback);
             $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"', $contentobject->feedback);
             $disclaimer = get_config('qtype_aitext', 'disclaimer');
-            // TODO Model currently is only used for connecting and at this point I believe. We need to remove all the model
-            //  selection logic or make local_ai_manager support the selection of models.
+            // TODO Model currently is only used for connecting and at this point I believe.
+            // We need to remove all the model selection logic or make local_ai_manager support the selection of models.
             $disclaimer = str_replace("[[model]]",
                     \local_ai_manager\ai_manager_utils::get_connector_instance_by_purpose('feedback')->get_model(), $disclaimer);
             $contentobject->feedback .= ' '.$this->llm_translate($disclaimer);
