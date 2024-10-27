@@ -145,6 +145,43 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     }
 
     /**
+     * Summary of perform_request
+     * @param mixed $manager
+     * @param array $options
+     * @return void
+     */
+    public function perform_request($prompt): string {
+        if (get_config('qtype_aitext', 'usecoreai')) {
+            global $USER;
+            $manager = new \core_ai\manager();
+            $action = new \core_ai\aiactions\generate_text(
+            contextid: $this->contextid,
+            userid: $USER->id,
+            prompttext: $prompt
+            );
+            $result = $manager->process_action($action);
+            $data = (object) $result->get_response_data();
+            $content = $data->generatedcontent;
+            return $content;
+
+        } else {
+            $manager = new local_ai_manager\manager('feedback');
+            $llmresponse = $manager->perform_request($prompt,  ['component' => 'qtype_aitext', 'contextid' => $this->contextid]);
+            if ($llmresponse->get_code() !== 200) {
+                throw new moodle_exception(
+                'err_retrievingfeedback',
+                'qtype_aitext',
+                '',
+                $llmresponse->get_errormessage(),
+                $llmresponse->get_debuginfo()
+                );
+            }
+            $content = $llmresponse->get_content();
+            return $content;
+        }
+    }
+
+    /**
      * Get the spellchecking response.
      *
      * @param array $response
@@ -155,67 +192,105 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     private function get_spellchecking(array $response): string {
         $fullaiprompt = $this->build_full_ai_spellchecking_prompt($response['answer']);
-        $ai = new local_ai_manager\manager('feedback');
-        $llmresponse = $ai->perform_request($fullaiprompt, ['component' => 'qtype_aitext', 'contextid' => $this->contextid]);
-        if ($llmresponse->get_code() !== 200) {
-            throw new moodle_exception(
-                'err_airesponsefailed',
-                'qtype_aitext',
-                '',
-                $llmresponse->get_errormessage(),
-                $llmresponse->get_debuginfo()
-            );
-        }
-        return $llmresponse->get_content();
+        $llmresponse = $this->perform_request($fullaiprompt);
+        return $llmresponse;
     }
 
     /**
-     * Grade response by making a call to external
-     * large language model such as ChatGPT
+     * Grade a student's response using AI feedback
      *
-     * @param array $response
-     * @return void
+     * @param array $response The student's response data
+     * @return array Grade result with fraction and state
      */
     public function grade_response(array $response): array {
-
         if ($this->spellcheck) {
-            $spellcheckresponse = $this->get_spellchecking($response);
-            $this->insert_attempt_step_data('-spellcheckresponse', $spellcheckresponse);
+            $this->handle_spellcheck($response);
         }
 
         if (!$this->is_complete_response($response)) {
-            $grade = [0 => 0, question_state::$needsgrading];
-            return $grade;
-        }
-        $ai = new local_ai_manager\manager('feedback');
-        if (is_array($response)) {
-            $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
-                 $this->defaultmark, $this->markscheme);
-            $llmresponse = $ai->perform_request($fullaiprompt, ['component' => 'qtype_aitext', 'contextid' => $this->contextid]);
-            if ($llmresponse->get_code() !== 200) {
-                throw new moodle_exception('err_retrievingfeedback', 'qtype_aitext', '', $llmresponse->get_errormessage(),
-                        $llmresponse->get_debuginfo());
-            }
-            $feedback = $llmresponse->get_content();
+            return $this->get_needs_grading_response();
         }
 
+        $fullaiprompt = $this->build_full_ai_prompt(
+        $response['answer'],
+        $this->aiprompt,
+        $this->defaultmark,
+        $this->markscheme
+        );
+        $feedback = $this->get_ai_feedback($response);
         $contentobject = $this->process_feedback($feedback);
+        $grade = $this->calculate_grade($contentobject);
 
-        // If there are no marks, write the feedback and set to needs grading .
-        if (is_null($contentobject->marks)) {
-            $grade = [0 => 0, question_state::$needsgrading];
-        } else {
-            $fraction = $contentobject->marks / $this->defaultmark;
-            $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
-        }
-         // The -aicontent data is used in question preview. Only needs to happen in preview.
-        $this->insert_attempt_step_data('-aiprompt', $fullaiprompt);
-        $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);
-
-        $this->insert_attempt_step_data('-comment', $contentobject->feedback);
-        $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
+        $this->store_attempt_data($contentobject, $feedback, $fullaiprompt);
 
         return $grade;
+    }
+
+    /**
+     * Process spellchecking for the response
+     *
+     * @param array $response The student's response data
+     */
+    private function handle_spellcheck(array $response): void {
+        $spellcheckresponse = $this->get_spellchecking($response);
+        $this->insert_attempt_step_data('-spellcheckresponse', $spellcheckresponse);
+    }
+
+    /**
+     * Get the default response for questions that need manual grading
+     *
+     * @return array Array containing grade fraction and needs grading state
+     */
+    private function get_needs_grading_response(): array {
+        return [0 => 0, question_state::$needsgrading];
+    }
+
+    /**
+     * Request and retrieve AI feedback for the response
+     *
+     * @param array $response The student's response data
+     * @return string The AI generated feedback content
+     * @throws moodle_exception When AI feedback retrieval fails
+     */
+    private function get_ai_feedback(array $response): string {
+
+        $fullaiprompt = $this->build_full_ai_prompt(
+        $response['answer'],
+        $this->aiprompt,
+        $this->defaultmark,
+        $this->markscheme
+        );
+        $llmresponse = $this->perform_request($fullaiprompt);
+        return $llmresponse;
+
+    }
+
+    /**
+     * Calculate the grade based on AI feedback
+     *
+     * @param stdClass $contentobject Object containing marks and feedback
+     * @return array Array containing grade fraction and state
+     */
+    private function calculate_grade(stdClass $contentobject): array {
+        if (is_null($contentobject->marks)) {
+            return $this->get_needs_grading_response();
+        }
+
+        $fraction = $contentobject->marks / $this->defaultmark;
+        return [$fraction, question_state::graded_state_for_fraction($fraction)];
+    }
+
+    /**
+     * Store the attempt data in the database
+     *
+     * @param stdClass $contentobject Object containing feedback
+     * @param string $feedback Raw feedback from AI
+     */
+    private function store_attempt_data(stdClass $contentobject, string $feedback, string $fullaiprompt): void {
+        $this->insert_attempt_step_data('-aiprompt', $fullaiprompt);
+        $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);
+        $this->insert_attempt_step_data('-comment', $contentobject->feedback);
+        $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
     }
 
     /**
@@ -229,10 +304,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
         $responsetext = strip_tags($response);
-            $responsetext = '[['.$responsetext.']]';
-            $prompt = get_config('qtype_aitext', 'prompt');
-            $prompt = preg_replace("/\[responsetext\]/", $responsetext, $prompt);
-            $prompt .= ' '.trim($aiprompt);
+        $responsetext = '[['.$responsetext.']]';
+        $prompt = get_config('qtype_aitext', 'prompt');
+        $prompt = preg_replace("/\[responsetext\]/", $responsetext, $prompt);
+        $prompt .= ' '.trim($aiprompt);
 
         if ($markscheme > '') {
             // Tell the LLM how to mark the submission.
@@ -284,13 +359,13 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             // TODO Model currently is only used for connecting and at this point I believe.
             // We need to remove all the model selection logic or make local_ai_manager support the selection of models.
             $disclaimer = str_replace("[[model]]",
-                    \local_ai_manager\ai_manager_utils::get_connector_instance_by_purpose('feedback')->get_model(), $disclaimer);
+                \local_ai_manager\ai_manager_utils::get_connector_instance_by_purpose('feedback')->get_model(), $disclaimer);
             $contentobject->feedback .= ' '.$this->llm_translate($disclaimer);
         } else {
             $contentobject = (object) [
-                                        "feedback" => $feedback,
-                                        "marks" => null,
-                                        ];
+                                    "feedback" => $feedback,
+                                    "marks" => null,
+                                    ];
         }
         return $contentobject;
     }
@@ -306,15 +381,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (current_language() == 'en') {
             return $text;
         }
-        $ai = new local_ai_manager\manager('translate');
         $cache = cache::make('qtype_aitext', 'stringdata');
         if (($translation = $cache->get(current_language().'_'.$text)) === false) {
             $prompt = 'translate "'.$text .'" into '.current_language();
-            $llmresponse = $ai->perform_request($prompt);
-            if ($llmresponse->get_code() !== 200) {
-                throw new moodle_exception('Could not retrieve the translation from the AI tool');
-            }
-            $translation = $llmresponse->get_content();
+            $translation = $this->perform_request($prompt);
             $translation = trim($translation, '"');
             $cache->set(current_language().'_'.$text, $translation);
         }
@@ -331,9 +401,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     protected function insert_attempt_step_data(string $name, string $value ): void {
         global $DB;
         $data = [
-            'attemptstepid' => $this->step->get_id(),
-            'name' => $name,
-            'value' => $value,
+        'attemptstepid' => $this->step->get_id(),
+        'name' => $name,
+        'value' => $value,
         ];
         $DB->insert_record('question_attempt_step_data', $data);
     }
@@ -369,7 +439,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $output = null;
         if (isset($response['answer'])) {
             $output .= question_utils::to_plain_text($response['answer'],
-                $response['answerformat'], ['para' => false]);
+            $response['answerformat'], ['para' => false]);
         }
 
         return $output;
@@ -446,7 +516,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (array_key_exists('answer', $response) && ($response['answer'] !== '')) {
             return true;
         } else if (array_key_exists('attachments', $response)
-                && $response['attachments'] instanceof question_response_files) {
+            && $response['attachments'] instanceof question_response_files) {
             return true;
         } else {
             return false;
@@ -476,8 +546,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $value2 = '';
         }
         return $value1 === $value2 && ($this->attachments == 0 ||
-                question_utils::arrays_same_at_key_missing_is_blank(
-                $prevresponse, $newresponse, 'attachments'));
+            question_utils::arrays_same_at_key_missing_is_blank(
+            $prevresponse, $newresponse, 'attachments'));
     }
 
     /**
@@ -505,7 +575,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         } else {
             return parent::check_file_access($qa, $options, $component,
-                    $filearea, $args, $forcedownload);
+                $filearea, $args, $forcedownload);
         }
     }
 
@@ -522,12 +592,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         // ideally, we should return as much as settings as possible (depending on the state and display options).
 
         $settings = [
-            'responseformat' => $this->responseformat,
-            'responsefieldlines' => $this->responsefieldlines,
-            'responsetemplate' => $this->responsetemplate,
-            'responsetemplateformat' => $this->responsetemplateformat,
-            'minwordlimit' => $this->minwordlimit,
-            'maxwordlimit' => $this->maxwordlimit,
+        'responseformat' => $this->responseformat,
+        'responsefieldlines' => $this->responsefieldlines,
+        'responsetemplate' => $this->responsetemplate,
+        'responsetemplateformat' => $this->responsetemplateformat,
+        'minwordlimit' => $this->minwordlimit,
+        'maxwordlimit' => $this->maxwordlimit,
         ];
 
         return $settings;
@@ -551,10 +621,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $count = count_words($responsestring);
         if ($this->maxwordlimit && $count > $this->maxwordlimit) {
             return get_string('maxwordlimitboundary', 'qtype_aitext',
-                    ['limit' => $this->maxwordlimit, 'count' => $count]);
+                ['limit' => $this->maxwordlimit, 'count' => $count]);
         } else if ($count < $this->minwordlimit) {
             return get_string('minwordlimitboundary', 'qtype_aitext',
-                    ['limit' => $this->minwordlimit, 'count' => $count]);
+                ['limit' => $this->minwordlimit, 'count' => $count]);
         } else {
             return null;
         }
@@ -582,10 +652,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $count = count_words($response['answer']);
         if ($this->maxwordlimit && $count > $this->maxwordlimit) {
             return get_string('wordcounttoomuch', 'qtype_aitext',
-                    ['limit' => $this->maxwordlimit, 'count' => $count]);
+                ['limit' => $this->maxwordlimit, 'count' => $count]);
         } else if ($count < $this->minwordlimit) {
             return get_string('wordcounttoofew', 'qtype_aitext',
-                    ['limit' => $this->minwordlimit, 'count' => $count]);
+                ['limit' => $this->minwordlimit, 'count' => $count]);
         } else {
             return get_string('wordcount', 'qtype_aitext', $count);
         }
