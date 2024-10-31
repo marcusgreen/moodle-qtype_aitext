@@ -35,7 +35,9 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtextarea('qtype_aitext/defaultmarksscheme',
         new lang_string('defaultmarksscheme', 'qtype_aitext'),
         new lang_string('defaultmarksscheme_setting', 'qtype_aitext'),
+
         new lang_string('thedefaultmarksscheme', 'qtype_aitext')));
+
     $settings->add(new admin_setting_configtext(
         'qtype_aitext/disclaimer',
         new lang_string('disclaimer', 'qtype_aitext'),
@@ -55,9 +57,9 @@ if ($ADMIN->fulltree) {
         'qtype_aitext/jsonprompt',
         new lang_string('jsonprompt', 'qtype_aitext'),
         new lang_string('jsonprompt_setting', 'qtype_aitext'),
-        'Return only a JSON object which enumerates a set of 2 elements.The JSON object should be in
-	this format: {feedback":"string","marks":"number"} where marks is a single number summing all marks.
-   	Also show the marks as part of the feedback.',
+        'Return only a JSON object which enumerates a set of 3 elements.' .
+        ' The JSON object should be in this format: {"feedback":"string","marks":"number", "relevance": "number"}' .
+        ' where marks is a single number summing all marks.',
         PARAM_RAW,
         20,
         6
@@ -93,7 +95,7 @@ if ($ADMIN->fulltree) {
         'qtype_aitext/feedbacklanguage',
         new lang_string('feedbacklanguage', 'qtype_aitext'),
         new lang_string('feedbacklanguage_setting', 'qtype_aitext'),
-        'en-us', constants::get_languages()
+        'en-us', constants::get_languages(true)
     ));
 
     $settings->add(new admin_setting_configselect(

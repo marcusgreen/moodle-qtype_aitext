@@ -84,5 +84,28 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024051102, 'qtype', 'aitext');
     }
 
+    if ($oldversion < 2024051103) {
+        // JSON prompt upgrade to factor in relevance. If the user has edited the JSON prompt, we don't touch it.
+        $originaljsonprompt = 'Return only a JSON object which enumerates a set of 2 elements.';
+        $originaljsonprompt .= 'The JSON object should be in this format: {feedback":"string","marks":"number"}';
+        $originaljsonprompt .= ' where marks is a single number summing all marks.';
+        $originaljsonprompt .= ' Also show the marks as part of the feedback.';
+        $originaljsonprompt = preg_replace('/\s+/', ' ', trim($originaljsonprompt));
+
+        $currentjsonprompt = get_config('qtype_aitext', 'jsonprompt');
+        $currentjsonprompt = preg_replace('/\s+/', ' ', trim($currentjsonprompt));
+
+        if ($currentjsonprompt == $originaljsonprompt) {
+            $newprompt = "Return only a JSON object which enumerates a set of 3 elements.";
+            $newprompt .= ' The JSON object should be in this format: {"feedback":"string","marks":"number", "relevance": "number"}';
+            $newprompt .= " where marks is a single number summing all marks.";
+            set_config('jsonprompt', $newprompt, 'qtype_aitext');
+        }
+
+
+        // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2024051103, 'qtype', 'aitext');
+    }
+
     return true;
 }

@@ -26,6 +26,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use qtype_aitext\constants;
+
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 use tool_aiconnect\ai;
 /**
@@ -191,7 +193,14 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (is_null($contentobject->marks)) {
             $grade = [0 => 0, question_state::$needsgrading];
         } else {
-            $fraction = $contentobject->marks / $this->defaultmark;
+            // Calculate the fraction of the marks but AI sometimes gives more marks than possible, so cap it.
+            $fraction = $contentobject->marks > $this->defaultmark ? 1 : $contentobject->marks / $this->defaultmark;
+
+            //relevance penalty
+            if(isset($contentobject->relevance) && $contentobject->relevance!==null){
+                $fraction = $fraction * ($contentobject->relevance * 0.01);
+            }
+
             $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
         $this->insert_feedback_and_prompt($fullaiprompt, $contentobject);
@@ -253,24 +262,48 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return string;
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
-        $responsetext = strip_tags($response);
-            $responsetext = '[['.$responsetext.']]';
-            $prompt = get_config('qtype_aitext', 'prompt');
-            $prompt = preg_replace("/\[responsetext\]/", $responsetext, $prompt);
-            $prompt .= ' '.trim($aiprompt);
+        $prompttemplate ="You are evaluating a students response to a question. ";
+        $prompttemplate .=  " {{jsonprompt}}. ";
+        //$prompttemplate .=  "  Return only a JSON object which enumerates a set of 3 elements.The JSON object should be in this format: {"feedback":"string","marks":"number", "relevance": "number"} where marks is a single number summing all marks. ";
 
-        if ($markscheme > '') {
-            // Tell the LLM how to mark the submission.
-            $prompt .= " The total score is: $defaultmark .";
-            $prompt .= ' '.$markscheme;
-        } else {
-            // Todo should this be a plugin setting value?.
-            $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
+        $prompttemplate .= get_config('qtype_aitext', 'prompt');
+        //$prompttemplate  =  "In [{{responsetext}}] analyse but do not mention the part between [[ and ]] as follows: ";
+
+        $prompttemplate .=  " {{{aiprompt}}}";
+        //$prompttemplate .=  " Explain if there is anything wrong with the grammar and spelling in the text";
+
+        if(!empty($markscheme)){
+            $prompttemplate .=  " Set marks in the json object according to the following criteria: {The maximum score is {{maximumscore}}. {{markscheme}}}";
+            //$prompttemplate .=" Set marks in the json object according to the following criteria: {The total score is 5. Deduct a point from the maximum score for each grammar or spelling mistake.}"
+        }else{
+            $prompttemplate .=  " Set marks to null in the json object.";
         }
-        $prompt .= ' '.trim(get_config('qtype_aitext', 'jsonprompt'));
-        $prompt .= ' translate the feedback to the language '.current_language();
-        return $prompt;
+        switch($this->relevance){
+            case constants::RELEVANCE_QTEXT:
+                $prompttemplate .=  " Calculate the relevance of the answer (percentage) to the following question  : {{{questiontext}}}";
+                break;
+            case constants::RELEVANCE_COMPARISON:
+                $prompttemplate .=  "  Calculate the relevance of the answer (percentage) to the extent it contains similar concepts to the following model answer : {{{relevanceanswer}}}";
+                break;
+            case constants::RELEVANCE_NONE:
+            default:
+                $prompttemplate .=  " Set relevance to null in the json object.";
+                break;
+        }
+               $prompttemplate .=  " Translate the feedback to the language: {{language}}.";
 
+        //set up the parameters to merge with the prompt template
+        $params= [
+            '[responsetext]' => '[[' . strip_tags($response) . ']]',
+            '{{aiprompt}}' => trim($aiprompt),
+            '{{maximumscore}}' => $defaultmark,
+            '{{markscheme}}' => $markscheme,
+            '{{jsonprompt}}' => trim(get_config('qtype_aitext', 'jsonprompt')),
+            '{{relevanceanswer}}' => $this->relevanceanswer,
+            '{{questiontext}}' => strip_tags($this->questiontext),
+            '{{language}}' => $this->feedbacklanguage == 'currentlanguage' ? current_language() : $this->feedbacklanguage];
+        $prompt = strtr($prompttemplate, $params);
+        return $prompt;
     }
     /**
      *
@@ -290,6 +323,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $contentobject->feedback = trim($contentobject->feedback);
             $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"',
                 $contentobject->feedback);
+            if(isset($contentobject->relevance) && $contentobject->relevance!==null){
+                $contentobject->feedback  .= ' ' . get_string('submissionrelevance', 'qtype_aitext', $contentobject->relevance);
+            }
             $disclaimer = get_config('qtype_aitext', 'disclaimer');
             $disclaimer = str_replace("[[model]]", $this->model, $disclaimer);
             $contentobject->feedback .= ' '.$this->llm_translate($disclaimer);

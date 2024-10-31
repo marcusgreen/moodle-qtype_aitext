@@ -45,6 +45,7 @@ class constants {
         'graderinfoformat',
         'responsetemplate',
         'responsetemplateformat',
+        'maxbytes',
         'aiprompt',
         'markscheme',
         'sampleanswer',
@@ -62,10 +63,13 @@ class constants {
      *
      * @return array
      */
-    public static function get_languages() {
+    public static function get_languages($includeauto=false) {
         $responselanguages=[];
         foreach (self::LANGUAGES as $langcode) {
             $responselanguages[$langcode] = get_string($langcode,"qtype_aitext");
+        }
+        if($includeauto){
+            $responselanguages['currentlanguage'] = get_string('currentlanguage',"qtype_aitext");
         }
         return $responselanguages;
     }

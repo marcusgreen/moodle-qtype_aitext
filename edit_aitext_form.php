@@ -97,7 +97,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->setDefault('responselanguage', get_config('qtype_aitext', 'responselanguage'));
 
         $mform->addElement('select', 'feedbacklanguage',
-            get_string('feedbacklanguage', 'qtype_aitext'), constants::get_languages());
+            get_string('feedbacklanguage', 'qtype_aitext'), constants::get_languages(true));
         $mform->setDefault('feedbacklanguage', get_config('qtype_aitext', 'feedbacklanguage'));
 
         $mform->addElement('select', 'responsefieldlines',
@@ -131,6 +131,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->hideIf('maxtime', 'responseformat', 'neq', 'audio');
 
         // Relevance
+        $mform->addElement('header', 'relevanceheader', get_string('relevanceheader', 'qtype_aitext'));
         $mform->addElement('select', 'relevance', get_string('relevance', 'qtype_aitext'), constants::get_relevance_opts());
         $mform->setDefault('relevance',  get_config('qtype_aitext', 'relevance'));
         // Relevance answer
