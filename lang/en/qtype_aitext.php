@@ -192,3 +192,4 @@ $string['retry'] = 'Retry';
 $string['currentwordcount'] = 'Total Words';
 $string['submissionrelevance'] = 'Relevance: {$a}%';
 $string['relevanceheader'] = 'Relevance';
+$string['correctedtext'] = 'Corrections:';

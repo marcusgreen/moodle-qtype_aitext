@@ -126,7 +126,7 @@ class qtype_aitext extends question_type {
         $options->responsetemplate = $formdata->responsetemplate['text'];
         $options->responsetemplateformat = $formdata->responsetemplate['format'];
 
-        //audior recording related options
+        // Audio recording related options.
         $options->responselanguage = $formdata->responselanguage;
         $options->feedbacklanguage = $formdata->feedbacklanguage;
         $options->maxtime = $formdata->maxtime;

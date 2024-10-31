@@ -47,7 +47,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
     /**
      *  LLM Model, will vary between AI systems, e.g. gpt4 or llama3
-    
+
      * @var mixed $model Store the llm model used for the question.
      */
     public $model;
@@ -196,8 +196,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             // Calculate the fraction of the marks but AI sometimes gives more marks than possible, so cap it.
             $fraction = $contentobject->marks > $this->defaultmark ? 1 : $contentobject->marks / $this->defaultmark;
 
-            //relevance penalty
-            if(isset($contentobject->relevance) && $contentobject->relevance!==null){
+            // Relevance penalty.
+            if (isset($contentobject->relevance) && $contentobject->relevance !== null) {
                 $fraction = $fraction * ($contentobject->relevance * 0.01);
             }
 
@@ -216,7 +216,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param string $markscheme The mark scheme.
      * @package qtype_aitext
      */
-    private function queue_ai_processing(string $answer, string $aiprompt, float $defaultmark, string $markscheme): void{
+    private function queue_ai_processing(string $answer, string $aiprompt, float $defaultmark, string $markscheme): void {
         global $DB;
         $data = [
             'activity' => 'qtype_aitext',
@@ -262,40 +262,40 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return string;
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
-        $prompttemplate ="You are evaluating a student's {{responselanguage}} language response to a question. ";
-        $prompttemplate .=  " {{jsonprompt}}. ";
-        //$prompttemplate .=  "  Return only a JSON object which enumerates a set of 3 elements.The JSON object should be in this format: {"feedback":"string","marks":"number", "relevance": "number"} where marks is a single number summing all marks. ";
+        $prompttemplate = "You are evaluating a student's {{responselanguage}} language response to a question. ";
+        $prompttemplate .= " {{jsonprompt}}. ";
+        // $prompttemplate .=  "  Return only a JSON object which enumerates a set of 3 elements.The JSON object should be in this format: {"feedback":"string","marks":"number", "relevance": "number"} where marks is a single number summing all marks. ";
 
         $prompttemplate .= get_config('qtype_aitext', 'prompt');
-        //$prompttemplate  =  "In [{{responsetext}}] analyse but do not mention the part between [[ and ]] as follows: ";
+        // $prompttemplate  =  "In [{{responsetext}}] analyse but do not mention the part between [[ and ]] as follows: ";
 
-        $prompttemplate .=  " {{{aiprompt}}}";
-        //$prompttemplate .=  " Explain if there is anything wrong with the grammar and spelling in the text";
+        $prompttemplate .= " {{{aiprompt}}}";
+        // $prompttemplate .=  " Explain if there is anything wrong with the grammar and spelling in the text";
 
-        if(!empty($markscheme)){
-            $prompttemplate .=  " Set marks in the json object according to the following criteria: {The maximum score is {{maximumscore}}. {{markscheme}}}";
-            //$prompttemplate .=" Set marks in the json object according to the following criteria: {The total score is 5. Deduct a point from the maximum score for each grammar or spelling mistake.}"
-        }else{
-            $prompttemplate .=  " Set marks to null in the json object.";
+        if (!empty($markscheme)) {
+            $prompttemplate .= " Set marks in the json object according to the following criteria: {The maximum score is {{maximumscore}}. {{markscheme}}}";
+            // $prompttemplate .=" Set marks in the json object according to the following criteria: {The total score is 5. Deduct a point from the maximum score for each grammar or spelling mistake.}"
+        } else {
+            $prompttemplate .= " Set marks to null in the json object.";
         }
         switch($this->relevance){
             case constants::RELEVANCE_QTEXT:
-                $prompttemplate .=  " Calculate the relevance of the answer (percentage) to the following question  : {{{questiontext}}}";
+                $prompttemplate .= " Calculate the relevance of the answer (percentage) to the following question  : {{{questiontext}}}";
                 break;
             case constants::RELEVANCE_COMPARISON:
-                $prompttemplate .=  "  Calculate the relevance of the answer (percentage) to the extent it contains similar concepts to the following model answer : {{{relevanceanswer}}}";
+                $prompttemplate .= "  Calculate the relevance of the answer (percentage) to the extent it contains similar concepts to the following model answer : {{{relevanceanswer}}}";
                 break;
             case constants::RELEVANCE_NONE:
             default:
-                $prompttemplate .=  " Set relevance to null in the json object.";
+                $prompttemplate .= " Set relevance to null in the json object.";
                 break;
         }
-               $prompttemplate .=  " Translate the feedback to the language: {{feedbacklanguage}}.";
+               $prompttemplate .= " Translate the feedback to the language: {{feedbacklanguage}}.";
 
-        //set up the parameters to merge with the prompt template
+        // set up the parameters to merge with the prompt template
         $responselanguage = empty($this->responselanguage) ? 'en-us' : $this->responselanguage;
         $responselanguagename = get_string($responselanguage, 'qtype_aitext');
-        $params= [
+        $params = [
             '[responsetext]' => '[[' . strip_tags($response) . ']]',
             '{{aiprompt}}' => trim($aiprompt),
             '{{maximumscore}}' => $defaultmark,
@@ -305,7 +305,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             '{{questiontext}}' => strip_tags($this->questiontext),
             '{{feedbacklanguage}}' => $this->feedbacklanguage == 'currentlanguage' || empty($this->feedbacklanguage) ?
                         current_language() : $this->feedbacklanguage,
-            '{{responselanguage}}' => $responselanguagename
+            '{{responselanguage}}' => $responselanguagename,
         ];
         $prompt = strtr($prompttemplate, $params);
         return $prompt;
@@ -328,12 +328,18 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $contentobject->feedback = trim($contentobject->feedback);
             $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"',
                 $contentobject->feedback);
-            if(isset($contentobject->relevance) && $contentobject->relevance!==null){
+            // Relevance.
+            if (isset($contentobject->relevance) && $contentobject->relevance !== null) {
                 $contentobject->feedback  .= ' ' . get_string('submissionrelevance', 'qtype_aitext', $contentobject->relevance);
+            }
+            // Corrections.
+            if (isset($contentobject->correctedtext) && !empty($contentobject->correctedtext)) {
+                $contentobject->feedback  .= '<br/>' . get_string('correctedtext', 'qtype_aitext') . '<br/>';
+                $contentobject->feedback  .= $contentobject->correctedtext;
             }
             $disclaimer = get_config('qtype_aitext', 'disclaimer');
             $disclaimer = str_replace("[[model]]", $this->model, $disclaimer);
-            $contentobject->feedback .= ' '.$this->llm_translate($disclaimer);
+            $contentobject->feedback .= '<br/>' . $this->llm_translate($disclaimer);
         } else {
             $contentobject = (object) [
                                         "feedback" => $feedback,
@@ -414,7 +420,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (isset($response['answer']) && isset($response['answerformat'])) {
             $output = question_utils::to_plain_text($response['answer'],
                 $response['answerformat'], ['para' => false]);
-        }else if(isset($response['answer'])){
+        } else if (isset($response['answer'])) {
             $output = question_utils::to_plain_text($response['answer'],
              FORMAT_HTML, ['para' => false]);
         }
