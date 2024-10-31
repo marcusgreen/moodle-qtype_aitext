@@ -67,10 +67,10 @@ if ($ADMIN->fulltree) {
         0, ['plain' => 'plain', 'editor' => 'editor', 'monospaced' => 'monospaced']
     ));
     $settings->add(new admin_setting_configcheckbox(
-        'qtype_aitext/usecoreai',
-        new lang_string('usecoreai', 'qtype_aitext'),
-        new lang_string('usecoreai_setting', 'qtype_aitext'),
-        1
+        'qtype_aitext/usemebis',
+        new lang_string('usemebis', 'qtype_aitext'),
+        new lang_string('usemebis_setting', 'qtype_aitext'),
+        0
     ));
 
 }

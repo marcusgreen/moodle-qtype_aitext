@@ -84,6 +84,27 @@ final class question_test extends \advanced_testcase {
     }
 
     /**
+     * Test the perform_request method.
+     * @covers ::perform_request()
+     *
+     * return void
+     */
+    public function test_perform_request(): void {
+        $this->resetAfterTest();
+        global $CFG;
+        if (!$CFG->llmapikey) {
+                 $this->markTestSkipped('Skipping test_perform_request due to no llmapikey in config.php');
+        }
+        set_config('qtype_aitext', 'usemebis', false);
+        set_config('aiprovider_openai', 'apikey', $CFG->llmapikey);
+        // Create the aitext question under test.
+        $questiontext = 'AI question text';
+        $aitext = qtype_aitext_test_helper::make_aitext_question(['questiontext' => $questiontext]);
+        $result = $aitext->perform_request('what is 2 * 2?');
+
+    }
+
+    /**
      * Test summarise_response() when teachers view quiz attempts and then
      * review them to see what has been saved in the response history table.
      *
