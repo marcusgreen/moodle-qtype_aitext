@@ -29,6 +29,11 @@
     <aiprompt>Evaluate me</aiprompt>
     <markscheme>One mark if correct</markscheme>
     <maxbytes>0</maxbytes>
+    <model>gpt-4</model>
+    <maxtime>0</maxtime>
+    <responselanguage>en-us</responselanguage>
+    <feedbacklanguage>en-us</feedbacklanguage>
+    <relevance>0</relevance>
     <filetypeslist></filetypeslist>
     <graderinfo format="html">
       <text></text>

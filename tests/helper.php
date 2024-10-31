@@ -23,6 +23,7 @@
  */
 
 use Random\RandomException;
+use qtype_aitext\constants;
 
 /**
  * Test helper class for the aitext question type.
@@ -75,6 +76,11 @@ class qtype_aitext_test_helper extends question_test_helper {
         $q->model = 'gpt4';
         $q->graderinfo = '';
         $q->graderinfoformat = FORMAT_HTML;
+        $q->maxtime = 0;
+        $q->responselanguage = 'en-us';
+        $q->feedbacklanguage = 'en-us';
+        $q->relevance = constants::RELEVANCE_NONE;
+        $q->relevanceanswer = '';
         $q->qtype = question_bank::get_qtype('aitext');
 
         return $q;
@@ -93,7 +99,7 @@ class qtype_aitext_test_helper extends question_test_helper {
      * question using the HTML editor allowing embedded files as input, and up
      * to three attachments.
      *
-     * @return stdClass the data that would be returned by $form->get_gata();
+     * @return stdClass the data that would be returned by $form->get_data();
      */
     public function get_aitext_question_form_data_editor() {
         $fromform = new stdClass();
@@ -113,6 +119,11 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->markscheme = 'Give one mark if the answer is correct';
         $fromform->sampleanswer = '';
         $fromform->model = 'gpt-4';
+        $fromform->maxtime = 0;
+        $fromform->responselanguage = 'en-us';
+        $fromform->feedbacklanguage = 'en-us';
+        $fromform->relevance = constants::RELEVANCE_QTEXT;
+        $fromform->relevanceanswer = '';
         return $fromform;
     }
 
@@ -151,6 +162,11 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
         $fromform->sampleanswer = '';
         $fromform->model = 'gpt-4';
+        $fromform->maxtime = 0;
+        $fromform->responselanguage = 'en-us';
+        $fromform->feedbacklanguage = 'en-us';
+        $fromform->relevance = constants::RELEVANCE_NONE;
+        $fromform->relevanceanswer = '';
         return $fromform;
     }
 
