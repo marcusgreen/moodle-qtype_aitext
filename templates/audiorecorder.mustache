@@ -14,8 +14,7 @@
     <div class="qtype_aitext_questionanswered">{{#str}} questionanswered , qtype_aitext {{/str}}</div>
     <div class="qtype_aitext_retry retry_{{safeid}} btn btn-secondary">{{#str}} retry , qtype_aitext {{/str}}</div>
 </div>
-<div class="qtype_aitext_currentwordcount">{{#str}} currentwordcount , qtype_aitext {{/str}}: <span class="{{safeid}}_currentwordcount">{{wordcount}}</span></div>
-
+<div class="qtype_aitext_currentwordcount {{^cancountwords}}hidden{{/cancountwords}}" >{{#str}} currentwordcount , qtype_aitext {{/str}}: <span class="{{safeid}}_currentwordcount">{{wordcount}}</span></div>
 
 
 </div>

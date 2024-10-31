@@ -262,7 +262,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return string;
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
-        $prompttemplate ="You are evaluating a student's {{targetlanguage}} language response to a question. ";
+        $prompttemplate ="You are evaluating a student's {{responselanguage}} language response to a question. ";
         $prompttemplate .=  " {{jsonprompt}}. ";
         //$prompttemplate .=  "  Return only a JSON object which enumerates a set of 3 elements.The JSON object should be in this format: {"feedback":"string","marks":"number", "relevance": "number"} where marks is a single number summing all marks. ";
 
@@ -293,8 +293,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                $prompttemplate .=  " Translate the feedback to the language: {{feedbacklanguage}}.";
 
         //set up the parameters to merge with the prompt template
-        $targetlanguage = empty($this->targetlanguage) ? 'en-us' : $this->targetlanguage;
-        $targetlanguagename = get_string($targetlanguage, 'qtype_aitext');
+        $responselanguage = empty($this->responselanguage) ? 'en-us' : $this->responselanguage;
+        $responselanguagename = get_string($responselanguage, 'qtype_aitext');
         $params= [
             '[responsetext]' => '[[' . strip_tags($response) . ']]',
             '{{aiprompt}}' => trim($aiprompt),
@@ -305,7 +305,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             '{{questiontext}}' => strip_tags($this->questiontext),
             '{{feedbacklanguage}}' => $this->feedbacklanguage == 'currentlanguage' || empty($this->feedbacklanguage) ?
                         current_language() : $this->feedbacklanguage,
-            '{{targetlanguage}}' => $targetlanguagename
+            '{{responselanguage}}' => $responselanguagename
         ];
         $prompt = strtr($prompttemplate, $params);
         return $prompt;

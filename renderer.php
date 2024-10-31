@@ -563,6 +563,7 @@ class qtype_aitext_format_audio_renderer extends qtype_aitext_format_renderer_ba
             'language' => $responselanguage,
             'maxtime' => $question->maxtime,
             'wordcount' => $wordcount,
+            'cancountwords'=> !in_array($responselanguage,['ja-jp','zh-cn','zh-tw','ko-kr']) ,
         ]);
 
         $output .= html_writer::end_tag('div');
