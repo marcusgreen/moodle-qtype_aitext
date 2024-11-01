@@ -95,7 +95,7 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         $currentjsonprompt = get_config('qtype_aitext', 'jsonprompt');
         $currentjsonprompt = preg_replace('/\s+/', ' ', trim($currentjsonprompt));
 
-        if ($currentjsonprompt == $originaljsonprompt) {
+        if ($currentjsonprompt == $originaljsonprompt || true) {
             $newprompt = "Return only a JSON object which enumerates a set of 4 elements.";
             $newprompt .= ' The JSON object should be in this format: {"feedback":"string","correctedtext":"string",marks":"number", "relevance": "number"}';
             $newprompt .= " where marks is a single number summing all marks.";
