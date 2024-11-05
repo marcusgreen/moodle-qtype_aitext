@@ -144,15 +144,15 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $this->step = $step;
     }
     /**
-     * Call the llm using either the 4.5 core api
-     * or the the mebis ai depending on the usemebisai
-     * settings checkbox.
+     * Call the llm using either the 4.5 core api or the backend provided by the local_ai_manager plugin.
+     *
+     * See "uselocalaimanager" admin setting.
      *
      * @param string $prompt
      * @return string $response
      */
     public function perform_request(string $prompt, string $purpose): string {
-        if (get_config('qtype_aitext', 'usemebisai')) {
+        if (get_config('qtype_aitext', 'uselocalaimanager')) {
             $manager = new local_ai_manager\manager($purpose);
             $llmresponse = (object) $manager->perform_request($prompt,  ['component' => 'qtype_aitext', 'contextid' => $this->contextid]);
             if ($llmresponse->get_code() !== 200) {
