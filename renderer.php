@@ -93,11 +93,14 @@ class qtype_aitext_renderer extends qtype_renderer {
         }
 
         $result = '';
-        $uniqid = uniqid();
-        $result .= html_writer::tag('div', '',
-                ['data-content' => 'local_ai_manager_infobox', 'data-boxid' => $uniqid]);
-        $PAGE->requires->js_call_amd('local_ai_manager/infobox', 'renderInfoBox',
-                ['qtype_aitext', $USER->id, '[data-content="local_ai_manager_infobox"][data-boxid="' . $uniqid . '"]', ['feedback']]);
+        if (get_config('qtype_aitext', 'uselocalaimanager')) {
+            $uniqid = uniqid();
+            $result .= html_writer::tag('div', '',
+                    ['data-content' => 'local_ai_manager_infobox', 'data-boxid' => $uniqid]);
+            $PAGE->requires->js_call_amd('local_ai_manager/infobox', 'renderInfoBox',
+                    ['qtype_aitext', $USER->id, '[data-content="local_ai_manager_infobox"][data-boxid="' . $uniqid . '"]',
+                            ['feedback']]);
+        }
         $result .= html_writer::tag('div', $question->format_questiontext($qa),
                 ['class' => 'qtext']);
 
@@ -111,10 +114,12 @@ class qtype_aitext_renderer extends qtype_renderer {
         }
         $result .= html_writer::tag('div', $files, ['class' => 'attachments']);
         $result .= html_writer::end_tag('div');
-        $result .= html_writer::tag('div', '',
-                ['data-content' => 'local_ai_manager_warningbox', 'data-boxid' => $uniqid]);
-        $PAGE->requires->js_call_amd('local_ai_manager/warningbox', 'renderWarningBox',
-                ['[data-content="local_ai_manager_warningbox"][data-boxid="' . $uniqid . '"]']);
+        if (get_config('qtype_aitext', 'uselocalaimanager')) {
+            $result .= html_writer::tag('div', '',
+                    ['data-content' => 'local_ai_manager_warningbox', 'data-boxid' => $uniqid]);
+            $PAGE->requires->js_call_amd('local_ai_manager/warningbox', 'renderWarningBox',
+                    ['[data-content="local_ai_manager_warningbox"][data-boxid="' . $uniqid . '"]']);
+        }
 
         return $result;
     }
