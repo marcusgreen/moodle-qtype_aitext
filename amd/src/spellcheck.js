@@ -24,7 +24,7 @@
 
 import * as Diff from 'qtype_aitext/diff';
 import ModalForm from 'core_form/modalform';
-import {get_string as getString} from 'core/str';
+import {getString as getString} from 'core/str';
 
 /**
  * Init the module.
@@ -47,9 +47,9 @@ export const init = (cmid, readonlyareaselector, spellcheckeditbuttonselector) =
 };
 
 /**
- * Render the spellcheckdiff.
+ * Render the spell check highlighting.
  *
- * @param {string} readonlyareaselector The selector for the readonly area to apply the spell check diff to
+ * @param {string} readonlyareaselector the selector for the readonly area to apply the spell check diff to
  */
 export const renderDiff = (readonlyareaselector) => {
     const studentanswer = document.querySelector(readonlyareaselector).innerHTML;
@@ -67,7 +67,7 @@ export const renderDiff = (readonlyareaselector) => {
         part.value = part.value.replace(/ /g, '&nbsp;');
         const parser = new DOMParser();
         part.value = parser.parseFromString(part.value, 'text/html');
-        var cls = part.added ? 'qtype_aitext_spellcheck_new' :
+        const cls = part.added ? 'qtype_aitext_spellcheck_new' :
             part.removed ? 'qtype_aitext_spellcheck_wrong' : '';
         if (part.added || part.removed) {
             span = document.createElement('span');
@@ -107,7 +107,9 @@ export const showModalForm = async(cmid, readonlyareaselector) => {
 };
 
 /**
- * Reload the page. This is not nice, but easy :-)
+ * Reload the page.
+ *
+ * This is not nice, but easy :-) .
  */
 const reloadpage = () => {
     location.reload();

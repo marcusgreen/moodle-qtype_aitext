@@ -39,3 +39,16 @@ Cron based evaluation. Allow for slow LLM systems by marking on a cron timer
 If you are a Moodle developer and you use vscode/vscodium you should consider this plugin https://marketplace.visualstudio.com/items?itemName=LMSCloud.mdlcode.
 It it very reasonably priced and will quickly save you time and frustration. It is the best Moodle development tool I have come accross in 20 years.
 
+## Dependencies
+
+This plugin uses a thirdparty library "jsdiff" (https://www.npmjs.com/package/diff) to display differences between the user's input and the corrected version provided by the AI tool. It's already packaged up, so you do not need to anything usually.
+
+## Development
+
+General moodle plugin development rules apply.
+
+Besides that:
+
+The "jsdiff" dependency is being declared as npm dependency in `package.json`, but is already deployed into the plugin's `amd/src` and - by running grunt - into the `amd/build` directory.
+
+If you want or have to update the dependency, you will have to run `npm install` followed by `npm run deployJsDiff` to deploy the new version to the moodle plugin.
