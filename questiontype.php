@@ -380,10 +380,21 @@ class qtype_aitext extends question_type {
         }
         return '';
     }
-
+    /**
+     * When using local_ai_manager the availability ai
+     * is controlled by the tenant setting
+     *
+     * @return mixed
+     */
     public function menu_name() {
-        $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
-        return $tenant->is_tenant_allowed() ? parent::menu_name() : '';
+        if (class_exists('\local_ai_manager\local\tenant')) {
+            if (get_config('qtype_aitext', 'uselocalaimanager')) {
+                $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
+                return $tenant->is_tenant_allowed() ? parent::menu_name() : '';
+            }
+        } else {
+            return parent::menu_name();
+        }
     }
 
 }
