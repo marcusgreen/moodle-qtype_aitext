@@ -382,8 +382,13 @@ class qtype_aitext extends question_type {
     }
 
     public function menu_name() {
-        $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
-        return $tenant->is_tenant_allowed() ? parent::menu_name() : '';
+        if (class_exists('\local_ai_manager\local\tenant')) {
+            $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
+             return $tenant->is_tenant_allowed() ? parent::menu_name() : '';
+        } else {
+            return '';
+        }
     }
+
 
 }

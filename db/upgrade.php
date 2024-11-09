@@ -76,7 +76,21 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         // Aitext savepoint reached.
         upgrade_plugin_savepoint(true, 2024051101, 'qtype', 'aitext');
     }
+    if ($oldversion < 2024051109) {
+        $table = new xmldb_table(name: 'qtype_aitext_testprompts');
 
+        // Adding fields to table qtype_stack_qtest_results.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_field('question', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('testprompt', XMLDB_TYPE_TEXT);
+         // Conditionally launch create table for tool_dataprivacy_contextlist.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2024051109, 'qtype', 'aitext');
+    }
 
     return true;
 }

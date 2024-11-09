@@ -62,9 +62,6 @@ class qtype_aitext_external extends external_api {
      * @return array the response array
      */
     public static function fetch_ai_grade($response, $defaultmark, $prompt, $marksscheme): stdClass {
-        // Get our AI helper.
-        $ai = new local_ai_manager\manager('feedback');
-
         // Build an aitext question instance so we can call the same code that the question type uses when it grades.
         $type = 'aitext';
         \question_bank::load_question_definition_classes($type);
@@ -73,12 +70,8 @@ class qtype_aitext_external extends external_api {
         // Make sure we have the right data for AI to work with.
         if (!empty($response) && !empty($prompt) && $defaultmark > 0) {
             $fullaiprompt = $aiquestion->build_full_ai_prompt($response, $prompt, $defaultmark, $marksscheme);
-            $llmresponse = $ai->perform_request($fullaiprompt);
-            if ($llmresponse->get_code() !== 200) {
-                throw new moodle_exception('err_retrievingtranslation', 'qtype_aitext', '',
-                        $llmresponse->get_errormessage());
-            }
-            $feedback = format_text($llmresponse->get_content(), FORMAT_HTML);
+            $feedback = $aiquestion->perform_request($fullaiprompt);
+            $feedback = format_text($feedback, FORMAT_HTML);
             $contentobject = $aiquestion->process_feedback($feedback);
         } else {
             $contentobject = (object)["feedback" => get_string('error_parammissing', 'qtype_aitext'), "marks" => 0];

@@ -24,11 +24,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * This plugin can use either the local_ai_manager back end
+ * or the Moodle 4.4 AI subsystem, so it is not possible to
+ * include a dependency statement.
+ */
 $plugin->component = 'qtype_aitext';
-$plugin->version   = 2024051101;
+$plugin->version   = 2024051109;
 $plugin->requires  = 2020110900;
 $plugin->release = '0.01';
 $plugin->maturity  = MATURITY_BETA;
-/*$plugin->dependencies = [
-    'local_ai_manager' => ANY_VERSION,
-];*/
+
