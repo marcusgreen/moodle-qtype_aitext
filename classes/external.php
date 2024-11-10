@@ -62,31 +62,22 @@ class qtype_aitext_external extends external_api {
      * @return array the response array
      */
     public static function fetch_ai_grade($response, $defaultmark, $prompt, $marksscheme): stdClass {
-        // Get our AI helper.
-        $ai = new local_ai_manager\manager('feedback');
-
         // Build an aitext question instance so we can call the same code that the question type uses when it grades.
         $type = 'aitext';
         \question_bank::load_question_definition_classes($type);
         $aiquestion = new qtype_aitext_question();
+        $aiquestion->contextid = 0;
         $aiquestion->qtype = \question_bank::get_qtype('aitext');
         // Make sure we have the right data for AI to work with.
         if (!empty($response) && !empty($prompt) && $defaultmark > 0) {
             $fullaiprompt = $aiquestion->build_full_ai_prompt($response, $prompt, $defaultmark, $marksscheme);
-            $llmresponse = $ai->perform_request($fullaiprompt);
-            if ($llmresponse->get_code() !== 200) {
-                throw new moodle_exception('err_retrievingtranslation', 'qtype_aitext', '',
-                        $llmresponse->get_errormessage());
-            }
-            $feedback = format_text($llmresponse->get_content(), FORMAT_HTML);
-            $contentobject = $aiquestion->process_feedback($feedback);
+            $feedback = $aiquestion->perform_request($fullaiprompt);
+            $contentobject = json_decode($feedback);
         } else {
-            $contentobject = (object)["feedback" => get_string('error_parammissing', 'qtype_aitext'), "marks" => 0];
+            $contentobject = (object)["feedback" => get_string('err_parammissing', 'qtype_aitext'), "marks" => 0];
         }
-
         // Return whatever we have got.
         return $contentobject;
-
     }
 
     /**
