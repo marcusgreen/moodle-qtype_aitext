@@ -44,10 +44,10 @@ if ($ADMIN->fulltree) {
         'qtype_aitext/prompt',
         new lang_string('prompt', 'qtype_aitext'),
         new lang_string('prompt_setting', 'qtype_aitext'),
-        'in [responsetext] analyse but do not mention the part between [[ and ]] as follows:',
+        'in [responsetext] analyse the part delimited by double brackets without mentioning the brackets as follows:',
         PARAM_RAW,
-        20,
-        3
+        80,
+        6
     ));
     $settings->add(new admin_setting_configtextarea(
         'qtype_aitext/jsonprompt',
@@ -57,7 +57,7 @@ if ($ADMIN->fulltree) {
 	this format: {feedback":"string","marks":"number"} where marks is a single number summing all marks.
    	Also show the marks as part of the feedback.',
         PARAM_RAW,
-        20,
+        80,
         6
     ));
     $settings->add(new admin_setting_configselect(
