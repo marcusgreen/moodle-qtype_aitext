@@ -188,7 +188,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @throws dml_exception
      * @throws moodle_exception
      */
-    private function get_spellchecking(array $response):string {
+    private function get_spellchecking(array $response): string {
         $fullaiprompt = $this->build_full_ai_spellchecking_prompt($response['answer']);
         $response = $this->perform_request($fullaiprompt, 'feedback');
         return $response;
@@ -223,7 +223,11 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (is_null($contentobject->marks)) {
             $grade = [0 => 0, question_state::$needsgrading];
         } else {
-            $fraction = $contentobject->marks / $this->defaultmark;
+            if (is_numeric($contentobject->marks)) {
+                $fraction = $contentobject->marks / $this->defaultmark;
+            } else {
+                $fraction = 0.0;
+            }
             $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
          // The -aicontent data is used in question preview. Only needs to happen in preview.
