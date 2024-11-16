@@ -72,6 +72,12 @@ if ($ADMIN->fulltree) {
         new lang_string('use_local_ai_manager_setting', 'qtype_aitext'),
         0
     ));
+    $settings->add(new admin_setting_configcheckbox(
+        'qtype_aitext/markprompt_required',
+        new lang_string('markprompt_required', 'qtype_aitext'),
+        new lang_string('markprompt_required_setting', 'qtype_aitext'),
+        0
+    ));
 
 }
 
