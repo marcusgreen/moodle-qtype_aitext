@@ -63,7 +63,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->setType('markscheme', PARAM_RAW);
         $mform->setDefault('markscheme', get_config('qtype_aitext', 'defaultmarksscheme'));
         $mform->addHelpButton('markscheme', 'markscheme', 'qtype_aitext');
-        if (get_config('qtype_aitext', 'markprompt_required')== 1) {
+        if (get_config('qtype_aitext', 'markprompt_required') == 1) {
             $mform->addRule('markscheme', get_string('markschememissing', 'qtype_aitext'), 'required');
         }
         $models = explode(",", get_config('tool_aiconnect', 'model'));

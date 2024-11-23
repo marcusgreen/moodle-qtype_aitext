@@ -1,0 +1,9 @@
+.qtype-aitext .countwords {
+    margin-top: 0.5rem; /* mt-2 */
+    margin-bottom: 0;
+}
+.qtype-aitext .minwords,
+.qtype-aitext .minwords {
+    margin-top: 0;
+    margin-bottom: 0;
+}
