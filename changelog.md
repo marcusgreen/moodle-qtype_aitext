@@ -1,3 +1,14 @@
+### Release 0.02 of the Moodle AIText question type Dec 2024
+
+Merged in code from https://github.com/mebis-lp/moodle-qtype_aitext
+Who have have extensive experience with live use of the question type.
+
+Moved away from using https://github.com/marcusgreen/moodle-tool_aiconnect
+as the backend and now use either the Moodle 4.5 Core AI API or alternatively
+https://github.com/mebis-lp/moodle-local_ai_manager
+
+
+
 ### Release 0.01 of the Moodle AIText question type May 2024
 
 Version 2024050300
