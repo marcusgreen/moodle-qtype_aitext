@@ -46,3 +46,14 @@
     max-width: 800px;
     background-color: #DDDDDD;
 }
+
+.qtype_aitext_spellcheck_wrong{
+    color: red;
+    text-decoration: line-through;
+    font-weight: 400;
+}
+
+.qtype_aitext_spellcheck_new {
+    color: green;
+    font-weight: 800;
+}
