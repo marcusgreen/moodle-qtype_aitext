@@ -30,7 +30,7 @@ if ($ADMIN->fulltree) {
         new lang_string('defaultprompt_setting', 'qtype_aitext'),
         new lang_string('thedefaultprompt', 'qtype_aitext')));
 
-    $settings->add(new admin_setting_configtextarea('qtype_aitext/defaultmarksscheme',
+        $settings->add(new admin_setting_configtextarea('qtype_aitext/defaultmarksscheme',
         new lang_string('defaultmarksscheme', 'qtype_aitext'),
         new lang_string('defaultmarksscheme_setting', 'qtype_aitext'),
         new lang_string('thedefaultmarksscheme', 'qtype_aitext')));
@@ -72,11 +72,34 @@ if ($ADMIN->fulltree) {
         new lang_string('use_local_ai_manager_setting', 'qtype_aitext'),
         0
     ));
+    // Define the choices for the radio buttons.
+    xdebug_break();
+    $backends = [
+        'local_ai_manager' => get_string('localaimanager', 'qtype_aitext'),
+        'core_ai_subsystem' => get_string('coreaisubsystem', 'qtype_aitext'),
+        'tool_aimanager' => get_string('toolaimanager', 'qtype_aitext'),
+    ];
+    // Add the radio buttons setting.
+    $settings->add(new admin_setting_configselect(
+        'qtype_aitext/backend',
+        get_string('backends', 'qtype_aitext'),
+        get_string('backends_text', 'qtype_aitext'),
+        'core_ai_subsystem',
+        $backends
+    ));
+
     $settings->add(new admin_setting_configcheckbox(
         'qtype_aitext/markprompt_required',
         new lang_string('markprompt_required', 'qtype_aitext'),
         new lang_string('markprompt_required_setting', 'qtype_aitext'),
         0
+    ));
+
+    $settings->add( new admin_setting_configcheckbox(
+            'qtype_aitext/translatepostfix',
+        new lang_string('translatepostfix', 'qtype_aitext'),
+        new lang_string('translatepostfix_text', 'qtype_aitext'),
+        1
     ));
 
 }

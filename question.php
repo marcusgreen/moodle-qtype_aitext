@@ -27,7 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/questionbase.php');
-use local_ai_manager\manager;
+
 /**
  * Represents an aitext question.
  *
@@ -152,7 +152,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return string $response
      */
     public function perform_request(string $prompt, string $purpose = 'feedback'): string {
-        if (get_config('qtype_aitext', 'uselocalaimanager')) {
+        $backend = get_config('qtype_aitext', 'backend');
+        if ($backend == 'local_ai_manager') {
             $manager = new local_ai_manager\manager($purpose);
             $llmresponse = (object) $manager->perform_request($prompt,  ['component' => 'qtype_aitext', 'contextid' => $this->contextid]);
             if ($llmresponse->get_code() !== 200) {
@@ -165,7 +166,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 );
             }
             return $llmresponse->get_content();
-        } else {
+        } else if ($backend == 'core_ai_subsystem') {
             global $USER;
             $manager = new \core_ai\manager();
             $action = new \core_ai\aiactions\generate_text(
@@ -176,7 +177,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $llmresponse = $manager->process_action($action);
             $responsedata = $llmresponse->get_response_data();
             return $responsedata['generatedcontent'];
+        } else if ($backend == 'tool_aimanager') {
+            $ai = new tool_aiconnect\ai\ai();
+            $llmresponse = $ai->prompt_completion($prompt);
+            return $llmresponse['response']['choices'][0]['message']['content'];
         }
+
     }
 
     /**
@@ -265,7 +271,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
         }
         $prompt .= ' '.trim(get_config('qtype_aitext', 'jsonprompt'));
+        if (get_config('qtype_aitext', 'translatepostfix')) {
+            $prompt .= ' translate the feedback to the language '.current_language();
+        };
+
         $prompt .= ' translate the feedback to the language '.current_language();
+
         return $prompt;
 
     }

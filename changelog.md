@@ -3,9 +3,19 @@
 Merged in code from https://github.com/mebis-lp/moodle-qtype_aitext
 Who have have extensive experience with live use of the question type.
 
-Moved away from using https://github.com/marcusgreen/moodle-tool_aiconnect
-as the backend and now use either the Moodle 4.5 Core AI API or alternatively
+It is now possible to select from three different "back end" systems for connecting to the LLM. These are
+
+* Tool AI Connect
+* Moodle 4.5 AI Subsystem
+* Local AI Manager
+
+Tool AI Connect was the only way previously. The Moodle 4.5 AI subsystem only supports OpenAI ChatGPT and Microsoft Azure (which supports the Open AI Models)
+Local AI Manager support Openai, Ollama, and has features to con
+
+
 https://github.com/mebis-lp/moodle-local_ai_manager
+https://github.com/marcusgreen/moodle-tool_aiconnect
+
 
 
 
