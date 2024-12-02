@@ -9,14 +9,21 @@ It is now possible to select from three different "back end" systems for connect
 * Moodle 4.5 AI Subsystem
 * Local AI Manager
 
-Tool AI Connect was the only way previously. The Moodle 4.5 AI subsystem only supports OpenAI ChatGPT and Microsoft Azure (which supports the Open AI Models)
-Local AI Manager support Openai, Ollama, and has features to con
+Tool AI Connect was the only way previously. The Moodle 4.5 AI subsystem only supports OpenAI ChatGPT and Microsoft Azure (which supports the Open AI Models).
 
+Local AI Manager support Openai (ChatGPT), Ollama, and has other interesting features including this from the readme
 
-https://github.com/mebis-lp/moodle-local_ai_manager
-https://github.com/marcusgreen/moodle-tool_aiconnect
+https://github.com/mebis-lp/moodle-local_ai_manager/blob/main/README.md
 
+"The AI manager provides the key feature of being a multi-tenant AI backend which is the main reason you should be using this plugin for providing AI functionality in your moodle instance instead of the moodle core AI subsystem."
 
+Removed the ability to pick a different model for each question.
+
+New configuration options in settings.php
+
+Marks prompt in the editing interface is optional
+
+Translation of the response is optional
 
 
 ### Release 0.01 of the Moodle AIText question type May 2024

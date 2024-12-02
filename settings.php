@@ -73,7 +73,6 @@ if ($ADMIN->fulltree) {
         0
     ));
     // Define the choices for the radio buttons.
-    xdebug_break();
     $backends = [
         'local_ai_manager' => get_string('localaimanager', 'qtype_aitext'),
         'core_ai_subsystem' => get_string('coreaisubsystem', 'qtype_aitext'),
