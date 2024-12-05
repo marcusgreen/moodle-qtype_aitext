@@ -10,6 +10,13 @@ https://github.com/marcusgreen/moodle-tool_aiconnect
 
 Additional documentation can be found here https://github.com/marcusgreen/moodle-qtype_aitext/wiki
 
+## Warning
+LLarge Language modesls (LLMs) such as ChatGPT are based on probablity and should never be relied on for high stakes tasks. LLM systems may give wrong and misleading answers and may give different answers based on the same data. This plugin is only as good as the LLM system it is linked to and the prompts that are provided as parts of the question.  This plugin was developed to help teachers and students to promote learning and it is widely used.
+
+## Additional Warning
+
+Do not use for important assessments,
+
 ## Prompting
 It requires the creation of a prompt to evaluate the text according to its purpose and an optional marking scheme. For example for a question 
 
