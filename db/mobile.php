@@ -42,12 +42,12 @@ $addons = [
                 ], // Function needs caching for offline.
                 'styles' => [
                     'url' => $CFG->wwwroot.'/question/type/aitext/mobile/qtype_aitext_app.css',
-                    'version' => '0.1'
-                ]
-            ]
+                    'version' => '0.1',
+                ],
+            ],
         ],
         'lang' => [
                     ['pluginname', 'qtype_aitext'], // Matching value in  lang/en/qtype_gapfill.
         ],
-    ]
+    ],
 ];

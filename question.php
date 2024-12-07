@@ -155,7 +155,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $backend = get_config('qtype_aitext', 'backend');
         if ($backend == 'local_ai_manager') {
             $manager = new local_ai_manager\manager($purpose);
-            $llmresponse = (object) $manager->perform_request($prompt,  ['component' => 'qtype_aitext', 'contextid' => $this->contextid]);
+            $llmresponse = (object) $manager->perform_request($prompt,  ['component' => 'qtype_aitext',
+             'contextid' => $this->contextid]);
             if ($llmresponse->get_code() !== 200) {
                 throw new moodle_exception(
                 'err_retrievingfeedback',
@@ -209,7 +210,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function grade_response(array $response): array {
 
-        if($this->spellcheck) {
+        if ($this->spellcheck) {
             $spellcheckresponse = $this->get_spellchecking($response);
             $this->insert_attempt_step_data('-spellcheckresponse', $spellcheckresponse);
         }
