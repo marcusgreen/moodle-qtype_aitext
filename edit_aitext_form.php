@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use qtype_aitext\constants;
+
 /**
  * aitext question type editing form.
  *
@@ -87,13 +89,21 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->setExpanded('responseoptions');
 
         $mform->addElement('select', 'responseformat',
-                get_string('responseformat', 'qtype_aitext'), $qtype->response_formats());
+                get_string('responseformat', 'qtype_aitext'), constants::get_response_formats());
         $mform->setDefault('responseformat', get_config('qtype_aitext', 'responseformat'));
+
+        $mform->addElement('select', 'responselanguage',
+            get_string('responselanguage', 'qtype_aitext'), constants::get_languages());
+        $mform->setDefault('responselanguage', get_config('qtype_aitext', 'responselanguage'));
+
+        $mform->addElement('select', 'feedbacklanguage',
+            get_string('feedbacklanguage', 'qtype_aitext'), constants::get_languages(true));
+        $mform->setDefault('feedbacklanguage', get_config('qtype_aitext', 'feedbacklanguage'));
 
         $mform->addElement('select', 'responsefieldlines',
                 get_string('responsefieldlines', 'qtype_aitext'), $qtype->response_sizes());
         $mform->setDefault('responsefieldlines', $this->get_default_value('responsefieldlines', 10));
-        $mform->hideIf('responsefieldlines', 'responseformat', 'eq', 'noinline');
+        $mform->hideIf('responsefieldlines', 'responseformat', 'eq', 'audio');
 
         // Create a text box that can be enabled/disabled for max/min word limits options.
         $wordlimitoptions = ['size' => '6', 'maxlength' => '6'];
@@ -104,7 +114,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addGroup($mingrp, 'mingroup', get_string('minwordlimit', 'qtype_aitext'), ' ', false);
         $mform->addHelpButton('mingroup', 'minwordlimit', 'qtype_aitext');
         $mform->disabledIf('minwordlimit', 'minwordenabled', 'notchecked');
-        $mform->hideIf('mingroup', 'responseformat', 'eq', 'noinline');
+        $mform->hideIf('mingroup', 'responseformat', 'eq', 'audio');
 
         $maxgrp[] = $mform->createElement('text', 'maxwordlimit', '', $wordlimitoptions);
         $mform->setType('maxwordlimit', PARAM_INT);
@@ -113,7 +123,21 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addGroup($maxgrp, 'maxgroup', get_string('maxwordlimit', 'qtype_aitext'), ' ', false);
         $mform->addHelpButton('maxgroup', 'maxwordlimit', 'qtype_aitext');
         $mform->disabledIf('maxwordlimit', 'maxwordenabled', 'notchecked');
-        $mform->hideIf('maxgroup', 'responseformat', 'eq', 'noinline');
+        $mform->hideIf('maxgroup', 'responseformat', 'eq', 'audio');
+
+        // timelimit
+        $mform->addElement('select', 'maxtime', get_string('maxtime', 'qtype_aitext'), constants::get_time_limits());
+        $mform->setDefault('maxtime',  get_config('qtype_aitext', 'maxtime'));
+        $mform->hideIf('maxtime', 'responseformat', 'neq', 'audio');
+
+        // Relevance
+        $mform->addElement('header', 'relevanceheader', get_string('relevanceheader', 'qtype_aitext'));
+        $mform->addElement('select', 'relevance', get_string('relevance', 'qtype_aitext'), constants::get_relevance_opts());
+        $mform->setDefault('relevance',  get_config('qtype_aitext', 'relevance'));
+        // Relevance answer
+        $mform->addElement('textarea', 'relevanceanswer', get_string('relevanceanswer', 'qtype_aitext'),
+            ['maxlen' => 50, 'rows' => 6, 'size' => 30]);
+        $mform->hideIf('relevanceanswer', 'relevance', 'neq', constants::RELEVANCE_COMPARISON);
 
         $mform->addElement('header', 'responsetemplateheader', get_string('responsetemplateheader', 'qtype_aitext'));
         $mform->addElement('editor', 'responsetemplate', get_string('responsetemplate', 'qtype_aitext'),
@@ -142,18 +166,24 @@ class qtype_aitext_edit_form extends question_edit_form {
             return $question;
         }
 
-        $question->responseformat = $question->options->responseformat;
-        $question->responsefieldlines = $question->options->responsefieldlines;
-        $question->minwordenabled = $question->options->minwordlimit ? 1 : 0;
-        $question->minwordlimit = $question->options->minwordlimit;
-        $question->maxwordenabled = $question->options->maxwordlimit ? 1 : 0;
-        $question->maxwordlimit = $question->options->maxwordlimit;
-        $question->aiprompt = $question->options->aiprompt;
-
-        $question->responsetemplate = [
-            'text' => $question->options->responsetemplate,
-            'format' => $question->options->responsetemplateformat,
-        ];
+        foreach (constants::EXTRA_FIELDS as $field) {
+            switch ($field) {
+                case 'minwordenabled':
+                    $question->minwordenabled = $question->options->minwordlimit ? 1 : 0;
+                    break;
+                case 'maxwordenabled':
+                    $question->maxwordenabled = $question->options->maxwordlimit ? 1 : 0;
+                    break;
+                case 'responsetemplate':
+                    $question->responsetemplate = [
+                        'text' => $question->options->responsetemplate,
+                        'format' => $question->options->responsetemplateformat,
+                    ];
+                    break;
+                default:
+                    $question->{$field} = $question->options->{$field};
+            }
+        }
 
         return $question;
     }

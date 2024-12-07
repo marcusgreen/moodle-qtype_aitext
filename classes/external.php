@@ -58,7 +58,7 @@ class qtype_aitext_external extends external_api {
      * @param integer $defaultmark
      * @param string $prompt
      * @param string $marksscheme
-     * @return void
+     * @return array
      */
     public static function fetch_ai_grade($response, $defaultmark, $prompt, $marksscheme) {
         // Get our AI helper.
