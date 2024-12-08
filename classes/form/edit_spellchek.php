@@ -47,10 +47,8 @@ class edit_spellchek extends dynamic_form {
         $mform->addElement('hidden', 'answerstepid');
         $mform->setType('answerstepid', PARAM_INT);
 
-
         $mform->addElement('static', 'student_answer', get_string('spellcheck_student_anser_desc', 'qtype_aitext'));
         $mform->setType('student_answer', PARAM_RAW);
-
 
         $mform->addElement(
             'editor',

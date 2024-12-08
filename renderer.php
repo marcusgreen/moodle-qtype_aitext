@@ -43,7 +43,7 @@ class qtype_aitext_renderer extends qtype_renderer {
      */
     public function formulation_and_controls(question_attempt $qa,
             question_display_options $options) {
-        global $CFG, $PAGE, $USER;
+        global $CFG, $USER;
 
         /** @var qtype_aitext_question $question */
         $question = $qa->get_question();
@@ -97,7 +97,7 @@ class qtype_aitext_renderer extends qtype_renderer {
             $uniqid = uniqid();
             $result .= html_writer::tag('div', '',
                     ['data-content' => 'local_ai_manager_infobox', 'data-boxid' => $uniqid]);
-            $PAGE->requires->js_call_amd('local_ai_manager/infobox', 'renderInfoBox',
+            $this->page->requires->js_call_amd('local_ai_manager/infobox', 'renderInfoBox',
                     ['qtype_aitext', $USER->id, '[data-content="local_ai_manager_infobox"][data-boxid="' . $uniqid . '"]',
                             ['feedback']]);
         }
@@ -117,7 +117,7 @@ class qtype_aitext_renderer extends qtype_renderer {
         if (get_config('qtype_aitext', 'uselocalaimanager')) {
             $result .= html_writer::tag('div', '',
                     ['data-content' => 'local_ai_manager_warningbox', 'data-boxid' => $uniqid]);
-            $PAGE->requires->js_call_amd('local_ai_manager/warningbox', 'renderWarningBox',
+            $this->page->requires->js_call_amd('local_ai_manager/warningbox', 'renderWarningBox',
                     ['[data-content="local_ai_manager_warningbox"][data-boxid="' . $uniqid . '"]']);
         }
 
@@ -332,7 +332,6 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
      * @throws coding_exception
      */
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
-        global $OUTPUT;
         $question = $qa->get_question();
         $uniqid = uniqid();
         $readonlyareaid = 'aitext_readonly_area' . $uniqid;
@@ -378,7 +377,7 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
             $btnoptions = ['id' => $spellcheckeditbuttonid, 'class' => 'btn btn-link'];
             $output .= html_writer::tag(
                 'button',
-                $OUTPUT->pix_icon(
+                $this->output->pix_icon(
                     'i/edit',
                     get_string('spellcheckedit', 'qtype_aitext'),
                     'moodle'
@@ -697,7 +696,6 @@ class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_ba
      */
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
         // CARE: This is basically duplicating response_area_read_only from qtype_aitext_format_editor_renderer.
-        global $OUTPUT;
         $question = $qa->get_question();
         $uniqid = uniqid();
         $readonlyareaid = 'aitext_readonly_area' . $uniqid;
@@ -743,7 +741,7 @@ class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_ba
             $btnoptions = ['id' => $spellcheckeditbuttonid, 'class' => 'btn btn-link'];
             $output .= html_writer::tag(
                     'button',
-                    $OUTPUT->pix_icon(
+                    $this->output->pix_icon(
                             'i/edit',
                             get_string('spellcheckedit', 'qtype_aitext'),
                             'moodle'
