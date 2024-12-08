@@ -144,12 +144,13 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $this->step = $step;
     }
     /**
-     * Call the llm using either the 4.5 core api or the backend provided by the local_ai_manager plugin.
+     * Call the llm using either the 4.5 core api or the backend provided by
+     * local_ai_manager (mebis) or tool_aimanager
      *
      * See "uselocalaimanager" admin setting.
      *
      * @param string $prompt
-     * @return string $response
+     * @param string $purpose
      */
     public function perform_request(string $prompt, string $purpose = 'feedback'): string {
         $backend = get_config('qtype_aitext', 'backend');
@@ -183,6 +184,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $llmresponse = $ai->prompt_completion($prompt);
             return $llmresponse['response']['choices'][0]['message']['content'];
         }
+        throw new moodle_exception('err_invalidbackend', 'qtype_aitext');
 
     }
 
