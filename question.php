@@ -278,7 +278,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $prompt .= ' translate the feedback to the language '.current_language();
         };
 
-        $prompt .= ' translate the feedback to the language '.current_language();
 
         return $prompt;
 
