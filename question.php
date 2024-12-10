@@ -278,9 +278,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $prompt .= ' translate the feedback to the language '.current_language();
         };
 
-
         return $prompt;
-
     }
 
     /**
@@ -337,6 +335,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (current_language() == 'en') {
             return $text;
         }
+        if (get_config('qtype_aitext', 'translatepostfix') == 0) {
+            return $text;
+        }
+
         $cache = cache::make('qtype_aitext', 'stringdata');
         if (($translation = $cache->get(current_language().'_'.$text)) === false) {
             $prompt = 'translate "'.$text .'" into '.current_language();
