@@ -147,8 +147,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * Call the llm using either the 4.5 core api or the backend provided by
      * local_ai_manager (mebis) or tool_aimanager
      *
-     * See "uselocalaimanager" admin setting.
-     *
      * @param string $prompt
      * @param string $purpose
      */

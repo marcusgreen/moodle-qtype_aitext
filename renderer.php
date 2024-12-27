@@ -93,7 +93,7 @@ class qtype_aitext_renderer extends qtype_renderer {
         }
 
         $result = '';
-        if (get_config('qtype_aitext', 'uselocalaimanager')) {
+        if (get_config('qtype_aitext', 'backend') === 'local_ai_manager') {
             $uniqid = uniqid();
             $result .= html_writer::tag('div', '',
                     ['data-content' => 'local_ai_manager_infobox', 'data-boxid' => $uniqid]);
@@ -114,7 +114,7 @@ class qtype_aitext_renderer extends qtype_renderer {
         }
         $result .= html_writer::tag('div', $files, ['class' => 'attachments']);
         $result .= html_writer::end_tag('div');
-        if (get_config('qtype_aitext', 'uselocalaimanager')) {
+        if (get_config('qtype_aitext', 'backend') === 'local_ai_manager') {
             $result .= html_writer::tag('div', '',
                     ['data-content' => 'local_ai_manager_warningbox', 'data-boxid' => $uniqid]);
             $this->page->requires->js_call_amd('local_ai_manager/warningbox', 'renderWarningBox',

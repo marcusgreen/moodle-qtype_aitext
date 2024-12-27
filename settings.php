@@ -66,12 +66,6 @@ if ($ADMIN->fulltree) {
         new lang_string('responseformat_setting', 'qtype_aitext'),
         0, ['plain' => 'plain', 'editor' => 'editor', 'monospaced' => 'monospaced']
     ));
-    $settings->add(new admin_setting_configcheckbox(
-        'qtype_aitext/uselocalaimanager',
-        new lang_string('use_local_ai_manager', 'qtype_aitext'),
-        new lang_string('use_local_ai_manager_setting', 'qtype_aitext'),
-        0
-    ));
     // Define the choices for the radio buttons.
     $backends = [
         'local_ai_manager' => get_string('localaimanager', 'qtype_aitext'),
