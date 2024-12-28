@@ -25,6 +25,8 @@ Marks prompt in the editing interface is optional
 
 Translation of the response is now optional
 
+Big thanks to Philipp Memmel for help with the switchable backend settings to work and for testing and many other things.
+
 Thanks to Farah Ahmad of Aga Khan University for reporting an issue with plagiarism plugins.
 
 Thanks to Matt Metzgar for reporting an issue with the tranlation postfix.

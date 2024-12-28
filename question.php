@@ -147,8 +147,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * Call the llm using either the 4.5 core api or the backend provided by
      * local_ai_manager (mebis) or tool_aimanager
      *
-     * See "uselocalaimanager" admin setting.
-     *
      * @param string $prompt
      * @param string $purpose
      */
@@ -341,7 +339,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         $cache = cache::make('qtype_aitext', 'stringdata');
         if (($translation = $cache->get(current_language().'_'.$text)) === false) {
-            $prompt = 'translate "'.$text .'" into '.current_language();
+            $prompt = 'translate "'.$text .'" into '.current_language() .
+                    'Only return the exact text, do not wrap it in other text.';
             $translation = $this->perform_request($prompt, 'translate');
             $translation = trim($translation, '"');
             $cache->set(current_language().'_'.$text, $translation);
