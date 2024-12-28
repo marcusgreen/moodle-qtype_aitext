@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="question/type/aitext/db" VERSION="20231230" COMMENT="XMLDB file for Moodle question/type/aitext"
+<XMLDB PATH="question/type/aitext/db" VERSION="20240718" COMMENT="XMLDB file for Moodle question/type/aitext"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
@@ -21,7 +21,8 @@
         <FIELD NAME="markscheme" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Instructions on how responses are to be marked."/>
         <FIELD NAME="sampleanswer" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="A sample answer for testing the prompt and AI response"/>
         <FIELD NAME="model" TYPE="char" LENGTH="60" NOTNULL="false" SEQUENCE="false" COMMENT="The model in the LLM, e.g. gpt-4 or llama3"/>
-</FIELDS>
+        <FIELD NAME="spellcheck" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="questionid" TYPE="foreign-unique" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
