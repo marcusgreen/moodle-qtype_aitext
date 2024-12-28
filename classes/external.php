@@ -72,7 +72,7 @@ class qtype_aitext_external extends external_api {
         if (!empty($response) && !empty($prompt) && $defaultmark > 0) {
             $fullaiprompt = $aiquestion->build_full_ai_prompt($response, $prompt, $defaultmark, $marksscheme);
             $feedback = $aiquestion->perform_request($fullaiprompt);
-            $contentobject = json_decode($feedback);
+            $contentobject = $aiquestion->process_feedback($feedback);
         } else {
             $contentobject = (object)["feedback" => get_string('err_parammissing', 'qtype_aitext'), "marks" => 0];
         }
