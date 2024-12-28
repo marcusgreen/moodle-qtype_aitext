@@ -292,7 +292,7 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
         if ($question->spellcheck) {
             $this->page->requires->js_call_amd('qtype_aitext/diff');
             $this->page->requires->js_call_amd('qtype_aitext/spellcheck', 'init',
-                    [$this->get_page()->cm->id, '#' . $readonlyareaid, '#' . $spellcheckeditbuttonid]);
+                    ['#' . $readonlyareaid, '#' . $spellcheckeditbuttonid]);
             $stepspellcheck = $qa->get_last_step_with_qt_var('-spellcheckresponse');
             $stepanswer = $qa->get_last_step_with_qt_var('answer');
         }

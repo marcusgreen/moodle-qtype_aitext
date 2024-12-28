@@ -41,9 +41,6 @@ class edit_spellcheck extends dynamic_form {
 
         $mform = &$this->_form;
 
-        $mform->addElement('hidden', 'cmid');
-        $mform->setType('cmid', PARAM_INT);
-
         $mform->addElement('hidden', 'attemptstepid');
         $mform->setType('attemptstepid', PARAM_INT);
 
@@ -141,7 +138,6 @@ class edit_spellcheck extends dynamic_form {
             'test' => $spellcheckrecord->value,
             'spellcheck_editor' => ['text' => $spellcheckrecord->value, 'format' => FORMAT_HTML, 'itemid' => $draftitemid],
             'attemptstepid' => $this->optional_param('attemptstepid', 0, PARAM_INT),
-            'cmid' => $this->optional_param('cmid', 0, PARAM_INT),
             'student_answer' => $answerrecord->value,
         ]);
     }
