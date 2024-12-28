@@ -29,7 +29,10 @@ use moodle_url;
  * @author     Dr. Peter Mayer
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class edit_spellchek extends dynamic_form {
+class edit_spellcheck extends dynamic_form {
+
+    /** @var context|null Variable to store the context because it is expensive to retrieve. */
+    private ?context $context = null;
 
     /**
      * Define the form
@@ -66,13 +69,8 @@ class edit_spellchek extends dynamic_form {
      * @return context
      */
     protected function get_context_for_dynamic_submission(): context {
-        $cmid = $this->optional_param('cmid', null, PARAM_INT);
-        if (empty($cmid)) {
-            $cmid = $this->_ajaxformdata['cmid'];
-        }
-        // Verify cm exists.
-        [, $cm] = get_course_and_cm_from_cmid($cmid);
-        return context_module::instance($cm->id);
+        $attemptstepid = $this->_ajaxformdata['attemptstepid'];
+        return $this->get_context_from_attemptstepid($attemptstepid);
     }
 
     /**
@@ -81,13 +79,26 @@ class edit_spellchek extends dynamic_form {
      * @throws \moodle_exception User does not have capability to access the form
      */
     protected function check_access_for_dynamic_submission(): void {
+        global $USER;
         $context = $this->get_context_for_dynamic_submission();
+
+        if ($context->contextlevel === CONTEXT_USER) {
+            // This will happen in preview mode.
+            // In preview mode we just check if the user context belongs to the current user.
+            if (intval($context->instanceid) !== intval($USER->id)) {
+                throw new \moodle_exception('nocapabilitytousethisservice');
+            }
+            return;
+        }
+        // We usually end up with a course module context otherwise. Even if not we just check for
+        // decent capabilities to edit the result of the AI.
         if (
             !has_capability('mod/quiz:grade', $context) &&
             !has_capability('mod/quiz:regrade', $context)
         ) {
             throw new \moodle_exception('nocapabilitytousethisservice');
         }
+
     }
 
     /**
@@ -146,5 +157,17 @@ class edit_spellchek extends dynamic_form {
             'attempt' => $this->optional_param('attempt', null, PARAM_INT),
         ];
         return new moodle_url('/mod/quiz/review.php', $params);
+    }
+
+    private function get_context_from_attemptstepid(int $attemptstepid) {
+        global $DB;
+        if (!is_null($this->context)) {
+            return $this->context;
+        }
+        $attemptstep = $DB->get_record('question_attempt_steps', ['id' => $attemptstepid]);
+        $attempt = $DB->get_record('question_attempts', ['id' => $attemptstep->questionattemptid]);
+        $questionusage = $DB->get_record('question_usages', ['id' => $attempt->questionusageid]);
+        $this->context = context::instance_by_id($questionusage->contextid);
+        return $this->context;
     }
 }

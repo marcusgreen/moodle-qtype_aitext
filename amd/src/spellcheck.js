@@ -94,7 +94,7 @@ export const showModalForm = async(cmid, readonlyareaselector) => {
     const answerstepid = document.querySelector(readonlyareaselector).dataset.spellcheckattemptstepanswerid;
     const title = await getString('spellcheckedit', 'qtype_aitext');
     const modalForm = new ModalForm({
-        formClass: "qtype_aitext\\form\\edit_spellchek",
+        formClass: "qtype_aitext\\form\\edit_spellcheck",
         args: {
             attemptstepid,
             answerstepid,
