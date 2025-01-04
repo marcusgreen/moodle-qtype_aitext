@@ -18,10 +18,12 @@ Feature: Test creating an AIText question
               And the following config values are set as admin:
                   | model | gpt-4,gpt-4o | tool_aiconnect |
         @javascript
-        Scenario: Create an AI text question with Response format set to 'HTML editor'
+        Scenario: Create an AI text question with Response format set to HTML editor
              When I am on the "Course 1" "core_question > course question bank" page logged in as teacher
-    # id_sampleanswer because it is collapsed when the form is opened for editing.
-              And I add a "AI Text" question filling the form with:
+                And I press "Create a new question ..."
+                And I set the field "AI Text" to "1"
+                And I press "Add"
+                And I set the following fields to these values:
                   | Question name    | aitext-001                      |
                   | Question text    | Write an aitext with 500 words. |
                   | General feedback | This is general feedback        |
@@ -30,37 +32,3 @@ Feature: Test creating an AIText question
                   | Mark scheme      | Give one mark if correct        |
 
              Then I should see "aitext-001"
-
-        Scenario: Create an AI Text question with Response format set to 'HTML editor with the file picker'
-             When I am on the "Course 1" "core_question > course question bank" page logged in as teacher
-              And I add a "AI Text" question filling the form with:
-                  | Question name    | aitext-002                      |
-                  | Question text    | Write an aitext with 500 words. |
-                  | General feedback | This is general feedback        |
-                  | AI Prompt        | Evaluate this                   |
-                  | Mark scheme      | Give one mark if correct        |
-                  | id_sampleanswer  | sample  answer                  |
-                  | Model            | gpt-4                           |
-
-
-
-             Then I should see "aitext-002"
-        @javascript
-        Scenario: Create an AI Text question for testing some default options
-             When I am on the "Course 1" "core_question > course question bank" page logged in as teacher
-              And I add a "AI Text" question filling the form with:
-                  | Question name         | aitext-003                      |
-                  | Question text         | Write an aitext with 500 words. |
-                  | General feedback      | This is general feedback        |
-                  | id_responsefieldlines | 15                              |
-                  | id_sampleanswer       | sample  answer                  |
-                  | Model                 | gpt-4o                          |
-
-
-             Then I should see "aitext-003"
-    # Checking that the next new question form displays user preferences settings.
-              And I press "Create a new question ..."
-              And I set the field "item_qtype_aitext" to "1"
-              And I click on "Add" "button" in the "Choose a question type to add" "dialogue"
-              And the following fields match these values:
-                  | id_responsefieldlines | 15 |

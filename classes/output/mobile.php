@@ -46,10 +46,10 @@ class mobile {
             'templates' => [
                 [
                     'id' => 'main',
-                    'html' => file_get_contents($templatepath)
-                    ]
+                    'html' => file_get_contents($templatepath),
+                ],
             ],
-            'javascript' => file_get_contents($CFG->dirroot . '/question/type/aitext/mobile/mobile.js')
+            'javascript' => file_get_contents($CFG->dirroot . '/question/type/aitext/mobile/mobile.js'),
         ];
     }
 }

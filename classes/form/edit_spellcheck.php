@@ -155,6 +155,16 @@ class edit_spellcheck extends dynamic_form {
         return new moodle_url('/mod/quiz/review.php', $params);
     }
 
+    /**
+     * Retrieves the context related to the given attemptstepid.
+     *
+     * First checks if a context has already been retrieved, if not, it retrieves
+     * the question usage context from the attempt step and the question attempt
+     * and finally creates a new context based on the usage context ID.
+     *
+     * @param int $attemptstepid The ID of the attempt step.
+     * @return context The context object.
+     */
     private function get_context_from_attemptstepid(int $attemptstepid) {
         global $DB;
         if (!is_null($this->context)) {
