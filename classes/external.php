@@ -47,6 +47,7 @@ class qtype_aitext_external extends external_api {
                 'defaultmark' => new external_value(PARAM_INT, 'The total possible score'),
                 'prompt' => new external_value(PARAM_TEXT, 'The AI Prompt'),
                 'marksscheme' => new external_value(PARAM_TEXT, 'The marks scheme'),
+                'contextid' => new external_value(PARAM_INT, 'The context id'),
             ]
         );
 
@@ -55,18 +56,41 @@ class qtype_aitext_external extends external_api {
     /**
      * Similar to clicking the submit button.
      *
-     * @param array $response
+     * @param string $response
      * @param integer $defaultmark
      * @param string $prompt
      * @param string $marksscheme
-     * @return array the response array
+     * @param int $contextid the context id
+     * @return stdClass the response
      */
-    public static function fetch_ai_grade($response, $defaultmark, $prompt, $marksscheme): stdClass {
+    public static function fetch_ai_grade(string $response, int $defaultmark,
+            string $prompt, string $marksscheme, int $contextid): stdClass {
+        [
+                'response' => $response,
+                'defaultmark' => $defaultmark,
+                'prompt' => $prompt,
+                'marksscheme' => $marksscheme,
+                'contextid' => $contextid,
+        ] = self::validate_parameters(self::fetch_ai_grade_parameters(),
+                [
+                        'response' => $response,
+                        'defaultmark' => $defaultmark,
+                        'prompt' => $prompt,
+                        'marksscheme' => $marksscheme,
+                        'contextid' => $contextid,
+                ]
+        );
+        $context = $contextid === 0 ? context_system::instance() : context::instance_by_id($contextid);
+        self::validate_context($context);
+
+        // TODO Eventually move this to a own capability which by default is assigned to a teacher in a course.
+        require_capability('mod/quiz:grade', $context);
+
         // Build an aitext question instance so we can call the same code that the question type uses when it grades.
         $type = 'aitext';
         \question_bank::load_question_definition_classes($type);
         $aiquestion = new qtype_aitext_question();
-        $aiquestion->contextid = 0;
+        $aiquestion->contextid = $contextid;
         $aiquestion->qtype = \question_bank::get_qtype('aitext');
         // Make sure we have the right data for AI to work with.
         if (!empty($response) && !empty($prompt) && $defaultmark > 0) {
