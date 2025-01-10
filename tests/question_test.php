@@ -17,11 +17,8 @@
 namespace qtype_aitext;
 
 use coding_exception;
-use dml_exception;
-use moodle_exception;
 use PHPUnit\Framework\ExpectationFailedException;
 use question_attempt_step;
-use question_display_options;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 defined('MOODLE_INTERNAL') || die();
@@ -29,8 +26,10 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 require_once($CFG->dirroot . '/question/type/aitext/tests/helper.php');
+require_once($CFG->dirroot . '/question/type/aitext/questiontype.php');
+
 use qtype_aitext_test_helper;
-use Random\RandomException;
+use qtype_aitext;
 
 /**
  * Unit tests for the matching question definition class.
@@ -40,6 +39,53 @@ use Random\RandomException;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class question_test extends \advanced_testcase {
+
+    /**
+     * Instance of the question type class
+     * @var
+     */
+    public $qtype;
+
+    /**
+    * There is a live connection to the External AI system
+    * When run locally it will make a connection. Otherwise the
+    * tests will be skipped
+    * @var boolean
+    */
+    protected int $islive;
+
+    /**
+     * Config.php should include the apikey and orgid in the form
+     * define("TEST_LLM_APIKEY", "XXXXXXXXXXXX");
+     * define("TEST_LLM_ORGID", "XXXXXXXXXXXX");
+     * Summary of setUp
+     * @return void
+     */
+    protected function setUp(): void {
+        $this->qtype = new \qtype_aitext();
+            if (defined('TEST_LLM_APIKEY') && defined('TEST_LLM_ORGID')) {
+                set_config('apikey', TEST_LLM_APIKEY, 'aiprovider_openai');
+                set_config('orgid', TEST_LLM_ORGID, 'aiprovider_openai');
+                set_config('enabled', true,'aiprovider_openai');
+                $this->islive = true;
+            }
+    }
+    /**
+     * Make a trivial request to the LLM to check the code works
+     * Only designed to test the 4.5 subsystem when run locally
+     * not when in GHA ci
+     * @return void
+     */
+    public function test_perform_request(): void {
+        $this->resetAfterTest(true);
+        if(!$this->islive) {
+                $this->markTestSkipped('No live connection to the AI system');
+        }
+        $aitext = qtype_aitext_test_helper::make_aitext_question([]);
+        $aitext->questiontext = 'What is 2 * 4?';
+        $response = $aitext->perform_request('What is 2 * 4 only return a single number');
+        $this->assertEquals('8', $response);
+    }
 
 
     /**
