@@ -135,7 +135,7 @@ class qtype_aitext_edit_form extends question_edit_form {
                 ['rows' => 10], $this->editoroptions);
 
         // Load any JS that we need to make things happen, specifically the prompt tester.
-        $PAGE->requires->js_call_amd('qtype_aitext/editformhelper', 'init', []);
+        $PAGE->requires->js_call_amd('qtype_aitext/editformhelper', 'init', [$this->context->id]);
     }
 
     /**

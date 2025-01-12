@@ -40,7 +40,7 @@ const Selectors = {
 /**
  * Initialise the format chooser.
  */
-export const init = () => {
+export const init = (contextid) => {
 
     // Set up strings
     var strings={};
@@ -77,7 +77,8 @@ export const init = () => {
                 response: sampleanswer.value,
                 defaultmark: defaultmark.value,
                 prompt: aiprompt.value,
-                marksscheme: marksscheme.value
+                marksscheme: marksscheme.value,
+                contextid: contextid
             },
             async: false
         }])[0].then(function(airesponse) {

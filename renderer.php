@@ -23,8 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use qtype_aitext\form\edit_spellcheck;
-
 defined('MOODLE_INTERNAL') || die();
 /**
  * Generates the output for aitext questions.
