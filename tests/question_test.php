@@ -42,16 +42,15 @@ final class question_test extends \advanced_testcase {
 
     /**
      * Instance of the question type class
-     * @var
+     * @var qtype_aitext
      */
-    public $qtype;
 
     /**
-    * There is a live connection to the External AI system
-    * When run locally it will make a connection. Otherwise the
-    * tests will be skipped
-    * @var boolean
-    */
+     * There is a live connection to the External AI system
+     * When run locally it will make a connection. Otherwise the
+     * tests will be skipped
+     * @var bool
+     */
     protected int $islive;
 
     /**
@@ -63,22 +62,23 @@ final class question_test extends \advanced_testcase {
      */
     protected function setUp(): void {
         $this->qtype = new \qtype_aitext();
-            if (defined('TEST_LLM_APIKEY') && defined('TEST_LLM_ORGID')) {
-                set_config('apikey', TEST_LLM_APIKEY, 'aiprovider_openai');
-                set_config('orgid', TEST_LLM_ORGID, 'aiprovider_openai');
-                set_config('enabled', true,'aiprovider_openai');
-                $this->islive = true;
-            }
+        if (defined('TEST_LLM_APIKEY') && defined('TEST_LLM_ORGID')) {
+            set_config('apikey', TEST_LLM_APIKEY, 'aiprovider_openai');
+            set_config('orgid', TEST_LLM_ORGID, 'aiprovider_openai');
+            set_config('enabled', true, 'aiprovider_openai');
+            $this->islive = true;
+        }
     }
     /**
      * Make a trivial request to the LLM to check the code works
      * Only designed to test the 4.5 subsystem when run locally
      * not when in GHA ci
+     * @covers \qtype_aitext\question::perform_request
      * @return void
      */
     public function test_perform_request(): void {
         $this->resetAfterTest(true);
-        if(!$this->islive) {
+        if (!$this->islive) {
                 $this->markTestSkipped('No live connection to the AI system');
         }
         $aitext = qtype_aitext_test_helper::make_aitext_question([]);
