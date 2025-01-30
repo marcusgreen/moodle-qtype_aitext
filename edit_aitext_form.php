@@ -49,6 +49,18 @@ class qtype_aitext_edit_form extends question_edit_form {
         // Spelling correction.
         $mform->addElement('checkbox', 'spellcheck', get_string('automatic_spellcheck', 'qtype_aitext'));
 
+        xdebug_break();
+
+        if($this->question->id) {
+          $qtestlink = html_writer::link($qtype->get_question_test_url($this->question),
+          $out, ['target' => '_blank']) . ' ' . $OUTPUT->help_icon('runquestiontests', 'qtype_stack');
+        }
+          /**
+          $qtlink = $mform->createElement('static', 'runquestiontests', '', $qtestlink);
+          $mform->insertElementBefore($qtlink, 'questionvariables');
+          **/
+
+
         // Ai prompt.
         $mform->addElement('textarea', 'aiprompt', get_string('aiprompt', 'qtype_aitext'),
              ['maxlen' => 50, 'rows' => 5, 'size' => 30]);
