@@ -94,6 +94,37 @@ if ($ADMIN->fulltree) {
         new lang_string('translatepostfix_text', 'qtype_aitext'),
         1
     ));
+    $patterns = [
+        '/ignore previous instructions/i',
+        '/disregard previous instructions/i',
+        '/forget previous instructions/i',
+        '/override previous instructions/i'
+    ];
+
+    $settings->add(new admin_setting_configcheckbox(
+        'qtype_aitext/logallprompts',
+        new lang_string('logallprompts', 'qtype_aitext'),
+        new lang_string('logallprompts_setting', 'qtype_aitext'),
+        0
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'qtype_aitext/logbyregex',
+        new lang_string('logbyregex', 'qtype_aitext'),
+        new lang_string('logbyregex_setting', 'qtype_aitext'),
+        0
+    ));
+    $defaultpatterns = implode("\n", $patterns);
+    $settings->add(new admin_setting_configtextarea(
+        'qtype_aitext/regularexpressions',
+        new lang_string('regularexpressions', 'qtype_aitext'),
+        new lang_string('regularexpressions_setting', 'qtype_aitext'),
+        $defaultpatterns,
+        PARAM_RAW,
+        80,
+        6
+    ));
+
 
 }
 

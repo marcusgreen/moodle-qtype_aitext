@@ -77,5 +77,30 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024051101, 'qtype', 'aitext');
     }
 
+    xdebug_break();
+    if ($oldversion < 2024071802) {
+
+        // Define table qtype_aitext_log to be created.
+        $table = new xmldb_table('qtype_aitext_log');
+
+        // Adding fields to table qtype_aitext_log.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('aitext', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('prompt', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timeupdated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table qtype_aitext_log.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('aitext', XMLDB_KEY_FOREIGN, ['aitext'], 'qtype_aitext', ['id']);
+
+        // Create the table.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2024071802, 'qtype', 'aitext');
+    }
+
     return true;
 }

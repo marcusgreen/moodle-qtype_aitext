@@ -68,7 +68,7 @@ $string['markscheme'] = 'Mark scheme';
 $string['markscheme_help'] = 'This will tell the AI grader how to give a numerical grade to the student response. The total possible score is this question\'s \'Default mark\'';
 $string['markschememissing'] = 'The marke scheme is missing. Please enter a prompt, how to mark the users input';
 $string['maxwordlimit'] = 'Maximum word limit';
-$string['maxwordlimit_help'] = 'If the response requires that students enter text, this is the maximum number of words that each student will be allowed to submit.';
+$string['maxwordlimit_help'] = 'Ifo the response requires that students enter text, this is the maximum number of words that each student will be allowed to submit.';
 $string['maxwordlimitboundary'] = 'The word limit for this question is {$a->limit} words and you are attempting to submit {$a->count} words. Please shorten your response and try again.';
 $string['minwordlimit'] = 'Minimum word limit';
 $string['minwordlimit_help'] = 'If the response requires that students enter text, this is the minimum number of words that each student will be allowed to submit.';
@@ -121,3 +121,13 @@ $string['use_local_ai_manager_setting'] = 'Use the local_ai_manager plugin to pr
 $string['wordcount'] = 'Word count: {$a}';
 $string['wordcounttoofew'] = 'Word count: {$a->count}, less than the required {$a->limit} words.';
 $string['wordcounttoomuch'] = 'Word count: {$a->count}, more than the limit of {$a->limit} words.';
+
+$string['regularexpressions'] = 'Regular expressions';
+$string['regularexpressions_setting'] = 'List of regular expressions to define what gets logged, e.g. prompt injection attempts.';
+
+$string['logallprompts'] = 'Log all prompts';
+$string['logallprompts_setting'] = 'Enable logging of all AI prompts for monitoring and debugging purposes';
+
+$string['logbyregex'] = 'Log by regular expression';
+$string['logbyregex_setting'] = 'Enable logging of prompts that match specified regular expressions (e.g. prompt injection attempts)';
+
