@@ -101,6 +101,7 @@ $string['responseoptions'] = 'Response options';
 $string['responsetemplate'] = 'Response template';
 $string['responsetemplate_help'] = 'Any text entered here will be displayed in the response input box when a new attempt at the question starts.';
 $string['responsetemplateheader'] = 'Response template';
+$string['responsetests'] = 'Test output from multiple responses';
 $string['sampleanswer'] = 'Sample Answer';
 $string['sampleanswer_help'] = 'The sample answer can be used to test how the AI grader will respond to a given response.';
 $string['sampleanswerempty'] = 'Make sure that you have an AI prompt and sample answer before testing.';

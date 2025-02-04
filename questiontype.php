@@ -36,6 +36,19 @@ require_once($CFG->libdir . '/questionlib.php');
  */
 class qtype_aitext extends question_type {
 
+
+    /**
+     * Get the URL for questiontestrun.php for a question.
+     *
+     * @param stdClass|qtype_stack_question $question question data, as from question_bank::load_question
+     *      or question_bank::load_question_data.
+     * @return moodle_url the URL.
+     */
+    public function get_question_test_url($question) {
+        $linkparams = $this->get_question_url_params($question);
+        return new moodle_url('/question/type/aitext/questiontestrun.php', $linkparams);
+    }
+
     /**
      * Question type is manually graded, though with this type it is
      * marked by the AI/LLM system
