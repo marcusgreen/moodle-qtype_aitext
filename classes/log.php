@@ -24,15 +24,15 @@ namespace qtype_aitext;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class log {
-    public function insert(int $aitextid, string $prompt) :bool {
+    public function insert(int $questionid, string $prompt) :bool {
         global $DB, $USER;
         if(get_config('qtype_aitext', 'logallprompts') == '1') {
             $record = new \stdClass();
-            $record->aitext = $aitextid;
+            $record->aitext = $questionid;
             $record->userid = $USER->id;
             $record->prompt = $prompt;
-            $record->pattern = '';
-            $record->timeupdated = time();
+            $record->regex = '';
+            $record->timecreated = time();
 
             $DB->insert_record('qtype_aitext_log', $record);
             return true;
@@ -44,11 +44,11 @@ class log {
                 if (preg_match($pattern, $prompt)) {
                     // Typically a prompt injection attempt.
                     $record = new \stdClass();
-                    $record->aitext = $aitextid;
+                    $record->aitext = $questionid;
                     $record->userid = $USER->id;
                     $record->prompt = $prompt;
-                    $record->pattern = $pattern;
-                    $record->timeupdated = time();
+                    $record->regex = $pattern;
+                    $record->timecreated = time();
                     $DB->insert_record('qtype_aitext_log', $record);
                     return true;
                 }

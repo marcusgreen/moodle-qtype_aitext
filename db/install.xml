@@ -34,7 +34,8 @@
         <FIELD NAME="aitext" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key to qtype_aitext table"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key to user table"/>
         <FIELD NAME="prompt" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The prompt that was sent to the AI"/>
-        <FIELD NAME="timeupdated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of when the log was created"/>
+        <FIELD NAME="regex" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="regex that found the match in the prompt (if any)"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of when the log was created"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

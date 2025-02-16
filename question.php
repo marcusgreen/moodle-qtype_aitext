@@ -151,6 +151,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param string $purpose
      */
     public function perform_request(string $prompt, string $purpose = 'feedback'): string {
+        xdebug_break();
+        $log = new qtype_aitext\log();
+        $log->insert($this->id, $prompt);
         $backend = get_config('qtype_aitext', 'backend');
         if ($backend == 'local_ai_manager') {
             $manager = new local_ai_manager\manager($purpose);

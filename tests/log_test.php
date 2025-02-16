@@ -41,6 +41,7 @@ class log_test extends \advanced_testcase {
      * @var mixed
      */
     protected $question;
+    protected $maliciousprompt = "This is a malicious prompt";
 
     protected function setUp(): void {
         parent::setUp();
@@ -65,7 +66,7 @@ class log_test extends \advanced_testcase {
         // // Assert the result is true
         $this->assertTrue($result);
 
-        // // Verify the database record
+        // Verify the database record.
         $records = $DB->get_records('qtype_aitext_log');
         $this->assertCount(1, $records);
     }
@@ -74,16 +75,19 @@ class log_test extends \advanced_testcase {
         global $DB;
         $this->resetAfterTest(true);
 
-
         // Set config for regular expressions
         set_config('regularexpressions', '1', 'qtype_aitext');
-        set_config('injectionprompts', '/malicious|hack/', 'qtype_aitext');
+        $regex = '/malicious|hack/';
+        set_config('injectionprompts',$regex , 'qtype_aitext');
 
         $log = new log();
-        $prompt = "This is a malicious prompt";
+
+        $result = $log->insert($this->question->id,'blank prompt');
+        /**Nothing matching the regex was found in the prompt */
+        $this->assertFalse($result);
 
         // Test the insert
-        $result = $log->insert($this->question->id,$prompt);
+        $result = $log->insert($this->question->id,$this->maliciousprompt);
 
         // Assert the result is true
         $this->assertTrue($result);
@@ -92,9 +96,8 @@ class log_test extends \advanced_testcase {
         $records = $DB->get_records('qtype_aitext_log');
         $this->assertCount(1, $records);
 
-        // $record = reset($records);
-        // $this->assertEquals($prompt, $record->prompt);
-        // $this->assertEquals('/malicious|hack/', $record->pattern);
+        $record = reset($records);
+        $this->assertStringContainsString('malicious', $record->regex);
     }
 
     public function test_insert_no_logging() {
