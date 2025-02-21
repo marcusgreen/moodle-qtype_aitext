@@ -22,7 +22,7 @@
  * @copyright  2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+use \moodle_url;
 /**
  * aitext question type editing form.
  *
@@ -60,8 +60,11 @@ class qtype_aitext_edit_form extends question_edit_form {
           $mform->insertElementBefore($qtlink, 'questionvariables');
           **/
          xdebug_break();
-        $link = "<a href='/question/type/aitext/response_test.php'>Test responses to prompt</a>";
-        $mform->addElement('static', 'responsetest', 'Response Test', $link);
+        $url = new moodle_url('/question/type/aitext/responsetest.php');
+        $link = html_writer::link($url, get_string('testresponses', 'qtype_aitext'));
+        $mform->addElement('static', 'questiontest', '', $link);
+        // $link = "<a href='/question/type/aitext/response_test.php'>Test responses to prompt</a>";
+        // $mform->addElement('static', 'responsetest', 'Response Test', $link);
 
         // Ai prompt.
         $mform->addElement('textarea', 'aiprompt', get_string('aiprompt', 'qtype_aitext'),

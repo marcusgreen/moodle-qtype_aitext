@@ -114,6 +114,7 @@ $string['spellcheckedit'] = 'Edit spellcheck';
 $string['spellcheckeditor'] = 'Edit the ai based spellcheck';
 $string['thedefaultmarksscheme'] = 'Deduct a point from the total score for each grammar or spelling mistake.';
 $string['thedefaultprompt'] = 'Explain if there is anything wrong with the grammar and spelling in the text.';
+$string['testresponses'] = 'Test responses';
 $string['toolaimanager'] = 'Tool AI Manager';
 $string['translatepostfix'] = 'Translate postfix';
 $string['translatepostfix_text'] = 'The end of the prompt has &quot;translate the feedback to the language .current_language()&quot; appended';

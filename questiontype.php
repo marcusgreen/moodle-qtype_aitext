@@ -394,20 +394,22 @@ class qtype_aitext extends question_type {
         return '';
     }
     /**
+     * The name this question should appear as in the create new question
+     * dropdown.
+     *
      * When using local_ai_manager the availability ai
-     * is controlled by the tenant setting
+     * is controlled by the tenant setting.
      *
      * @return mixed
      */
     public function menu_name() {
-        if (class_exists('\local_ai_manager\local\tenant')) {
-            if (get_config('qtype_aitext', 'backend') === 'local_ai_manager') {
-                $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
-                return $tenant->is_tenant_allowed() ? parent::menu_name() : '';
+        if (get_config('qtype_aitext', 'backend') === 'local_ai_manager' && class_exists('\local_ai_manager\local\tenant')) {
+            $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
+            if (!$tenant->is_tenant_allowed()) {
+                return '';
             }
-        } else {
-            return parent::menu_name();
         }
+        return parent::menu_name();
     }
 
 }
