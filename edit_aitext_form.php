@@ -40,6 +40,8 @@ class qtype_aitext_edit_form extends question_edit_form {
         global $PAGE;
 
         /** @var qtype_aitext $qtype */
+        // Get the question ID from the URL or session.
+        $questionid = optional_param('id', 0, PARAM_INT);
         $qtype = question_bank::get_qtype('aitext');
         $mform->removeelement('generalfeedback');
         $mform->removeelement('questiontext');
@@ -60,7 +62,7 @@ class qtype_aitext_edit_form extends question_edit_form {
           $mform->insertElementBefore($qtlink, 'questionvariables');
           **/
          xdebug_break();
-        $url = new moodle_url('/question/type/aitext/responsetest.php');
+        $url = new moodle_url('/question/type/aitext/responserun.php',['questionid' => $questionid]);
         $link = html_writer::link($url, get_string('testresponses', 'qtype_aitext'));
         $mform->addElement('static', 'questiontest', '', $link);
         // $link = "<a href='/question/type/aitext/response_test.php'>Test responses to prompt</a>";
@@ -105,10 +107,18 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->setType('sampleanswer', PARAM_RAW);
         $mform->setDefault('sampleanswer', '');
         $mform->addHelpButton('sampleanswer', 'sampleanswer', 'qtype_aitext');
+
+        // $repeatarray[] = $mform->createElement('textarea', 'response', get_string('sampleanswer', 'qtype_aitext'));
+        // $this->repeat_elements($repeatarray,1,[],'hiddenname','FieldName');
+
         $mform->addElement('static', 'sampleanswereval', '',  '<a class="qtype_aitext_sampleanswerbtn btn btn-secondary"
-                id="id_sampleanswerbtn">'
+                id="xid_sampleanswerbtn">'
+
             . get_string('sampleanswerevaluate', 'qtype_aitext') . '</a>' .
              '<div class="qtype_aitext_sampleanswereval" id="id_sampleanswereval"></div>');
+//<a class="qtype_aitext_sampleanswerbtn btn btn-secondary" id="id_sampleanswerbtn">Evaluate Sample Answer</a>
+       $mform->addElement('button', 'sampleanswerbtn', get_string('sampleanswerevaluate', 'qtype_aitext'));
+
         $mform->addElement('header', 'responseoptions', get_string('responseoptions', 'qtype_aitext'));
         $mform->setExpanded('responseoptions');
 
