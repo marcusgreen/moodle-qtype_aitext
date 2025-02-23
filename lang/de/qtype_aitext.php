@@ -73,7 +73,6 @@ $string['pluginnameadding'] = 'Hinzufügen einer KI-Text-Frage';
 $string['pluginnameediting'] = 'Bearbeiten einer AI-Text-Frage';
 $string['pluginnamesummary'] = 'Ermöglicht die Beantwortung eines Datei-Uploads und/oder eines Online-Textes. Die Antwort des Schülers wird vom konfigurierten AI/Large-Sprachmodell verarbeitet, das ein Feedback und optional eine Note zurückgibt.';
 $string['privacy::responsefieldlines'] = 'Anzahl der Zeilen, die die Größe des Eingabefeldes (Textarea) angeben.';
-$string['privacy:metadata'] = 'AI Text question type plugin allows question authors to set default options as user preferences.';
 $string['privacy:preference:attachments'] = 'Anzahl der erlaubten Anhänge.';
 $string['privacy:preference:attachmentsrequired'] = 'Anzahl der erforderlichen Anhänge.';
 $string['privacy:preference:defaultmark'] = 'Die Standardmarkierung, die für eine bestimmte Frage gesetzt wurde.';
@@ -95,14 +94,12 @@ $string['sampleanswerevaluate'] = 'Beispielantwort auswerten';
 $string['showprompt'] = 'Eingabeaufforderung anzeigen';
 $string['spellcheck_editor_desc'] = 'Dies ist der Text, in dem die Rechtschreibfehler von der KI korrigiert wurden. Sie können diesen Korrekturvorschlag bearbeiten.';
 
-
 $string['spellcheck_prompt'] = 'Gib den Text ohne strukturelle Änderung 1:1 wieder. Verzichte auf ein Feedback. Aber korrigiere alle Rechtschreibfehler im nachfolgenden Text: ';
 $string['spellcheck_student_anser_desc'] = 'Dies ist die ursprüngliche Antwort des Schülers';
 $string['spellcheckedit'] = 'Rechtschreibprüfung bearbeiten';
 $string['spellcheckeditor'] = 'Rechtschreibprüfung der KI bearbeiten';
 $string['thedefaultmarksscheme'] = 'Ziehe für jeden Grammatik- oder Rechtschreibfehler einen Punkt von der Gesamtpunktzahl ab.';
 $string['thedefaultprompt'] = 'Erklären Sie, ob etwas mit der Grammatik und der Rechtschreibung im Text nicht stimmt.';
-$string['untestedquestionbehaviour'] = 'Ungetestetes Frageverhalten';
 $string['wordcount'] = 'Wortanzahl: {$a}';
 $string['wordcounttoofew'] = 'Wortanzahl: {$a->count}, weniger als die erforderlichen {$a->limit} Wörter.';
 $string['wordcounttoomuch'] = 'Wortanzahl: {$a->count}, mehr als das Limit von {$a->limit} Wörtern.';

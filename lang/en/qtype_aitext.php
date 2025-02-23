@@ -24,7 +24,6 @@
  */
 
 $string['acceptedfiletypes'] = 'Accepted file types';
-
 $string['aiprompt'] = 'AI Prompt';
 $string['aiprompt_help'] = 'A prompt for the Ai Grader. This is the guideline that AI uses to give feedback on the student response.';
 $string['aipromptmissing'] = 'The ai prompt is missing. Please enter a prompt on the basis of which the feedback is generated.';
@@ -105,6 +104,7 @@ $string['sampleanswer'] = 'Sample Answer';
 $string['sampleanswer_help'] = 'The sample answer can be used to test how the AI grader will respond to a given response.';
 $string['sampleanswerempty'] = 'Make sure that you have an AI prompt and sample answer before testing.';
 $string['sampleanswerevaluate'] = 'Evaluate Sample Answer';
+$string['sampleanswereval'] = 'Sample Answer Evaluation';
 $string['showprompt'] = 'Show prompt';
 $string['spellcheck_editor_desc'] = 'This is the text in which the spelling mistakes have been corrected by AI. You can edit this suggested correction.';
 $string['spellcheck_prompt'] = 'Reproduce the text 1:1. Give no feedback!. But correct all spelling mistakes in the following text: ';

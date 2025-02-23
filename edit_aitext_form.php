@@ -38,7 +38,6 @@ class qtype_aitext_edit_form extends question_edit_form {
      */
     protected function definition_inner($mform) {
         global $PAGE;
-
         /** @var qtype_aitext $qtype */
         $qtype = question_bank::get_qtype('aitext');
         $mform->removeelement('generalfeedback');
@@ -83,15 +82,26 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addElement('html', '</div>');
 
         $mform->addElement('header', 'prompttester', get_string('prompttester', 'qtype_aitext'));
+
         $mform->addElement('textarea', 'sampleanswer', get_string('sampleanswer', 'qtype_aitext'),
             ['maxlen' => 50, 'rows' => 6, 'size' => 30]);
         $mform->setType('sampleanswer', PARAM_RAW);
         $mform->setDefault('sampleanswer', '');
-        $mform->addHelpButton('sampleanswer', 'sampleanswer', 'qtype_aitext');
-        $mform->addElement('static', 'sampleanswereval', '',  '<a class="qtype_aitext_sampleanswerbtn btn btn-secondary"
-                id="id_sampleanswerbtn">'
-            . get_string('sampleanswerevaluate', 'qtype_aitext') . '</a>' .
-             '<div class="qtype_aitext_sampleanswereval" id="id_sampleanswereval"></div>');
+        $mform->addElement('static', 'spinner', '',  '<div class ="hide col-md-9" id="id_spinner"></div>');
+
+        $mform->addElement('button', 'sampleanswerbtn', get_string('sampleanswerevaluate', 'qtype_aitext'));
+        $mform->registerNoSubmitButton('sampleanswerbtn"');
+
+        $options = [
+            'cols' => 50,
+            'rows' => 5,
+            'disabled' => 'disabled',
+        ];
+
+        $mform->addElement('textarea', 'sampleanswereval', get_string('sampleanswereval', 'qtype_aitext'), $options);
+
+        $mform->setDefault('element_name', 'The default value');
+
         $mform->addElement('header', 'responseoptions', get_string('responseoptions', 'qtype_aitext'));
         $mform->setExpanded('responseoptions');
 
@@ -135,7 +145,8 @@ class qtype_aitext_edit_form extends question_edit_form {
                 ['rows' => 10], $this->editoroptions);
 
         // Load any JS that we need to make things happen, specifically the prompt tester.
-        $PAGE->requires->js_call_amd('qtype_aitext/editformhelper', 'init', [$this->context->id]);
+        $PAGE->requires->js_call_amd('qtype_aitext/responserun', 'init', [$this->context->id]);
+
     }
 
     /**

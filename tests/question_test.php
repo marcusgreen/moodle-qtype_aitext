@@ -44,6 +44,7 @@ final class question_test extends \advanced_testcase {
      * Instance of the question type class
      * @var qtype_aitext
      */
+    public qtype_aitext $question;
 
     /**
      * There is a live connection to the External AI system
@@ -51,7 +52,7 @@ final class question_test extends \advanced_testcase {
      * tests will be skipped
      * @var bool
      */
-    protected int $islive;
+    protected bool $islive = false;
 
     /**
      * Config.php should include the apikey and orgid in the form
@@ -61,7 +62,7 @@ final class question_test extends \advanced_testcase {
      * @return void
      */
     protected function setUp(): void {
-        $this->qtype = new \qtype_aitext();
+        $this->question = new \qtype_aitext();
         if (defined('TEST_LLM_APIKEY') && defined('TEST_LLM_ORGID')) {
             set_config('apikey', TEST_LLM_APIKEY, 'aiprovider_openai');
             set_config('orgid', TEST_LLM_ORGID, 'aiprovider_openai');
