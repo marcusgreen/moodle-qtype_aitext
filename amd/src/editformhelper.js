@@ -63,7 +63,7 @@ export const init = (contextid) => {
         const marksscheme = form.querySelector(Selectors.fields.markscheme);
         const defaultmark = form.querySelector(Selectors.fields.defaultmark);
 
-        if(sampleanswer.value==="" || aiprompt.value===""){
+        if (sampleanswer.value === "" || aiprompt.value === "") {
             Notify.alert(strings.prompttester, strings.sampleanswerempty);
             return;
         }
