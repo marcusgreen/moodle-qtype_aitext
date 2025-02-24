@@ -41,6 +41,7 @@ const Selectors = {
  * Initialise the format chooser.
  */
 export const init = (contextid) => {
+    return;
 
     // Set up strings
     var strings={};

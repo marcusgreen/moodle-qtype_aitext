@@ -86,12 +86,12 @@ class qtype_aitext_edit_form extends question_edit_form {
             ['maxlen' => 50, 'rows' => 6, 'size' => 30]);
         $mform->setType('sampleanswer', PARAM_RAW);
         $mform->setDefault('sampleanswer', '');
-        $mform->addHelpButton('sampleanswer', 'sampleanswer', 'qtype_aitext');
-        $mform->addElement('static', 'sampleanswereval', '',  '<a class="qtype_aitext_sampleanswerbtn btn btn-secondary"
-                id="id_sampleanswerbtn">'
-            . get_string('sampleanswerevaluate', 'qtype_aitext') . '</a>' .
-             '<div id="id_sampleanswereval"></div>');
-
+        // $mform->addHelpButton('sampleanswer', 'sampleanswer', 'qtype_aitext');
+        // // $mform->addElement('static', 'sampleanswereval', '',  '<a class="qtype_aitext_sampleanswerbtn btn btn-secondary"
+        // //         id="id_sampleanswerbtn">'
+        // //     . get_string('sampleanswerevaluate', 'qtype_aitext') . '</a>' .
+        // //      '<div id="id_sampleanswereval"></div>');
+        $mform->addElement('static', 'sampleanswereval2', '',  '<div id="id_sampleanswereval2"></div>');
 
         $mform->addElement('button', 'sampleanswerbtn2"', get_string('sampleanswerevaluate', 'qtype_aitext'));
         $mform->registerNoSubmitButton('sampleanswerbtn2"');
@@ -139,8 +139,8 @@ class qtype_aitext_edit_form extends question_edit_form {
                 ['rows' => 10], $this->editoroptions);
 
         // Load any JS that we need to make things happen, specifically the prompt tester.
-        $PAGE->requires->js_call_amd('qtype_aitext/editformhelper', 'init', [$this->context->id]);
-        $PAGE->requires->js_call_amd('qtype_aitext/responserun','init');
+        //$PAGE->requires->js_call_amd('qtype_aitext/editformhelper', 'init', [$this->context->id]);
+        $PAGE->requires->js_call_amd('qtype_aitext/responserun','init', [$this->context->id]);
 
     }
 
