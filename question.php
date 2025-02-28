@@ -151,11 +151,15 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param string $purpose
      */
     public function perform_request(string $prompt, string $purpose = 'feedback'): string {
+
         $backend = get_config('qtype_aitext', 'backend');
+        if(empty($backend)) {
+            throw new moodle_exception('err_invalidbackend', 'qtype_aitext', '', $backend);
+        };
         if ($backend == 'local_ai_manager') {
-            $manager = new local_ai_manager\manager($purpose);
-            $llmresponse = (object) $manager->perform_request($prompt, 'qtype_aitext', $this->contextid);
-            if ($llmresponse->get_code() !== 200) {
+            $ai = new local_ai_manager\manager('feedback');
+            $llmresponse = $ai->perform_request($prompt, ['component' => 'qtype_aitext', 'contextid' => $this->contextid]);
+                if ($llmresponse->get_code() !== 200) {
                 throw new moodle_exception(
                 'err_retrievingfeedback',
                 'qtype_aitext',
@@ -164,7 +168,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 $llmresponse->get_debuginfo()
                 );
             }
-            return $llmresponse->get_content();
+            $content =  $llmresponse->get_content();
         } else if ($backend == 'core_ai_subsystem') {
             global $USER;
             $manager = new \core_ai\manager();
@@ -175,14 +179,16 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             );
             $llmresponse = $manager->process_action($action);
             $responsedata = $llmresponse->get_response_data();
-            return $responsedata['generatedcontent'];
+            $content = $responsedata['generatedcontent'];
         } else if ($backend == 'tool_aimanager') {
             $ai = new tool_aiconnect\ai\ai();
             $llmresponse = $ai->prompt_completion($prompt);
-            return $llmresponse['response']['choices'][0]['message']['content'];
+            $content = $llmresponse['response']['choices'][0]['message']['content'];
         }
-        throw new moodle_exception('err_invalidbackend', 'qtype_aitext');
-
+        if(empty($content)){
+            throw new moodle_exception('err_retrievingfeedback', 'qtype_aitext','', $backend);
+        }
+        return $content;
     }
 
     /**
