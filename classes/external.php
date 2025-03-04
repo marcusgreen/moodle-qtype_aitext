@@ -57,7 +57,7 @@ class qtype_aitext_external extends external_api {
      * Similar to clicking the submit button.
      *
      * @param string $response
-     * @param integer $defaultmark
+     * @param int $defaultmark
      * @param string $prompt
      * @param string $marksscheme
      * @param int $contextid the context id
