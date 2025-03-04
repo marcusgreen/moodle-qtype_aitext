@@ -92,6 +92,7 @@ $string['privacy:preference:responseformat'] = 'What is the response format (HTM
 $string['prompt'] = 'Prompt';
 $string['prompt_setting'] = 'Wrapper text for the prompt set to the AI System, [responsetext] is whatever the student typed as an answer. The ai prompt value from the question will be appended to this';
 $string['prompttester'] = 'Prompt Tester';
+$string['qtype_aitext_log'] ='Log for AI Text';
 $string['responsefieldlines'] = 'Input box size';
 $string['responseformat'] = 'Response format';
 $string['responseformat_setting'] = 'The editor the student uses when responding';
