@@ -44,14 +44,14 @@ final class question_test extends \advanced_testcase {
      * Instance of the question type class
      * @var qtype_aitext
      */
-
+    public $question;
     /**
      * There is a live connection to the External AI system
      * When run locally it will make a connection. Otherwise the
      * tests will be skipped
      * @var bool
      */
-    protected int $islive;
+    protected bool $islive  = false;
 
     /**
      * Config.php should include the apikey and orgid in the form
@@ -61,7 +61,7 @@ final class question_test extends \advanced_testcase {
      * @return void
      */
     protected function setUp(): void {
-        $this->qtype = new \qtype_aitext();
+        $this->question = new \qtype_aitext();
         if (defined('TEST_LLM_APIKEY') && defined('TEST_LLM_ORGID')) {
             set_config('apikey', TEST_LLM_APIKEY, 'aiprovider_openai');
             set_config('orgid', TEST_LLM_ORGID, 'aiprovider_openai');
@@ -86,7 +86,23 @@ final class question_test extends \advanced_testcase {
         $response = $aitext->perform_request('What is 2 * 4 only return a single number');
         $this->assertEquals('8', $response);
     }
-
+    /**
+     * Check the student response gets interprolated into the prompt ready to send
+     * off to the LLM
+     * @covers \qtype_aitext\question::build_full_ai_prompt
+     */
+    public function test_build_full_ai_prompt() {
+        $this->resetAfterTest(true);
+        $question = qtype_aitext_test_helper::make_aitext_question([]);
+        $question->questiontext = 'What is 2 * 4?';
+        $aiprompt = "Is the a correct response to the question 'What is 2 * 4?";
+        $defaultmark = 1;
+        $markscheme  = 'Give one mark if the response is 8';
+        $studentresponse = 'It is 8';
+        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+        $pattern = '/\[\[' . $studentresponse . '\]\]/';
+        $this->assertEquals(1, preg_match($pattern, $result));
+    }
 
     /**
      * Tests the call to the quesitonbase summary code
