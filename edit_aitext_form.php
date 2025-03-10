@@ -95,6 +95,7 @@ class qtype_aitext_edit_form extends question_edit_form {
             'disabled' => 'disabled',
         ];
         $repeatarray = [
+            $mform->createElement('static', 'spinner', '',  '<div class =" col-md-9" id="id_spinner"></div>'),
             $mform->createElement('textarea', 'sampleanswer', get_string('sampleanswer', 'qtype_aitext'), ['maxlen' => 50, 'rows' => 6, 'size' => 30]),
             $mform->createElement('textarea', 'sampleanswereval', get_string('sampleanswereval', 'qtype_aitext'), $options),
             $mform->createelement('button', 'sampleanswerbtn', get_string('sampleanswerevaluate', 'qtype_aitext')),

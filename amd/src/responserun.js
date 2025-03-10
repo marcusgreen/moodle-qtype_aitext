@@ -27,22 +27,42 @@ import Notify from 'core/notification';
 import Log from 'core/log';
 import {exception as displayException} from 'core/notification';
 
-const Selectors = {
-    fields: {
-        sampleanswer: '#id_sampleanswer',
-        sampleanswerbtn: '#id_sampleanswerbtn',
-        sampleanswereval: '#id_sampleanswereval',
-        spinner: '#id_spinner',
-        aiprompt: '#id_aiprompt',
-        markscheme: '#id_markscheme',
-        defaultmark: '#id_defaultmark',
-    },
-};
 
 export const init = (contextid) => {
 
+    const Selectors = {
+        fields: {
+            sampleanswer: '#id_sampleanswer',
+            sampleanswerbtn: '#id_sampleanswerbtn',
+            sampleanswereval: '#id_sampleanswereval',
+        },
+    };
+    let elementcount = document.querySelectorAll("[id^='id_sampleanswerbtn']");
+    let SelectorsWithCount = {};
+
+    for (let i = 0; i < elementcount.length; i++) {
+        SelectorsWithCount.fields = {};
+        for (let key in Selectors.fields) {
+            SelectorsWithCount.fields[key] = Selectors.fields[key] + "_" + i;
+            SelectorsWithCount.fields.aiprompt = '#id_aiprompt';
+            SelectorsWithCount.fields.markscheme = '#id_markscheme';
+            SelectorsWithCount.fields.defaultmark = '#id_defaultmark';
+            SelectorsWithCount.fields.spinner = '#id_spinner';
+        }
+        clickSetup(contextid, SelectorsWithCount);
+    }
+
+};
+
+/**
+ * Configure event handlers
+ *
+ * @param {number} contextid
+ * @param {object} Selectors
+ */
+function clickSetup(contextid, Selectors) {
     // Set up strings
-    var strings={};
+    var strings = {};
     get_strings([
         {"key": "prompttester", "component": 'qtype_aitext'},
         {"key": "sampleanswerempty", "component": 'qtype_aitext'},
@@ -96,4 +116,4 @@ export const init = (contextid) => {
 
 }); // End of click.
 
-};
+}
