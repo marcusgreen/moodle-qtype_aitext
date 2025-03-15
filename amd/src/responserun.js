@@ -74,12 +74,15 @@ function clickSetup(contextid, Selectors) {
     });
     document.querySelector(Selectors.fields.sampleanswerbtn).addEventListener('click', e => {
         const form = e.target.closest('form');
-        const sampleanswer = form.querySelector(Selectors.fields.sampleanswer);
-        const sampleanswereval = form.querySelector(Selectors.fields.sampleanswereval);
+        let index = e.target.id.lastIndexOf("_");
+        let id = e.target.id.slice(index + 1);
 
-        const aiprompt = form.querySelector(Selectors.fields.aiprompt);
-        const marksscheme = form.querySelector(Selectors.fields.markscheme);
-        const defaultmark = form.querySelector(Selectors.fields.defaultmark);
+        const sampleanswer = document.getElementById('id_sampleanswer' + '_'+ id);
+        const sampleanswereval = document.getElementById('id_sampleanswereval' + "_" + id);
+
+        const aiprompt = document.getElementById('id_aiprompt');
+        const marksscheme = document.getElementById('id_markscheme');
+        const defaultmark = document.getElementById('id_defaultmark');
         const spinner = form.querySelector(Selectors.fields.spinner);
 
         if (sampleanswer.value === "" || aiprompt.value === "") {

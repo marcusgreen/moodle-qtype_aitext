@@ -38,9 +38,9 @@ class qtype_aitext_edit_form extends question_edit_form {
      */
     protected function definition_inner($mform) {
         global $PAGE;
-        /** @var qtype_aitext $qtype */
         // Get the question ID from the URL or session.
         $questionid = optional_param('id', 0, PARAM_INT);
+        /** @var qtype_aitext $qtype */
         $qtype = question_bank::get_qtype('aitext');
         $mform->removeelement('generalfeedback');
         $mform->removeelement('questiontext');
@@ -50,8 +50,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         // Spelling correction.
         $mform->addElement('checkbox', 'spellcheck', get_string('automatic_spellcheck', 'qtype_aitext'));
 
-
-        $url = new moodle_url('/question/type/aitext/responserun.php',['questionid' => $questionid]);
+        $url = new moodle_url('/question/type/aitext/responserun.php', ['questionid' => $questionid]);
         $link = html_writer::link($url, get_string('testresponses', 'qtype_aitext'));
 
         // Ai prompt.
@@ -89,15 +88,12 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         $mform->addElement('header', 'prompttester', get_string('prompttester', 'qtype_aitext'));
 
-        $options = [
-            'cols' => 50,
-            'rows' => 5,
-            'disabled' => 'disabled',
-        ];
+        $answeroptions = ['maxlen' => 50, 'rows' => 6, 'size' => 30];
+        $evaloptions = ['cols' => 50, 'rows' => 5, 'disabled' => 'disabled' ];
         $repeatarray = [
             $mform->createElement('static', 'spinner', '',  '<div class =" col-md-9" id="id_spinner"></div>'),
-            $mform->createElement('textarea', 'sampleanswer', get_string('sampleanswer', 'qtype_aitext'), ['maxlen' => 50, 'rows' => 6, 'size' => 30]),
-            $mform->createElement('textarea', 'sampleanswereval', get_string('sampleanswereval', 'qtype_aitext'), $options),
+            $mform->createElement('textarea', 'sampleanswer', get_string('sampleanswer', 'qtype_aitext'), $answeroptions),
+            $mform->createElement('textarea', 'sampleanswereval', get_string('sampleanswereval', 'qtype_aitext'), $evaloptions),
             $mform->createelement('button', 'sampleanswerbtn', get_string('sampleanswerevaluate', 'qtype_aitext')),
             $mform->createElement('html','<hr/>'),
         ];
@@ -113,12 +109,11 @@ class qtype_aitext_edit_form extends question_edit_form {
             $repeateloptions,
             'option_repeats',
             'option_add_fields',
-            2,
+            1,
             null,
             true,
             'delete',
         );
-
 
         $mform->setType('option', PARAM_CLEANHTML);
 
