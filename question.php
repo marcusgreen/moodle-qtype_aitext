@@ -123,6 +123,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     /** @var bool $spellcheck if spellcheck is enabled */
     public bool $spellcheck;
 
+
+    /** @var array  */
+    public $sampleanswers;
+
     /**
      * Required by the interface question_automatically_gradable_with_countback.
      *

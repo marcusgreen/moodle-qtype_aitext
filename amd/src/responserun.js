@@ -77,7 +77,7 @@ function clickSetup(contextid, Selectors) {
         let index = e.target.id.lastIndexOf("_");
         let id = e.target.id.slice(index + 1);
 
-        const sampleanswer = document.getElementById('id_sampleanswer' + '_'+ id);
+        const sampleanswer = document.getElementById('id_sampleanswers' + '_'+ id);
         const sampleanswereval = document.getElementById('id_sampleanswereval' + "_" + id);
 
         const aiprompt = document.getElementById('id_aiprompt');

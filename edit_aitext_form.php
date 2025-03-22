@@ -92,20 +92,19 @@ class qtype_aitext_edit_form extends question_edit_form {
         $evaloptions = ['cols' => 50, 'rows' => 5, 'disabled' => 'disabled' ];
         $repeatarray = [
             $mform->createElement('static', 'spinner', '',  '<div class =" col-md-9" id="id_spinner"></div>'),
-            $mform->createElement('textarea', 'sampleanswer', get_string('sampleanswer', 'qtype_aitext'), $answeroptions),
+            $mform->createElement('textarea', 'sampleanswers', get_string('sampleanswer', 'qtype_aitext'), $answeroptions),
             $mform->createElement('textarea', 'sampleanswereval', get_string('sampleanswereval', 'qtype_aitext'), $evaloptions),
             $mform->createelement('button', 'sampleanswerbtn', get_string('sampleanswerevaluate', 'qtype_aitext')),
             $mform->createElement('html','<hr/>'),
         ];
 
         $repeateloptions = [];
-        $repeatno = 1;
         $mform->setType('sampleanswereval', PARAM_CLEANHTML);
         $mform->setType('optionid', PARAM_INT);
-
+        $samplecount = $this->get_sample_count();
         $this->repeat_elements(
             $repeatarray,
-            $repeatno,
+            $samplecount,
             $repeateloptions,
             'option_repeats',
             'option_add_fields',
@@ -114,6 +113,7 @@ class qtype_aitext_edit_form extends question_edit_form {
             true,
             'delete',
         );
+
 
         $mform->setType('option', PARAM_CLEANHTML);
 
@@ -163,6 +163,14 @@ class qtype_aitext_edit_form extends question_edit_form {
         $PAGE->requires->js_call_amd('qtype_aitext/responserun', 'init', [$this->context->id]);
 
     }
+    protected function get_sample_count() {
+        if (isset($this->question->id)) {
+            if(isset($this->question->options->sampleanswers)) {
+               return count($this->question->options->sampleanswers);
+            }
+        }
+        return 0;
+    }
 
     /**
      * Perform any preprocessing needed on the data passed in
@@ -171,6 +179,8 @@ class qtype_aitext_edit_form extends question_edit_form {
      * @return object $question the modified data.
      */
     protected function data_preprocessing($question) {
+
+
         $question = parent::data_preprocessing($question);
 
         if (empty($question->options)) {
@@ -185,6 +195,13 @@ class qtype_aitext_edit_form extends question_edit_form {
         $question->maxwordlimit = $question->options->maxwordlimit;
         $question->aiprompt = $question->options->aiprompt;
         $question->spellcheck = $question->options->spellcheck;
+        xdebug_break();
+        // Make the count start from 0 like the repeat array elements.
+        $question->sampleanswers = [];
+        foreach($question->options->sampleanswers as $sampleanswer) {
+            $question->sampleanswers[] = $sampleanswer->response;
+        }
+        //$question->sampleanswers = $question->options->sampleanswers;
 
         $question->responsetemplate = [
             'text' => $question->options->responsetemplate,
@@ -193,6 +210,7 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         return $question;
     }
+
 
     /**
      * Check the question text is valid, specifically that

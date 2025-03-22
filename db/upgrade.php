@@ -77,5 +77,29 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024051101, 'qtype', 'aitext');
     }
 
+    if ($oldversion < 2024071895) {
+
+        // Define table qtype_aitext_testresponse to be created.
+        $table = new xmldb_table('qtype_aitext_sampleanswers');
+
+        // Adding fields to table qtype_aitext_testresponse.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('question', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('response', XMLDB_TYPE_TEXT, null, null, null, null, null);
+
+        // Adding keys to table qtype_aitext_testresponse.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('ait_test_response', XMLDB_KEY_FOREIGN, ['question'], 'qtype_aitext', ['id']);
+
+        // Conditionally launch create table for qtype_aitext_testresponse.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2024071895, 'qtype', 'aitext');
+    }
+
+
     return true;
 }

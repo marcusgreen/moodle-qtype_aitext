@@ -77,6 +77,12 @@ class qtype_aitext extends question_type {
         global $DB;
         $question->options = $DB->get_record('qtype_aitext',
                 ['questionid' => $question->id], '*', MUST_EXIST);
+        $question->options->sampleanswers = $DB->get_records(
+            'qtype_aitext_sampleanswers',
+            ['question' => $question->id],
+            'id ASC',
+            '*'
+        );
         parent::get_question_options($question);
     }
 
@@ -104,15 +110,16 @@ class qtype_aitext extends question_type {
         global $DB;
         $context = $formdata->context;
         $options = $DB->get_record('qtype_aitext', ['questionid' => $formdata->id]);
+        xdebug_break();
         if (!$options) {
             $options = new stdClass();
             $options->questionid = $formdata->id;
             $options->id = $DB->insert_record('qtype_aitext', $options);
         }
+
         $options->spellcheck = !empty($formdata->spellcheck);
         $options->aiprompt = $formdata->aiprompt;
         $options->markscheme = $formdata->markscheme;
-        $options->sampleanswer = $formdata->sampleanswer;
         $options->model = trim($formdata->model);
         $options->responseformat = $formdata->responseformat;
         $options->responsefieldlines = $formdata->responsefieldlines;
@@ -139,6 +146,12 @@ class qtype_aitext extends question_type {
         $options->responsetemplateformat = $formdata->responsetemplate['format'];
 
         $DB->update_record('qtype_aitext', $options);
+
+        foreach($formdata->sampleanswers as $sa) {
+            $sampleanswer['question'] = $formdata->id;
+            $sampleanswer['response'] = $sa;
+            $DB->insert_record('qtype_aitext_sampleanswers', $sampleanswer);
+        }
     }
     /**
      * Called when previewing a question or when displayed in a quiz
@@ -160,7 +173,8 @@ class qtype_aitext extends question_type {
         $question->responsetemplateformat = $questiondata->options->responsetemplateformat;
         $question->aiprompt = $questiondata->options->aiprompt;
         $question->markscheme = $questiondata->options->markscheme;
-        $question->sampleanswer = $questiondata->options->sampleanswer;
+        parent::get_question_options($question);
+
         /* Legacy quesitons may not have a model set, so assign the first in the settings */
         if (empty($question->model)) {
             $model = explode(",", get_config('tool_aiconnect', 'model'))[0];
@@ -168,6 +182,12 @@ class qtype_aitext extends question_type {
         } else {
             $question->model = $questiondata->options->model;
         }
+    }
+
+    public function get_sampleanswers($question) {
+        global $DB;
+        $sampleanswers = $DB->get_records('qtype_aitext_sampleanswers', ['question' => $question->id]);
+        return $sampleanswers;
     }
     /**
      * Delete a question from the database
