@@ -110,7 +110,6 @@ class qtype_aitext extends question_type {
         global $DB;
         $context = $formdata->context;
         $options = $DB->get_record('qtype_aitext', ['questionid' => $formdata->id]);
-        xdebug_break();
         if (!$options) {
             $options = new stdClass();
             $options->questionid = $formdata->id;
@@ -147,7 +146,7 @@ class qtype_aitext extends question_type {
 
         $DB->update_record('qtype_aitext', $options);
 
-        foreach($formdata->sampleanswers as $sa) {
+        foreach ($formdata->sampleanswers as $sa) {
             $sampleanswer['question'] = $formdata->id;
             $sampleanswer['response'] = $sa;
             $DB->insert_record('qtype_aitext_sampleanswers', $sampleanswer);

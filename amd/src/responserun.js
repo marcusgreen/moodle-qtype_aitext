@@ -47,7 +47,6 @@ export const init = (contextid) => {
             SelectorsWithCount.fields.aiprompt = '#id_aiprompt';
             SelectorsWithCount.fields.markscheme = '#id_markscheme';
             SelectorsWithCount.fields.defaultmark = '#id_defaultmark';
-            SelectorsWithCount.fields.spinner = '#id_spinner';
         }
         clickSetup(contextid, SelectorsWithCount);
     }
@@ -73,17 +72,18 @@ function clickSetup(contextid, Selectors) {
         strings.sampleanswerempty = s[i++];
     });
     document.querySelector(Selectors.fields.sampleanswerbtn).addEventListener('click', e => {
-        const form = e.target.closest('form');
         let index = e.target.id.lastIndexOf("_");
         let id = e.target.id.slice(index + 1);
 
-        const sampleanswer = document.getElementById('id_sampleanswers' + '_'+ id);
+        const sampleanswer = document.getElementById('id_sampleanswers' + '_' + id);
         const sampleanswereval = document.getElementById('id_sampleanswereval' + "_" + id);
 
         const aiprompt = document.getElementById('id_aiprompt');
         const marksscheme = document.getElementById('id_markscheme');
         const defaultmark = document.getElementById('id_defaultmark');
-        const spinner = form.querySelector(Selectors.fields.spinner);
+
+        const spinnerOuter = document.querySelector('#fitem_id_spinner_' + id);
+        const spinner = spinnerOuter.querySelector('#id_spinner');
 
         if (sampleanswer.value === "" || aiprompt.value === "") {
             Notify.alert(strings.prompttester, strings.sampleanswerempty);
