@@ -166,8 +166,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             }
             return $llmresponse->get_content();
         } else if ($backend == 'core_ai_subsystem') {
-            global $USER;
-            $manager = new \core_ai\manager();
+            global $USER,$CFG, $DB;
+            if(str_starts_with($CFG->release, '5')) {
+                $manager = new \core_ai\manager($DB);
+            } else {
+                $manager = new \core_ai\manager();
+            }
             $action = new \core_ai\aiactions\generate_text(
                 contextid: $this->contextid,
                 userid: $USER->id,

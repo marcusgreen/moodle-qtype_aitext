@@ -12,11 +12,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-import {get_strings} from 'core/str';
+import {
+    get_strings
+} from 'core/str';
 import Ajax from 'core/ajax';
 import Log from 'core/log';
 import Notify from 'core/notification';
-import {exception as displayException} from 'core/notification';
+import {
+    exception as displayException
+} from 'core/notification';
 
 /**
  * Question AI Text Edit Form Helper
@@ -43,12 +47,17 @@ const Selectors = {
 export const init = (contextid) => {
 
     // Set up strings
-    var strings={};
-    get_strings([
-        { "key": "prompttester", "component": 'qtype_aitext'},
-        { "key": "sampleanswerempty", "component": 'qtype_aitext'},
+    var strings = {};
+    get_strings([{
+            "key": "prompttester",
+            "component": 'qtype_aitext'
+        },
+        {
+            "key": "sampleanswerempty",
+            "component": 'qtype_aitext'
+        },
 
-    ]).done(function (s) {
+    ]).done(function(s) {
         var i = 0;
         strings.prompttester = s[i++];
         strings.sampleanswerempty = s[i++];
@@ -63,13 +72,14 @@ export const init = (contextid) => {
         const marksscheme = form.querySelector(Selectors.fields.markscheme);
         const defaultmark = form.querySelector(Selectors.fields.defaultmark);
 
-        if(sampleanswer.value==="" || aiprompt.value===""){
+        if (sampleanswer.value === "" || aiprompt.value === "") {
             Notify.alert(strings.prompttester, strings.sampleanswerempty);
             return;
         }
 
         //put  spinner in place
-        sampleanswereval.innerHTML='<i class="icon fa fa-spinner fa-spin fa-2x"></i>';
+        // This is an alternative https://github.com/moodle/moodle/blob/main/lib/amd/src/loadingicon.js.
+        sampleanswereval.innerHTML = '<i class="icon fa fa-spinner fa-spin fa-2x"></i>';
 
         Ajax.call([{
             methodname: 'qtype_aitext_fetch_ai_grade',
@@ -90,5 +100,5 @@ export const init = (contextid) => {
             displayException(error);
             sampleanswereval.innerHTML = '';
         });
-    });//end of click
+    }); //end of click
 };
