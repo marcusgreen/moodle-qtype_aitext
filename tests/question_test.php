@@ -17,6 +17,7 @@
 namespace qtype_aitext;
 
 use coding_exception;
+use core_reportbuilder\external\filters\set;
 use PHPUnit\Framework\ExpectationFailedException;
 use question_attempt_step;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -42,8 +43,9 @@ final class question_test extends \advanced_testcase {
 
     /**
      * Instance of the question type class
-     * @var qtype_aitext
+     * @var question
      */
+    public $question;
 
     /**
      * There is a live connection to the External AI system
@@ -61,7 +63,7 @@ final class question_test extends \advanced_testcase {
      * @return void
      */
     protected function setUp(): void {
-        $this->qtype = new \qtype_aitext();
+        $this->question = new \qtype_aitext();
         if (defined('TEST_LLM_APIKEY') && defined('TEST_LLM_ORGID')) {
             set_config('apikey', TEST_LLM_APIKEY, 'aiprovider_openai');
             set_config('orgid', TEST_LLM_ORGID, 'aiprovider_openai');
@@ -102,6 +104,32 @@ final class question_test extends \advanced_testcase {
             $aitext->questiontext = 'Hello <img src="http://example.com/globe.png" alt="world" />';
             $this->assertEquals('Hello [world]', $aitext->get_question_summary());
     }
+
+    /**
+     * Check on some permutations of how the prompt that is sent to the
+     * LLM is constructed
+     * @covers ::build_full_ai_prompt
+     */
+    public function test_build_full_ai_prompt() :void {
+        $this->resetAfterTest();
+
+        $question = qtype_aitext_test_helper::make_aitext_question([]);
+        set_config('prompt', 'in [responsetext] ','qtype_aitext');
+        set_config('defaultprompt', 'check this','qtype_aitext');
+        set_config('markscheme', 'one mark','qtype_aitext');
+        set_config('jsonprompt', 'testprompt','qtype_aitext');
+
+        $response = '<p> Thank you </p>';
+        $result = $question->build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme);
+
+        $this->assertStringContainsString('[[ Thank you ]]', $result);
+        // HTML tags should be stripped out.
+        $this->assertStringNotContainsString('<p>', $result);
+
+        $markscheme = "2 points";
+        $result = $question->build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme);
+        $this->assertStringContainsString('2 points', $result);
+}
 
     /**
      * Check that non valid json returned from the LLM is
