@@ -260,6 +260,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return string;
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
+
+        // Check if [questiontext] is in the aiprompt and replace it with the question text
+        if (strpos($aiprompt, '[questiontext]') !== false) {
+            $aiprompt = str_replace('[questiontext]', strip_tags($this->questiontext), $aiprompt);
+        }
+
         $responsetext = strip_tags($response);
             $responsetext = '[['.$responsetext.']]';
             $prompt = get_config('qtype_aitext', 'prompt');
