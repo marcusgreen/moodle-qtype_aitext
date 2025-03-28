@@ -102,8 +102,7 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
      */
     protected function after_execute_question() {
         global $DB;
-
-        $aitextswithoutoptions = $DB->get_records_sql("
+        $qwithoutoptions = $DB->get_records_sql("
                     SELECT q.*
                       FROM {question} q
                       JOIN {backup_ids_temp} bi ON bi.newitemid = q.id
@@ -114,7 +113,7 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
                        AND bi.itemname = ?
                 ", ['aitext', $this->get_restoreid(), 'question_created']);
 
-        foreach ($aitextswithoutoptions as $q) {
+        foreach ($qwithoutoptions as $q) {
             $defaultoptions = new stdClass();
             $defaultoptions->questionid = $q->id;
             $defaultoptions->aiprompt = '';
