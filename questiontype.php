@@ -173,6 +173,7 @@ class qtype_aitext extends question_type {
         $question->aiprompt = $questiondata->options->aiprompt;
         $question->markscheme = $questiondata->options->markscheme;
         parent::get_question_options($question);
+        $question->options->sampleanswers = $this->get_sampleanswers($question);
 
         /* Legacy quesitons may not have a model set, so assign the first in the settings */
         if (empty($question->model)) {
@@ -183,11 +184,18 @@ class qtype_aitext extends question_type {
         }
     }
 
+    /**
+     * Get the structure from the database
+     *
+     * @param qtype_aitext $question
+     * @return array
+     */
     public function get_sampleanswers($question) {
         global $DB;
         $sampleanswers = $DB->get_records('qtype_aitext_sampleanswers', ['question' => $question->id]);
         return $sampleanswers;
     }
+
     /**
      * Delete a question from the database
      *

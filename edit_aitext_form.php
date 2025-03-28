@@ -86,6 +86,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         , ['rows' => 10], $this->editoroptions);
         $mform->addElement('html', '</div>');
 
+        // Add repeated sample answer options along with the field for returned responses.
         $mform->addElement('header', 'prompttester', get_string('prompttester', 'qtype_aitext'));
 
         $answeroptions = ['maxlen' => 50, 'rows' => 6, 'size' => 30];
@@ -95,6 +96,7 @@ class qtype_aitext_edit_form extends question_edit_form {
             $mform->createElement('textarea', 'sampleanswers', get_string('sampleanswer', 'qtype_aitext'), $answeroptions),
             $mform->createElement('textarea', 'sampleanswereval', get_string('sampleanswereval', 'qtype_aitext'), $evaloptions),
             $mform->createelement('button', 'sampleanswerbtn', get_string('sampleanswerevaluate', 'qtype_aitext')),
+            $mform->createElement('submit', 'delete', get_string('deletesample', 'qtype_aitext'), 0),
             $mform->createElement('html', '<hr/>'),
         ];
 
@@ -102,6 +104,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->setType('sampleanswereval', PARAM_CLEANHTML);
         $mform->setType('optionid', PARAM_INT);
         $samplecount = $this->get_sample_count();
+        $mform->registerNoSubmitButton('delete');
         $this->repeat_elements(
             $repeatarray,
             $samplecount,
@@ -109,7 +112,7 @@ class qtype_aitext_edit_form extends question_edit_form {
             'option_repeats',
             'option_add_fields',
             1,
-            null,
+            get_string('addsample', 'qtype_aitext'),
             true,
             'delete',
         );
@@ -160,15 +163,23 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         // Load any JS that we need to make things happen, specifically the prompt tester.
         $PAGE->requires->js_call_amd('qtype_aitext/responserun', 'init', [$this->context->id]);
-
     }
+
+    /**
+     * retrieved from function get_sampleanswers in class quesitontype
+     *
+     * @return int count of sample answers
+     */
     protected function get_sample_count() {
         if (isset($this->question->id)) {
-            if(isset($this->question->options->sampleanswers)) {
-                return count($this->question->options->sampleanswers);
+            if (isset($this->question->options->sampleanswers)) {
+                if (count($this->question->options->sampleanswers) > 0) {
+                    return count($this->question->options->sampleanswers);
+                }
             }
         }
-        return 0;
+        // Always have one empty sample answer set of fields.
+        return 1;
     }
 
     /**
@@ -195,7 +206,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $question->spellcheck = $question->options->spellcheck;
         // Make the count start from 0 like the repeat array elements.
         $question->sampleanswers = [];
-        foreach($question->options->sampleanswers as $sampleanswer) {
+        foreach ($question->options->sampleanswers as $sampleanswer) {
             $question->sampleanswers[] = $sampleanswer->response;
         }
 

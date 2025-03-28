@@ -24,6 +24,7 @@
  */
 
 $string['acceptedfiletypes'] = 'Accepted file types';
+$string['addsample'] = 'Add a sample response';
 $string['aiprompt'] = 'AI Prompt';
 $string['aiprompt_help'] = 'A prompt for the Ai Grader. This is the guideline that AI uses to give feedback on the student response.';
 $string['aipromptmissing'] = 'The ai prompt is missing. Please enter a prompt on the basis of which the feedback is generated.';
@@ -39,6 +40,7 @@ $string['defaultmarksscheme'] = 'Marks scheme';
 $string['defaultmarksscheme_setting'] = 'This will be the default marks scheme for new questions. Questions authors should alter this to suit the question.';
 $string['defaultprompt'] = 'AI Prompt';
 $string['defaultprompt_setting'] = 'This will be the default AI prompt for new questions. It tells the AI grader how to analyse the student response. It is the guideline that AI uses to give feedback on the student response. Question authors should alter this to suit the question.';
+$string['deletesample'] = 'Delete sample';
 $string['disclaimer'] = 'Disclaimer';
 $string['disclaimer_setting'] = 'Text appended to each response indicating feedback is from a Large Language Model and not a human';
 $string['err_invalidbackend'] = 'Err invalidbackend;';
@@ -105,17 +107,17 @@ $string['responsetests'] = 'Test output from multiple responses';
 $string['sampleanswer'] = 'Sample Answer';
 $string['sampleanswer_help'] = 'The sample answer can be used to test how the AI grader will respond to a given response.';
 $string['sampleanswerempty'] = 'Make sure that you have an AI prompt and sample answer before testing.';
-$string['sampleanswerevaluate'] = 'Evaluate Sample Answer';
 $string['sampleanswereval'] = 'Sample Answer Evaluation';
+$string['sampleanswerevaluate'] = 'Evaluate Sample Answer';
 $string['showprompt'] = 'Show prompt';
 $string['spellcheck_editor_desc'] = 'This is the text in which the spelling mistakes have been corrected by AI. You can edit this suggested correction.';
 $string['spellcheck_prompt'] = 'Reproduce the text 1:1. Give no feedback!. But correct all spelling mistakes in the following text: ';
 $string['spellcheck_student_anser_desc'] = 'This is the original student\'s answer';
 $string['spellcheckedit'] = 'Edit spellcheck';
 $string['spellcheckeditor'] = 'Edit the ai based spellcheck';
+$string['testresponses'] = 'Test responses';
 $string['thedefaultmarksscheme'] = 'Deduct a point from the total score for each grammar or spelling mistake.';
 $string['thedefaultprompt'] = 'Explain if there is anything wrong with the grammar and spelling in the text.';
-$string['testresponses'] = 'Test responses';
 $string['toolaimanager'] = 'Tool AI Manager';
 $string['translatepostfix'] = 'Translate postfix';
 $string['translatepostfix_text'] = 'The end of the prompt has &quot;translate the feedback to the language .current_language()&quot; appended';

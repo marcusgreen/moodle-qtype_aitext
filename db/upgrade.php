@@ -22,7 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 /**
  * Upgrade code for the aitext question type.
  *
@@ -99,7 +98,6 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         // Aitext savepoint reached.
         upgrade_plugin_savepoint(true, 2024071895, 'qtype', 'aitext');
     }
-
 
     return true;
 }
