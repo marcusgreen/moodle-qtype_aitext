@@ -50,9 +50,6 @@ class qtype_aitext_edit_form extends question_edit_form {
         // Spelling correction.
         $mform->addElement('checkbox', 'spellcheck', get_string('automatic_spellcheck', 'qtype_aitext'));
 
-        $url = new moodle_url('/question/type/aitext/responserun.php', ['questionid' => $questionid]);
-        $link = html_writer::link($url, get_string('testresponses', 'qtype_aitext'));
-
         // Ai prompt.
         $mform->addElement('textarea', 'aiprompt', get_string('aiprompt', 'qtype_aitext'),
              ['maxlen' => 50, 'rows' => 5, 'size' => 30]);
@@ -88,6 +85,7 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         // Add repeated sample answer options along with the field for returned responses.
         $mform->addElement('header', 'prompttester', get_string('prompttester', 'qtype_aitext'));
+        $mform->addHelpButton('prompttester','prompttesthelp', 'qtype_aitext');
 
         $answeroptions = ['maxlen' => 50, 'rows' => 6, 'size' => 30];
         $evaloptions = ['cols' => 50, 'rows' => 5, 'disabled' => 'disabled' ];
@@ -101,7 +99,9 @@ class qtype_aitext_edit_form extends question_edit_form {
         ];
 
         $repeateloptions = [];
+        $mform->setType('sampleanswers', PARAM_CLEANHTML);
         $mform->setType('sampleanswereval', PARAM_CLEANHTML);
+
         $mform->setType('optionid', PARAM_INT);
         $samplecount = $this->get_sample_count();
         $mform->registerNoSubmitButton('delete');
