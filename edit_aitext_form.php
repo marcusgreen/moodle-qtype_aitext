@@ -85,7 +85,7 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         // Add repeated sample answer options along with the field for returned responses.
         $mform->addElement('header', 'prompttester', get_string('prompttester', 'qtype_aitext'));
-        $mform->addHelpButton('prompttester','prompttesthelp', 'qtype_aitext');
+        $mform->addHelpButton('prompttester', 'prompttesthelp', 'qtype_aitext');
 
         $answeroptions = ['maxlen' => 50, 'rows' => 6, 'size' => 30];
         $evaloptions = ['cols' => 50, 'rows' => 5, 'disabled' => 'disabled' ];

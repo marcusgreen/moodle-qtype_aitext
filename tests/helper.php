@@ -22,7 +22,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 use Random\RandomException;
+require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 
 /**
  * Test helper class for the aitext question type.
@@ -48,7 +51,8 @@ class qtype_aitext_test_helper extends question_test_helper {
         $question = new qtype_aitext_question();
         $question->questiontext = $options['questiontext'] ?? '';
         $question->model = $options['model'] ?? '';
-        $question->sampleanswer = $options['sampleanswer'] ?? '';
+        $question->sampleanswers = $options['sampleanswers'] ?? '';
+
         $question->markscheme = $options['markscheme'] ?? '';
         $question->aiprompt = $options['aiprompt'] ?? '';
         $question->contextid = 1;
@@ -72,7 +76,7 @@ class qtype_aitext_test_helper extends question_test_helper {
         $q->responsefieldlines = 10;
         $q->minwordlimit = null;
         $q->maxwordlimit = null;
-        $q->sampleanswer = '';
+        $q->sampleanswers = [];
         $q->model = 'gpt4';
         $q->graderinfo = '';
         $q->graderinfoformat = FORMAT_HTML;
@@ -112,7 +116,7 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
         $fromform->aiprompt = 'A prompt for the LLM';
         $fromform->markscheme = 'Give one mark if the answer is correct';
-        $fromform->sampleanswer = '';
+        $fromform->sampleanswers = [];
         $fromform->model = 'gpt-4';
         return $fromform;
     }
@@ -150,7 +154,7 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->graderinfo = ['text' => '', 'format' => FORMAT_HTML];
         $fromform->responsetemplate = ['text' => '', 'format' => FORMAT_HTML];
         $fromform->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
-        $fromform->sampleanswer = '';
+        $fromform->sampleanswers = [];
         $fromform->model = 'gpt-4';
         return $fromform;
     }

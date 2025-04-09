@@ -61,6 +61,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public $model;
 
+    /**
+     * Options including from sampleanswers table
+     * @var array
+     */
+    public $options;
+
 
     /**
      * used in the question editing interface
@@ -172,7 +178,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         } else if ($backend == 'core_ai_subsystem') {
             global $USER, $CFG, $DB;
             // There was a breaking change in the move to Moodle 5x.
-            if(str_starts_with($CFG->release, '5')) {
+            if (str_starts_with($CFG->release, '5')) {
                 $manager = new \core_ai\manager($DB);
             } else {
                 $manager = new \core_ai\manager();

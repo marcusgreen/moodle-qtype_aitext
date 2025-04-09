@@ -93,6 +93,7 @@ $string['privacy:preference:responseformat'] = 'What is the response format (HTM
 $string['prompt'] = 'Prompt';
 $string['prompt_setting'] = 'Wrapper text for the prompt set to the AI System, [responsetext] is whatever the student typed as an answer. The ai prompt value from the question will be appended to this';
 $string['prompttester'] = 'Prompt Tester';
+$string['prompttesthelp'] = 'Prompt test help';
 $string['prompttesthelp_help'] = 'When the form is saved only the test response is saved, not the value returned by the LLM';
 $string['response'] = 'Response';
 $string['responsefieldlines'] = 'Input box size';
