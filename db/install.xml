@@ -28,15 +28,15 @@
         <KEY NAME="questionid" TYPE="foreign-unique" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="qtype_aitext_sampleanswers" COMMENT="id of the question being linked to">
+    <TABLE NAME="qtype_aitext_sampleresponses" COMMENT="id of the question being linked to">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="question" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="response" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Student answers to be tested during question authoring"/>
+        <FIELD NAME="response" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Student responses to be tested during question authoring"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="ait_sampleanswers" TYPE="foreign" FIELDS="question" REFTABLE="qtype_aitext" REFFIELDS="id"/>
+        <KEY NAME="ait_sampleresponses" TYPE="foreign" FIELDS="question" REFTABLE="qtype_aitext" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
   </TABLES>

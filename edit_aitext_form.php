@@ -84,23 +84,23 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addElement('html', '</div>');
 
         // Add repeated sample answer options along with the field for returned responses.
-        $mform->addElement('header', 'prompttester', get_string('prompttester', 'qtype_aitext'));
-        $mform->addHelpButton('prompttester', 'prompttesthelp', 'qtype_aitext');
+        $mform->addElement('header', 'responsetest', get_string('responsetester', 'qtype_aitext'));
+        $mform->addHelpButton('responsetester', 'responsetesthelp', 'qtype_aitext');
 
         $answeroptions = ['maxlen' => 50, 'rows' => 6, 'size' => 30];
         $evaloptions = ['cols' => 50, 'rows' => 5, 'disabled' => 'disabled' ];
         $repeatarray = [
             $mform->createElement('static', 'spinner', '', '<div class =" col-md-9" id="id_spinner"></div>'),
-            $mform->createElement('textarea', 'sampleanswers', get_string('sampleanswer', 'qtype_aitext'), $answeroptions),
-            $mform->createElement('textarea', 'sampleanswereval', get_string('sampleanswereval', 'qtype_aitext'), $evaloptions),
-            $mform->createelement('button', 'sampleanswerbtn', get_string('sampleanswerevaluate', 'qtype_aitext')),
+            $mform->createElement('textarea', 'sampleresponses', get_string('sampleresponse', 'qtype_aitext'), $answeroptions),
+            $mform->createElement('textarea', 'sampleresponseeval', get_string('sampleresponseeval', 'qtype_aitext'), $evaloptions),
+            $mform->createelement('button', 'sampleresponsebtn', get_string('sampleresponseevaluate', 'qtype_aitext')),
             $mform->createElement('submit', 'delete', get_string('deletesample', 'qtype_aitext'), 0),
             $mform->createElement('html', '<hr/>'),
         ];
 
         $repeateloptions = [];
-        $mform->setType('sampleanswers', PARAM_CLEANHTML);
-        $mform->setType('sampleanswereval', PARAM_CLEANHTML);
+        $mform->setType('sampleresponses', PARAM_CLEANHTML);
+        $mform->setType('sampleresponseeval', PARAM_CLEANHTML);
 
         $mform->setType('optionid', PARAM_INT);
         $samplecount = $this->get_sample_count();
@@ -166,15 +166,15 @@ class qtype_aitext_edit_form extends question_edit_form {
     }
 
     /**
-     * retrieved from function get_sampleanswers in class quesitontype
+     * retrieved from function get_sampleresponses in class quesitontype
      *
      * @return int count of sample answers
      */
     protected function get_sample_count() {
         if (isset($this->question->id)) {
-            if (isset($this->question->options->sampleanswers)) {
-                if (count($this->question->options->sampleanswers) > 0) {
-                    return count($this->question->options->sampleanswers);
+            if (isset($this->question->options->sampleresponses)) {
+                if (count($this->question->options->sampleresponses) > 0) {
+                    return count($this->question->options->sampleresponses);
                 }
             }
         }
@@ -205,9 +205,9 @@ class qtype_aitext_edit_form extends question_edit_form {
         $question->aiprompt = $question->options->aiprompt;
         $question->spellcheck = $question->options->spellcheck;
         // Make the count start from 0 like the repeat array elements.
-        $question->sampleanswers = [];
-        foreach ($question->options->sampleanswers as $sampleanswer) {
-            $question->sampleanswers[] = $sampleanswer->response;
+        $question->sampleresponses = [];
+        foreach ($question->options->sampleresponses as $sampleresponse) {
+            $question->sampleresponses[] = $sampleresponse->response;
         }
 
         $question->responsetemplate = [
