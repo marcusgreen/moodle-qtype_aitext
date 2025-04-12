@@ -353,12 +353,12 @@ class qtype_aitext extends question_type {
         if (is_array($extraanswersfields)) {
             array_shift($extraanswersfields);
         }
-        xdebug_break();
-        if (isset($data['#']['sampleresponses'])) {
-            $x=1;
+        if (isset($data['#']['sampleresponse'])) {
+            $sampleresponses = $data['#']['sampleresponse'];
+            foreach ($sampleresponses as $key => $srxml) {
+                $qo->sampleresponses[$key] = $format->getpath($srxml, ['#','response',0,'#'],0);
+            }
         }
-
-
         return $qo;
     }
     /**
@@ -395,14 +395,14 @@ class qtype_aitext extends question_type {
                 $output .= "    <$field>".$format->xml_escape($value)."</$field>\n";
             }
         }
-        $output .= "    <sampleresponses>\n";
+        //$output .= "    <sampleresponses>\n";
         foreach ($question->options->sampleresponses as $sampleresponse) {
             $output .= "     <sampleresponse>\n";
             $output .= '      <question>' . $sampleresponse->question . "</question>\n";
             $output .= '      <response>' . $sampleresponse->response . "</response>\n";
             $output .= "     </sampleresponse>\n";
         }
-        $output .= "    </sampleresponses>\n";
+        //$output .= "    </sampleresponses>\n";
         return $output;
     }
     /**
