@@ -22,13 +22,13 @@
  * @copyright  2023 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-use moodle_url;
-/**
- * aitext question type editing form.
- *
- * @author  2023 Marcus Green
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+
+ /**
+  * aitext question type editing form.
+  *
+  * @author  2023 Marcus Green
+  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+  */
 class qtype_aitext_edit_form extends question_edit_form {
     /**
      * Add aitext specific form fields for editing
@@ -85,7 +85,7 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         // Add repeated sample answer options along with the field for returned responses.
         $mform->addElement('header', 'responsetest', get_string('responsetester', 'qtype_aitext'));
-        $mform->addHelpButton('responsetester', 'responsetesthelp', 'qtype_aitext');
+        $mform->addHelpButton('responsetest', 'responsetesthelp', 'qtype_aitext');
 
         $answeroptions = ['maxlen' => 50, 'rows' => 6, 'size' => 30];
         $evaloptions = ['cols' => 50, 'rows' => 5, 'disabled' => 'disabled' ];

@@ -102,7 +102,6 @@ class qtype_aitext_test_helper extends question_test_helper {
      */
     public function get_aitext_question_form_data_editor() {
         $fromform = new stdClass();
-
         $fromform->name = 'aitext question (HTML editor)';
         $fromform->questiontext = ['text' => 'Please write a story about a frog.', 'format' => FORMAT_HTML];
         $fromform->defaultmark = 1.0;
@@ -116,7 +115,7 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
         $fromform->aiprompt = 'A prompt for the LLM';
         $fromform->markscheme = 'Give one mark if the answer is correct';
-        $fromform->sampleanswers = [];
+        $fromform->sampleresponses = [];
         $fromform->model = 'gpt-4';
         return $fromform;
     }

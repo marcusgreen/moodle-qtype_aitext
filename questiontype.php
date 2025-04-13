@@ -132,7 +132,6 @@ class qtype_aitext extends question_type {
 
         $options->maxbytes = $formdata->maxbytes ?? 0;
         if (is_array($formdata->graderinfo)) {
-            // TODO find out what it should save and ensure it is available as text not arrays.
             $formdata->graderinfo = [
                 'text' => '',
                 'format' => FORMAT_HTML,
@@ -258,7 +257,7 @@ class qtype_aitext extends question_type {
 
     /**
      * The choices that should be offered for the number of attachments.
-     * @todo remove method and calls to it as file is no longer a submit option
+     * Note: remove method and calls to it as file is no longer a submit option
      *
      * @return array
      */
@@ -274,7 +273,7 @@ class qtype_aitext extends question_type {
 
     /**
      * The choices that should be offered for the number of required attachments.
-     * @todo remove as file has been removed as a submission type
+     * Note: remove as file has been removed as a submission type
      *
      * @return array
      */
@@ -336,7 +335,7 @@ class qtype_aitext extends question_type {
         foreach ($extraquestionfields as $field) {
             $qo->$field = $format->getpath($data, ['#', $field, 0, '#'], '');
         }
-        // TODO add in other text fields.
+        // Note: add in other text fields.
         $textfields = ['responsetemplate'];
         foreach ($textfields as $field) {
             $fmt = $format->get_format($format->getpath($data, ['#', $field.'format', 0, '#'], 0));
@@ -356,7 +355,7 @@ class qtype_aitext extends question_type {
         if (isset($data['#']['sampleresponse'])) {
             $sampleresponses = $data['#']['sampleresponse'];
             foreach ($sampleresponses as $key => $srxml) {
-                $qo->sampleresponses[$key] = $format->getpath($srxml, ['#','response',0,'#'],0);
+                $qo->sampleresponses[$key] = $format->getpath($srxml, ['#', 'response', 0, '#'], 0);
             }
         }
         return $qo;
@@ -395,14 +394,12 @@ class qtype_aitext extends question_type {
                 $output .= "    <$field>".$format->xml_escape($value)."</$field>\n";
             }
         }
-        //$output .= "    <sampleresponses>\n";
         foreach ($question->options->sampleresponses as $sampleresponse) {
             $output .= "     <sampleresponse>\n";
             $output .= '      <question>' . $sampleresponse->question . "</question>\n";
             $output .= '      <response>' . $sampleresponse->response . "</response>\n";
             $output .= "     </sampleresponse>\n";
         }
-        //$output .= "    </sampleresponses>\n";
         return $output;
     }
     /**
