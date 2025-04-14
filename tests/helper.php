@@ -115,7 +115,7 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
         $fromform->aiprompt = 'A prompt for the LLM';
         $fromform->markscheme = 'Give one mark if the answer is correct';
-        $fromform->sampleresponses = [];
+        $fromform->sampleresponses[] = 'response1';
         $fromform->model = 'gpt-4';
         return $fromform;
     }
@@ -153,7 +153,7 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->graderinfo = ['text' => '', 'format' => FORMAT_HTML];
         $fromform->responsetemplate = ['text' => '', 'format' => FORMAT_HTML];
         $fromform->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
-        $fromform->sampleanswers = [];
+        $fromform->sampleresponses[] = 'response1';
         $fromform->model = 'gpt-4';
         return $fromform;
     }
