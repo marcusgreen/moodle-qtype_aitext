@@ -166,17 +166,13 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             }
             return $llmresponse->get_content();
         } else if ($backend == 'core_ai_subsystem') {
-            global $USER,$CFG, $DB;
-            if(str_starts_with($CFG->release, '5')) {
-                $manager = new \core_ai\manager($DB);
-            } else {
-                $manager = new \core_ai\manager();
-            }
+            global $USER;
             $action = new \core_ai\aiactions\generate_text(
                 contextid: $this->contextid,
                 userid: $USER->id,
                 prompttext: $prompt
             );
+            $manager = \core\di::get(\core_ai\manager::class);
             $llmresponse = $manager->process_action($action);
             $responsedata = $llmresponse->get_response_data();
             return $responsedata['generatedcontent'];
@@ -261,7 +257,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
 
-        // Check if [questiontext] is in the aiprompt and replace it with the question text
+        // Check if [questiontext] is in the aiprompt and replace it with the question text.
         if (strpos($aiprompt, '[questiontext]') !== false) {
             $aiprompt = str_replace('[questiontext]', strip_tags($this->questiontext), $aiprompt);
         }
