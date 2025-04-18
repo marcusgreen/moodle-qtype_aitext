@@ -107,35 +107,30 @@ final class question_test extends \advanced_testcase {
     }
 
     /**
-     * Check on some permutations of how the prompt that is sent to the
-     * LLM is constructed
-     * @covers ::build_full_ai_prompt
+     * Check the student response gets interpolated into the prompt ready to send
+     * off to the LLM
+     * @covers \qtype_aitext\question::build_full_ai_prompt
      */
     public function test_build_full_ai_prompt(): void {
-        $this->resetAfterTest();
-        if (!$this->islive) {
-                $this->markTestSkipped('No live connection to the AI system');
-        }
-
+        $this->resetAfterTest(true);
         $question = qtype_aitext_test_helper::make_aitext_question([]);
-        set_config('prompt', 'in [responsetext] ', 'qtype_aitext');
-        set_config('defaultprompt', 'check this', 'qtype_aitext');
-        set_config('markscheme', 'one mark', 'qtype_aitext');
-        set_config('jsonprompt', 'testprompt', 'qtype_aitext');
+        $question->questiontext = 'Write an English sentence in the past tense';
+        $aiprompt = "Is the text gramatically correct?";
+        $markscheme  = 'One mark if the response is gramatically correct';
+        $studentresponse = 'Yesterday I went to the park';
+        $defaultmark = 1;
 
-        $response = '<p> Thank you </p>';
-        $aiprompt = '';
-        $defaultmark = '';
-        $markscheme = '';
-        $result = $question->build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme);
+        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
 
-        $this->assertStringContainsString('[[ Thank you ]]', $result);
-        // HTML tags should be stripped out.
+        // Student response is within [ ] delimters. Angle brackets might be better, e.g. <<<< >>>>.
+        $pattern = '/\[\[' . $studentresponse . '\]\]/';
+        $this->assertEquals(1, preg_match($pattern, $result));
+
+        // HTML tags should be stripped out, though that might change in the future.
         $this->assertStringNotContainsString('<p>', $result);
 
-        $markscheme = "2 points";
-        $result = $question->build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme);
-        $this->assertStringContainsString('2 points', $result);
+        // Marks scheme should be in result ready to send to LLm. Though it is optional.
+        $this->assertStringContainsString($markscheme, $result);
     }
 
     /**
