@@ -71,6 +71,20 @@ final class question_test extends \advanced_testcase {
             $this->islive = true;
         }
     }
+
+    public function test_upgrade() : void{
+        $this->resetAfterTest(true);
+        global $DB;
+        $aitext = ['questionid' => 1, 'sampleanswer' => 'sampleanswer'];
+        $DB->insert_record('qtype_aitext', $aitext);
+        xdebug_break();
+
+        $sampleanswers = $DB->get_records('qtype_aitext',null,'','id,sampleanswer');
+        foreach ($sampleanswers as $sampleanswer) {
+                $record = ['question' => $sampleanswer->id, 'response' => $sampleanswer->sampleanswer];
+                $DB->insert_record('qtype_aitext_sampleresponses', $record);
+        }
+    }
     /**
      * Make a trivial request to the LLM to check the code works
      * Only designed to test the 4.5 subsystem when run locally

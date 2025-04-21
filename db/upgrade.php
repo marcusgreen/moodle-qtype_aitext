@@ -89,6 +89,14 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
+        // Move existing sampleanswers to sampleresponses table.
+        $sampleanswers = $DB->get_records('qtype_aitext',null,'','id,sampleanswer');
+        foreach ($sampleanswers as $sampleanswer) {
+                $record = ['question' => $sampleanswer->id, 'response' => $sampleanswer->sampleanswer];
+                $DB->insert_record('qtype_aitext_sampleresponses', $record);
+        }
+        // At some point remove sampleanswer field from qtype_aitext table
+
         // Aitext savepoint reached.
         upgrade_plugin_savepoint(true, 2025041002, 'qtype', 'aitext');
 
