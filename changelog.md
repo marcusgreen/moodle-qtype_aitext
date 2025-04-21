@@ -1,3 +1,14 @@
+
+### Release 0.03 of the Moodle AIText question type April 2025
+
+Fixed compatibility with Moodle 5.0, thanks to Philipp Memmel of Mebis-lp for the hint about Dependency Injection.
+
+In question editing form changed sample answer allowing multiple sample responses. This saves multiple responses
+to be tested against the prompt. Make the spinner prettier for the web service call in the editing form.
+
+Fix backup/restore and xml import/export
+
+
 ### Release 0.02 of the Moodle AIText question type Dec 2024
 
 Merged in code from https://github.com/mebis-lp/moodle-qtype_aitext

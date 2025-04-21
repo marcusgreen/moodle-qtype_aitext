@@ -72,14 +72,19 @@ final class question_test extends \advanced_testcase {
         }
     }
 
-    public function test_upgrade() : void{
+    /**
+     * Test the upgrade process that migrates sample answers from the old table structure to the new one.
+     *
+     * @covers \qtype_aitext\db\upgrade
+     * @return void
+     */
+    public function test_upgrade(): void {
         $this->resetAfterTest(true);
         global $DB;
         $aitext = ['questionid' => 1, 'sampleanswer' => 'sampleanswer'];
         $DB->insert_record('qtype_aitext', $aitext);
-        xdebug_break();
 
-        $sampleanswers = $DB->get_records('qtype_aitext',null,'','id,sampleanswer');
+        $sampleanswers = $DB->get_records('qtype_aitext', null, '', 'id,sampleanswer');
         foreach ($sampleanswers as $sampleanswer) {
                 $record = ['question' => $sampleanswer->id, 'response' => $sampleanswer->sampleanswer];
                 $DB->insert_record('qtype_aitext_sampleresponses', $record);

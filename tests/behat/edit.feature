@@ -25,7 +25,6 @@ Feature: Test editing an AI Text question
   Scenario: Edit an aitext question
     When I am on the "Course 1" "core_question > course question bank" page logged in as teacher
     And I choose "Edit question" action for "aitext-001" in the question bank
-    And I pause
     And I set the following fields to these values:
           | Question name |  |
     And I press "id_submitbutton"
