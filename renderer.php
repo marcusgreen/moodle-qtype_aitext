@@ -98,9 +98,20 @@ class qtype_aitext_renderer extends qtype_renderer {
             $this->page->requires->js_call_amd('local_ai_manager/infobox', 'renderInfoBox',
                     ['qtype_aitext', $USER->id, '[data-content="local_ai_manager_infobox"][data-boxid="' . $uniqid . '"]',
                             ['feedback']]);
+  
         }
+
         $result .= html_writer::tag('div', $question->format_questiontext($qa),
                 ['class' => 'qtext']);
+    	
+    	// Add hidden spinner placeholder.
+		$result .= html_writer::div(
+			html_writer::div('', 'spinner-border', ['role' => 'status']) .
+			html_writer::div(get_string('aitextprocessing', 'qtype_aitext'), 'mt-2'),
+			'aitext-spinner d-none text-center my-4'
+		);
+    	// Load the spinner JS module to enable showing spinner on form submit.
+		$this->page->requires->js_call_amd('qtype_aitext/spinner', 'init');
 
         $result .= html_writer::start_tag('div', ['class' => 'ablock']);
         $result .= html_writer::tag('div', $answer, ['class' => 'answer']);
@@ -115,10 +126,11 @@ class qtype_aitext_renderer extends qtype_renderer {
         if (get_config('qtype_aitext', 'backend') === 'local_ai_manager') {
             $result .= html_writer::tag('div', '',
                     ['data-content' => 'local_ai_manager_warningbox', 'data-boxid' => $uniqid]);
-            $this->page->requires->js_call_amd('local_ai_manager/warningbox', 'renderWarningBox',
+           $this->page->requires->js_call_amd('local_ai_manager/warningbox', 'renderWarningBox',
                     ['[data-content="local_ai_manager_warningbox"][data-boxid="' . $uniqid . '"]']);
+        
         }
-
+    
         return $result;
     }
 

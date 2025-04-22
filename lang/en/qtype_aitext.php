@@ -24,10 +24,10 @@
  */
 
 $string['acceptedfiletypes'] = 'Accepted file types';
-
 $string['aiprompt'] = 'AI Prompt';
 $string['aiprompt_help'] = 'A prompt for the Ai Grader. This is the guideline that AI uses to give feedback on the student response.';
 $string['aipromptmissing'] = 'The ai prompt is missing. Please enter a prompt on the basis of which the feedback is generated.';
+$string['aitextprocessing'] = 'AI is evaluating your answer...';
 $string['answerfiles'] = 'Answer files';
 $string['answertext'] = 'Answer text';
 $string['attachmentsoptional'] = 'Attachments are optional';
@@ -42,6 +42,7 @@ $string['defaultprompt'] = 'AI Prompt';
 $string['defaultprompt_setting'] = 'This will be the default AI prompt for new questions. It tells the AI grader how to analyse the student response. It is the guideline that AI uses to give feedback on the student response. Question authors should alter this to suit the question.';
 $string['disclaimer'] = 'Disclaimer';
 $string['disclaimer_setting'] = 'Text appended to each response indicating feedback is from a Large Language Model and not a human';
+$string['emptyresponsealert'] = 'Please enter a response before checking';
 $string['err_invalidbackend'] = 'Err invalidbackend;';
 $string['err_maxminmismatch'] = 'Maximum word limit must be greater than minimum word limit';
 $string['err_maxwordlimit'] = 'Maximum word limit is enabled but is not set';
@@ -105,6 +106,7 @@ $string['sampleanswer'] = 'Sample Answer';
 $string['sampleanswer_help'] = 'The sample answer can be used to test how the AI grader will respond to a given response.';
 $string['sampleanswerempty'] = 'Make sure that you have an AI prompt and sample answer before testing.';
 $string['sampleanswerevaluate'] = 'Evaluate Sample Answer';
+$string['sampleanswereval'] = 'Sample Answer Evaluation';
 $string['showprompt'] = 'Show prompt';
 $string['spellcheck_editor_desc'] = 'This is the text in which the spelling mistakes have been corrected by AI. You can edit this suggested correction.';
 $string['spellcheck_prompt'] = 'Reproduce the text 1:1. Give no feedback!. But correct all spelling mistakes in the following text: ';
