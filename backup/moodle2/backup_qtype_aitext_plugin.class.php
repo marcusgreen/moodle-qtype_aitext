@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use qtype_aitext\constants;
 
 /**
  * Provides the information to backup aitext questions
@@ -47,10 +48,7 @@ class backup_qtype_aitext_plugin extends backup_qtype_plugin {
 
         // Now create the qtype own structures.
 
-        $aitext = new backup_nested_element('aitext', ['id'], [
-                'aiprompt', 'markscheme', 'sampleanswer', 'responseformat', 'responsefieldlines', 'minwordlimit', 'maxwordlimit',
-                'graderinfo', 'graderinfoformat', 'responsetemplate', 'model',
-                'responsetemplateformat', 'maxbytes']);
+        $aitext = new backup_nested_element('aitext', ['id'], constants::EXTRA_FIELDS);
 
         // Now the own qtype tree.
         $pluginwrapper->add_child($aitext);

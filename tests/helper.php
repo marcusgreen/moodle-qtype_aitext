@@ -18,7 +18,7 @@
  * Test helpers for the aitext question type.
  *
  * @package    qtype_aitext
- * @copyright  2013 The Open University
+ * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,11 +26,12 @@ defined('MOODLE_INTERNAL') || die();
 
 use Random\RandomException;
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
+use qtype_aitext\constants;
 
 /**
  * Test helper class for the aitext question type.
  *
- * @copyright  2013 The Open University
+ * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_test_helper extends question_test_helper {
@@ -80,6 +81,11 @@ class qtype_aitext_test_helper extends question_test_helper {
         $q->model = 'gpt4';
         $q->graderinfo = '';
         $q->graderinfoformat = FORMAT_HTML;
+        $q->maxtime = 0;
+        $q->responselanguage = 'en-us';
+        $q->feedbacklanguage = 'en-us';
+        $q->relevance = constants::RELEVANCE_NONE;
+        $q->relevanceanswer = '';
         $q->qtype = question_bank::get_qtype('aitext');
 
         return $q;
@@ -98,7 +104,7 @@ class qtype_aitext_test_helper extends question_test_helper {
      * question using the HTML editor allowing embedded files as input, and up
      * to three attachments.
      *
-     * @return stdClass the data that would be returned by $form->get_gata();
+     * @return stdClass the data that would be returned by $form->get_data();
      */
     public function get_aitext_question_form_data_editor() {
         $fromform = new stdClass();
@@ -117,6 +123,11 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->markscheme = 'Give one mark if the answer is correct';
         $fromform->sampleresponses[] = 'response1';
         $fromform->model = 'gpt-4';
+        $fromform->maxtime = 0;
+        $fromform->responselanguage = 'en-us';
+        $fromform->feedbacklanguage = 'en-us';
+        $fromform->relevance = constants::RELEVANCE_QTEXT;
+        $fromform->relevanceanswer = '';
         return $fromform;
     }
 
@@ -155,6 +166,11 @@ class qtype_aitext_test_helper extends question_test_helper {
         $fromform->status = \core_question\local\bank\question_version_status::QUESTION_STATUS_READY;
         $fromform->sampleresponses[] = 'response1';
         $fromform->model = 'gpt-4';
+        $fromform->maxtime = 0;
+        $fromform->responselanguage = 'en-us';
+        $fromform->feedbacklanguage = 'en-us';
+        $fromform->relevance = constants::RELEVANCE_NONE;
+        $fromform->relevanceanswer = '';
         return $fromform;
     }
 

@@ -26,6 +26,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use qtype_aitext\constants;
+
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 
 
@@ -43,6 +45,14 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public $responseformat;
 
+
+    /**
+     *  LLM Model, will vary between AI systems, e.g. gpt4 or llama3
+
+     * @var mixed $model Store the llm model used for the question.
+     */
+    public $model;
+
     /**
      * Count of lines of text
      *
@@ -55,12 +65,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
     /** @var int indicates whether the maximum number of words required */
     public $maxwordlimit;
-
-    /**
-     * LLM Model, will vary between AI systems, e.g. gpt4 or llama3
-     * @var stream_set_blocking
-     */
-    public $model;
 
 
     /**
@@ -217,18 +221,13 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * large language model such as ChatGPT
      *
      * @param array $response
-     * @return void
+     * @return array An array containing the grade fraction and the question state.
+     *
      */
     public function grade_response(array $response): array {
-
-        if ($this->spellcheck) {
-            $spellcheckresponse = $this->get_spellchecking($response);
-            $this->insert_attempt_step_data('-spellcheckresponse', $spellcheckresponse);
-        }
-
+        global $DB;
         if (!$this->is_complete_response($response)) {
-            $grade = [0 => 0, question_state::$needsgrading];
-            return $grade;
+            return [0 => 0, question_state::$needsgrading];
         }
         if (is_array($response)) {
             $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
@@ -248,14 +247,53 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             }
             $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
-         // The -aicontent data is used in question preview. Only needs to happen in preview.
+        $this->insert_feedback_and_prompt($fullaiprompt, $contentobject);
+
+        return $grade;
+    }
+    /**
+     * Queues the AI processing in batch mode.
+     *
+     * @param string $answer The student's answer.
+     * @param string $aiprompt The AI prompt.
+     * @param float $defaultmark The default mark.
+     * @param string $markscheme The mark scheme.
+     * @package qtype_aitext
+     */
+    private function queue_ai_processing(string $answer, string $aiprompt, float $defaultmark, string $markscheme): void {
+        global $DB;
+        $data = [
+            'activity' => 'qtype_aitext',
+            'status' => 0,
+            'tries' => 0,
+            'prompttext' => $this->build_full_ai_prompt($answer, $aiprompt, $defaultmark, $markscheme),
+            'actiondata' => $this->step->get_id(),
+            'timecreated' => time(),
+            'timemodified' => time(),
+
+        ];
+
+        $DB->insert_record('tool_aiconnect_queue', $data);
+    }
+
+    /**
+     * Inserts the AI feedback and prompt into the attempt step data.
+     *
+     * This method is used to insert the AI generated prompt and feedback
+     * into the attempt step data, which is used during question preview.
+     * It also adds the feedback as a comment in HTML format.
+     *
+     * @param string $fullaiprompt The full AI-generated prompt.
+     * @param object $contentobject An object containing the feedback.
+     * @return void
+     */
+    public function insert_feedback_and_prompt($fullaiprompt, $contentobject): void {
+        // The -aicontent data is used in question preview. Only needs to happen in preview.
         $this->insert_attempt_step_data('-aiprompt', $fullaiprompt);
         $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);
 
         $this->insert_attempt_step_data('-comment', $contentobject->feedback);
         $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
-
-        return $grade;
     }
 
     /**
@@ -268,25 +306,54 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return string;
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
-        $responsetext = strip_tags($response);
-            $responsetext = '[['.$responsetext.']]';
-            $prompt = get_config('qtype_aitext', 'prompt');
-            $prompt = preg_replace("/\[responsetext\]/", $responsetext, $prompt);
-            $prompt .= ' '.trim($aiprompt);
+        $prompttemplate = "You are evaluating a student's {{responselanguage}} language response to a question. ";
+        $prompttemplate .= " {{jsonprompt}}. ";
 
-        if ($markscheme > '') {
-            // Tell the LLM how to mark the submission.
-            $prompt .= " The total score is: $defaultmark .";
-            $prompt .= ' '.$markscheme;
+        $prompttemplate .= get_config('qtype_aitext', 'prompt');
+
+        $prompttemplate .= " {{{aiprompt}}}";
+
+        if (!empty($markscheme)) {
+            $prompttemplate .= " Set marks in the json object according to the following criteria: {The maximum score is {{maximumscore}}. {{markscheme}}}";
         } else {
-            // Todo should this be a plugin setting value?.
-            $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
+            $prompttemplate .= " Set marks to null in the json object.";
         }
         $prompt .= ' '.trim(get_config('qtype_aitext', 'jsonprompt'));
         if (get_config('qtype_aitext', 'translatepostfix')) {
             $prompt .= ' translate the feedback to the language '.current_language();
         };
 
+        switch($this->relevance){
+            case constants::RELEVANCE_QTEXT:
+                $prompttemplate .= " Calculate the relevance of the answer (percentage) to the following question  : {{{questiontext}}}";
+                break;
+            case constants::RELEVANCE_COMPARISON:
+                $prompttemplate .= "  Calculate the relevance of the answer (percentage) to the extent it contains similar concepts to the
+                 following model answer : {{{relevanceanswer}}}";
+                break;
+            case constants::RELEVANCE_NONE:
+            default:
+                $prompttemplate .= " Set relevance to null in the json object.";
+                break;
+        }
+               $prompttemplate .= " Translate the feedback to the language: {{feedbacklanguage}}.";
+
+        // set up the parameters to merge with the prompt template
+        $responselanguage = empty($this->responselanguage) ? 'en-us' : $this->responselanguage;
+        $responselanguagename = get_string($responselanguage, 'qtype_aitext');
+        $params = [
+            '[responsetext]' => '[[' . strip_tags($response) . ']]',
+            '{{aiprompt}}' => trim($aiprompt),
+            '{{maximumscore}}' => $defaultmark,
+            '{{markscheme}}' => $markscheme,
+            '{{jsonprompt}}' => trim(get_config('qtype_aitext', 'jsonprompt')),
+            '{{relevanceanswer}}' => $this->relevanceanswer,
+            '{{questiontext}}' => strip_tags($this->questiontext),
+            '{{feedbacklanguage}}' => $this->feedbacklanguage == 'currentlanguage' || empty($this->feedbacklanguage) ?
+                        current_language() : $this->feedbacklanguage,
+            '{{responselanguage}}' => $responselanguagename,
+        ];
+        $prompt = strtr($prompttemplate, $params);
         return $prompt;
     }
 
@@ -321,9 +388,21 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $contentobject = json_decode($feedback);
         if (json_last_error() === JSON_ERROR_NONE) {
             $contentobject->feedback = trim($contentobject->feedback);
-            $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"', $contentobject->feedback);
+            $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"',
+                $contentobject->feedback);
+            // Relevance.
+            if (isset($contentobject->relevance) && $contentobject->relevance !== null) {
+                $contentobject->feedback  .= ' ' . get_string('submissionrelevance', 'qtype_aitext', $contentobject->relevance);
+            }
+            // Corrections.
+            if (isset($contentobject->correctedtext) && !empty($contentobject->correctedtext)) {
+                $contentobject->feedback  .= '<br/>' . get_string('correctedtext', 'qtype_aitext') . '<br/>';
+                $contentobject->feedback  .= $contentobject->correctedtext;
+            }
             $disclaimer = get_config('qtype_aitext', 'disclaimer');
             $contentobject->feedback .= ' '.$this->llm_translate($disclaimer);
+            $disclaimer = str_replace("[[model]]", $this->model, $disclaimer);
+            $contentobject->feedback .= '<br/>' . $this->llm_translate($disclaimer);
         } else {
             $contentobject = (object) [
                                         "feedback" => $feedback,
@@ -405,9 +484,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function summarise_response(array $response) {
         $output = null;
-        if (isset($response['answer'])) {
-            $output .= question_utils::to_plain_text($response['answer'],
+        if (isset($response['answer']) && isset($response['answerformat'])) {
+            $output = question_utils::to_plain_text($response['answer'],
                 $response['answerformat'], ['para' => false]);
+        } else if (isset($response['answer'])) {
+            $output = question_utils::to_plain_text($response['answer'],
+             FORMAT_HTML, ['para' => false]);
         }
 
         return $output;
@@ -560,12 +642,15 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         // ideally, we should return as much as settings as possible (depending on the state and display options).
 
         $settings = [
+            'feedbacklanguage' => $this->feedbacklanguage,
+            'responselanguage' => $this->responselanguage,
             'responseformat' => $this->responseformat,
             'responsefieldlines' => $this->responsefieldlines,
             'responsetemplate' => $this->responsetemplate,
             'responsetemplateformat' => $this->responsetemplateformat,
             'minwordlimit' => $this->minwordlimit,
             'maxwordlimit' => $this->maxwordlimit,
+            'maxtime' => $this->maxtime,
         ];
 
         return $settings;

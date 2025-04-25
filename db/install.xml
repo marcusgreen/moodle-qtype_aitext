@@ -22,6 +22,11 @@
         <FIELD NAME="sampleanswer" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="A sample answer for testing the prompt and AI response"/>
         <FIELD NAME="model" TYPE="char" LENGTH="60" NOTNULL="false" SEQUENCE="false" COMMENT="The model in the LLM, e.g. gpt-4 or llama3"/>
         <FIELD NAME="spellcheck" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="responselanguage" TYPE="char" LENGTH="16" NOTNULL="true" DEFAULT="en-us" SEQUENCE="false" COMMENT="The language of student response."/>
+        <FIELD NAME="feedbacklanguage" TYPE="char" LENGTH="16" NOTNULL="true" DEFAULT="en-us" SEQUENCE="false" COMMENT="The language of AI feedback."/>
+        <FIELD NAME="maxtime" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The time limit for audio recording responses"/>
+        <FIELD NAME="relevance" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"  SEQUENCE="false" COMMENT="Setting for how relevance should be determined"/>
+        <FIELD NAME="relevanceanswer" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="An authorative answer for establishing relevance of student response"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

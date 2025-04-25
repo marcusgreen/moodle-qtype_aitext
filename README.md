@@ -31,9 +31,13 @@ There is a prompttester field in the quesition editing form which uses ajax to t
 
 HTML tags are stripped out from the text submitted to the AI System so evaluation cannot consider HTML formatting.
 
-## Roadmap
+## Credits
 
 ~~Mobile app compatibility~~
+I'd like to thank Justin Hunt of https://poodll.com for encurangement and contributions. Poodll is a a suite of excellent, mature language learning tools that integrate with moodle.
+I would also like to thank the people at https://mebis.bycs.de for ideas, code and encouragement.
+
+## Roadmap
 
 Cron based evaluation. Allow for slow LLM systems by marking on a cron timer
 
