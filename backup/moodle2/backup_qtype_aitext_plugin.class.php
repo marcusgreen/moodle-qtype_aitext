@@ -32,12 +32,21 @@
 class backup_qtype_aitext_plugin extends backup_qtype_plugin {
 
     /**
+     * returns the name of the plugin/question type
+     *
+     * @return string
+     */
+    protected static function qtype_name() {
+        return 'aitext';
+    }
+
+    /**
      * Returns the qtype information to attach to question element
      */
     protected function define_question_plugin_structure() {
 
         // Define the virtual plugin element with the condition to fulfill.
-        $plugin = $this->get_plugin_element(null, '../../qtype', 'aitext');
+            $plugin = $this->get_plugin_element(null, '../../qtype', 'aitext');
 
         // Create one standard named plugin element (the visible container).
         $pluginwrapper = new backup_nested_element($this->get_recommended_name());
@@ -52,12 +61,22 @@ class backup_qtype_aitext_plugin extends backup_qtype_plugin {
                 'graderinfo', 'graderinfoformat', 'responsetemplate', 'model',
                 'responsetemplateformat', 'maxbytes']);
 
+        $sampleresponses = new backup_nested_element('sampleresponses');
+        $sampleresponse = new backup_nested_element('sampleresponse', ['id'], ['question', 'response']);
+
+        $pluginwrapper->add_child($sampleresponses);
+        $sampleresponses->add_child($sampleresponse);
+
         // Now the own qtype tree.
         $pluginwrapper->add_child($aitext);
 
         // Set source to populate the data.
         $aitext->set_source_table('qtype_aitext',
                 ['questionid' => backup::VAR_PARENTID]);
+
+        // Set source to populate the data.
+        $sampleresponse->set_source_table('qtype_aitext_sampleresponses',
+        ['question' => backup::VAR_PARENTID]);
 
         // Don't need to annotate ids nor files.
 

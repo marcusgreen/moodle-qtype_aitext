@@ -23,12 +23,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/**
- * aitext question type editing form.
- *
- * @author  2023 Marcus Green
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+ /**
+  * aitext question type editing form.
+  *
+  * @author  2023 Marcus Green
+  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+  */
 class qtype_aitext_edit_form extends question_edit_form {
     /**
      * Add aitext specific form fields for editing
@@ -38,7 +38,8 @@ class qtype_aitext_edit_form extends question_edit_form {
      */
     protected function definition_inner($mform) {
         global $PAGE;
-
+        // Get the question ID from the URL or session.
+        $questionid = optional_param('id', 0, PARAM_INT);
         /** @var qtype_aitext $qtype */
         $qtype = question_bank::get_qtype('aitext');
         $mform->removeelement('generalfeedback');
@@ -82,16 +83,42 @@ class qtype_aitext_edit_form extends question_edit_form {
         , ['rows' => 10], $this->editoroptions);
         $mform->addElement('html', '</div>');
 
-        $mform->addElement('header', 'prompttester', get_string('prompttester', 'qtype_aitext'));
-        $mform->addElement('textarea', 'sampleanswer', get_string('sampleanswer', 'qtype_aitext'),
-            ['maxlen' => 50, 'rows' => 6, 'size' => 30]);
-        $mform->setType('sampleanswer', PARAM_RAW);
-        $mform->setDefault('sampleanswer', '');
-        $mform->addHelpButton('sampleanswer', 'sampleanswer', 'qtype_aitext');
-        $mform->addElement('static', 'sampleanswereval', '',  '<a class="qtype_aitext_sampleanswerbtn btn btn-secondary"
-                id="id_sampleanswerbtn">'
-            . get_string('sampleanswerevaluate', 'qtype_aitext') . '</a>' .
-             '<div class="qtype_aitext_sampleanswereval" id="id_sampleanswereval"></div>');
+        // Add repeated sample answer options along with the field for returned responses.
+        $mform->addElement('header', 'responsetest', get_string('responsetester', 'qtype_aitext'));
+        $mform->addHelpButton('responsetest', 'responsetesthelp', 'qtype_aitext');
+
+        $answeroptions = ['maxlen' => 50, 'rows' => 6, 'size' => 30];
+        $evaloptions = ['cols' => 50, 'rows' => 5, 'disabled' => 'disabled' ];
+        $repeatarray = [
+            $mform->createElement('static', 'spinner', '', '<div class =" col-md-9" id="id_spinner"></div>'),
+            $mform->createElement('textarea', 'sampleresponses', get_string('sampleresponse', 'qtype_aitext'), $answeroptions),
+            $mform->createElement('textarea', 'sampleresponseeval', get_string('sampleresponseeval', 'qtype_aitext'), $evaloptions),
+            $mform->createelement('button', 'sampleresponsebtn', get_string('sampleresponseevaluate', 'qtype_aitext')),
+            $mform->createElement('submit', 'delete', get_string('deletesample', 'qtype_aitext'), 0),
+            $mform->createElement('html', '<hr/>'),
+        ];
+
+        $repeateloptions = [];
+        $mform->setType('sampleresponses', PARAM_CLEANHTML);
+        $mform->setType('sampleresponseeval', PARAM_CLEANHTML);
+
+        $mform->setType('optionid', PARAM_INT);
+        $samplecount = $this->get_sample_count();
+        $mform->registerNoSubmitButton('delete');
+        $this->repeat_elements(
+            $repeatarray,
+            $samplecount,
+            $repeateloptions,
+            'option_repeats',
+            'option_add_fields',
+            1,
+            get_string('addsample', 'qtype_aitext'),
+            true,
+            'delete',
+        );
+
+        $mform->setType('option', PARAM_CLEANHTML);
+
         $mform->addElement('header', 'responseoptions', get_string('responseoptions', 'qtype_aitext'));
         $mform->setExpanded('responseoptions');
 
@@ -135,7 +162,24 @@ class qtype_aitext_edit_form extends question_edit_form {
                 ['rows' => 10], $this->editoroptions);
 
         // Load any JS that we need to make things happen, specifically the prompt tester.
-        $PAGE->requires->js_call_amd('qtype_aitext/editformhelper', 'init', [$this->context->id]);
+        $PAGE->requires->js_call_amd('qtype_aitext/responserun', 'init', [$this->context->id]);
+    }
+
+    /**
+     * retrieved from function get_sampleresponses in class quesitontype
+     *
+     * @return int count of sample answers
+     */
+    protected function get_sample_count() {
+        if (isset($this->question->id)) {
+            if (isset($this->question->options->sampleresponses)) {
+                if (count($this->question->options->sampleresponses) > 0) {
+                    return count($this->question->options->sampleresponses);
+                }
+            }
+        }
+        // Always have one empty sample answer set of fields.
+        return 1;
     }
 
     /**
@@ -145,6 +189,7 @@ class qtype_aitext_edit_form extends question_edit_form {
      * @return object $question the modified data.
      */
     protected function data_preprocessing($question) {
+
         $question = parent::data_preprocessing($question);
 
         if (empty($question->options)) {
@@ -159,6 +204,11 @@ class qtype_aitext_edit_form extends question_edit_form {
         $question->maxwordlimit = $question->options->maxwordlimit;
         $question->aiprompt = $question->options->aiprompt;
         $question->spellcheck = $question->options->spellcheck;
+        // Make the count start from 0 like the repeat array elements.
+        $question->sampleresponses = [];
+        foreach ($question->options->sampleresponses as $sampleresponse) {
+            $question->sampleresponses[] = $sampleresponse->response;
+        }
 
         $question->responsetemplate = [
             'text' => $question->options->responsetemplate,
@@ -167,6 +217,7 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         return $question;
     }
+
 
     /**
      * Check the question text is valid, specifically that

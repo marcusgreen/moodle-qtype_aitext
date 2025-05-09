@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 
+
 /**
  * Represents an aitext question.
  *
@@ -63,11 +64,18 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
 
     /**
+     * Options including from sampleanswers table
+     * @var array
+     */
+    public $options;
+
+
+    /**
      * used in the question editing interface
      *
-     * @var string
+     * @var array
      */
-    public $sampleanswer;
+    public $sampleresponses;
 
     /**
      * Information on how to manually grade
@@ -122,6 +130,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
     /** @var bool $spellcheck if spellcheck is enabled */
     public bool $spellcheck;
+
+
+    /** @var array  */
+    public $sampleanswers;
 
     /**
      * Required by the interface question_automatically_gradable_with_countback.
