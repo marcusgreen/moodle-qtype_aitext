@@ -1,5 +1,5 @@
 
-### Release 0.03 of the Moodle AIText question type April 2025
+### Release 0.03 of the Moodle AIText question type May 2025
 
 Fixed compatibility with Moodle 5.0, thanks to Philipp Memmel of Mebis-lp for the hint about Dependency Injection.
 
