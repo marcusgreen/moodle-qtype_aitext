@@ -143,6 +143,13 @@ class qtype_aitext_renderer extends qtype_renderer {
                 $comment[0] = $comment[0].$showprompt;
             }
             return $comment[0];
+        } else {
+            if ($qa->has_manual_comment()) {
+                 return '<label for="feedback">Your feedback here:</label><br>
+                      <textarea id="feedback" name="feedback" rows="4" cols="50"></textarea>
+                      <button type="submit" form="feedback">Submit</button>';
+            }
+
         }
         return '';
     }
