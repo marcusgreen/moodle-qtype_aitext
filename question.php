@@ -268,10 +268,23 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return string;
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
-
+        $expertmode = false;
         // Check if [questiontext] is in the aiprompt and replace it with the question text.
-        if (strpos($aiprompt, '[questiontext]') !== false) {
-            $aiprompt = str_replace('[questiontext]', strip_tags($this->questiontext), $aiprompt);
+        if (strpos($aiprompt, '[[question]]') !== false) {
+            $aiprompt = str_replace('[[question]]', strip_tags($this->questiontext), $aiprompt);
+        }
+        if (strpos($aiprompt, '[[expert]]') !== false) {
+            if (strpos($aiprompt, '[[response]]') !== false) {
+                $prompt = preg_replace("/\[\[response\]\]/", $response, $aiprompt);
+            } //Else throw an exception.
+
+            $prompt = str_replace('[[expert]]', '', $prompt);
+
+            if (strpos($aiprompt, '[[userlang]]') !== false) {
+                $prompt .= ' '.current_language();
+            }
+            return $prompt;
+            $expertmode = true;
         }
 
         $responsetext = strip_tags($response);
@@ -295,6 +308,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         return $prompt;
     }
+
 
     /**
      * Build the full ai spellchecking prompt.
