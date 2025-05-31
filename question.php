@@ -116,12 +116,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     public $markscheme;
 
     /**
-     * Prompt is passed to the LLM without any wrapping
-     * @var boolean
-     */
-    public $expertmode;
-
-    /**
      * Question attempt step
      *
      * @var mixed
@@ -274,18 +268,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return string;
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
-        xdebug_break();
 
         // Check if [questiontext] is in the aiprompt and replace it with the question text.
         if (strpos($aiprompt, '[questiontext]') !== false) {
             $aiprompt = str_replace('[questiontext]', strip_tags($this->questiontext), $aiprompt);
-        }
-
-        if (strpos($aiprompt, '[[expert]]') !== false) {
-            $prompt = str_replace('[[response]]', $response, $aiprompt);
-            $prompt = str_replace('[[expert]]','', $prompt);
-            $this->expertmode = true;
-            return $prompt;
         }
 
         $responsetext = strip_tags($response);
