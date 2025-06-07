@@ -230,12 +230,17 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
         }
+        xdebug_break();
         if (is_array($response)) {
+
             $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
                  $this->defaultmark, $this->markscheme);
             $feedback = $this->perform_request($fullaiprompt, 'feedback');
+
+
         }
-        $contentobject = $this->process_feedback($feedback);
+        //$contentobject = $this->process_feedback($feedback);
+        $contentobject = (object) ['feedback' => 'If a prompt contains [[expert]] or [[response]] it must contain both', 'marks' => 0];
 
         // If there are no marks, write the feedback and set to needs grading .
         if (is_null($contentobject->marks)) {
@@ -269,23 +274,30 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
         $expertmode = false;
-        // Check if [questiontext] is in the aiprompt and replace it with the question text.
-        if (strpos($aiprompt, '[[question]]') !== false) {
-            $aiprompt = str_replace('[[question]]', strip_tags($this->questiontext), $aiprompt);
-        }
-        if (strpos($aiprompt, '[[expert]]') !== false) {
-            if (strpos($aiprompt, '[[response]]') !== false) {
-                $prompt = preg_replace("/\[\[response\]\]/", $response, $aiprompt);
-            } //Else throw an exception.
+        xdebug_break();
 
-            $prompt = str_replace('[[expert]]', '', $prompt);
+        if (get_config('qtype_aitext', 'advancedmode') !== false) {
 
-            if (strpos($aiprompt, '[[userlang]]') !== false) {
-                $prompt .= ' '.current_language();
-            }
-            return $prompt;
-            $expertmode = true;
-        }
+        // // Check if [questiontext] is in the aiprompt and replace it with the question text.
+        // if (strpos($aiprompt, '[[question]]') !== false) {
+        //     $aiprompt = str_replace('[[question]]', strip_tags($this->questiontext), $aiprompt);
+        // }
+        // if (strpos($aiprompt, '[[expert]]') !== false) {
+        //     $prompt = str_replace('[[expert]]', '', $aiprompt);
+        //     if (strpos($aiprompt, '[[response]]') !== false) {
+        //         $prompt = preg_replace("/\[\[response\]\]/", $response, $prompt);
+        //     } else {
+        //          throw new \Exception("The '[[response]]' placeholder is required in expert mode aiprompt.");
+        //     }
+
+        //     if (strpos($aiprompt, '[[userlang]]') !== false) {
+        //         $prompt .= ' '.current_language();
+        //     }
+        //     $expertmode = true;
+
+        //     return $prompt;
+        // }
+    }
 
         $responsetext = strip_tags($response);
             $responsetext = '[['.$responsetext.']]';
