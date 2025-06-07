@@ -231,9 +231,18 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             return $grade;
         }
         if (is_array($response)) {
+            $has_expert = strpos($this->aiprompt, '[[expert]]') !== false;
+            $has_response = strpos($this->aiprompt, '[[response]]') !== false;
+               // If one is present but not both, return early with the message.
+             if ($has_expert xor $has_response) {
+                $feedback =  'If the prompt contains[[expert]] or [[response]] it must contain both';
+                $fullaiprompt = $this->aiprompt;
+             } else {
+
             $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
-                 $this->defaultmark, $this->markscheme);
-            $feedback = $this->perform_request($fullaiprompt, 'feedback');
+                $this->defaultmark, $this->markscheme);
+                $feedback = $this->perform_request($fullaiprompt, 'feedback');
+             }
         }
         $contentobject = $this->process_feedback($feedback);
 
@@ -268,23 +277,19 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return string;
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
-        $expertmode = false;
         // Check if [questiontext] is in the aiprompt and replace it with the question text.
         if (strpos($aiprompt, '[[question]]') !== false) {
             $aiprompt = str_replace('[[question]]', strip_tags($this->questiontext), $aiprompt);
         }
         if (strpos($aiprompt, '[[expert]]') !== false) {
-            if (strpos($aiprompt, '[[response]]') !== false) {
-                $prompt = preg_replace("/\[\[response\]\]/", $response, $aiprompt);
-            } //Else throw an exception.
-
-            $prompt = str_replace('[[expert]]', '', $prompt);
+            // remove [[expert]] as it is just a flag.
+            $prompt = str_replace('/\[[expert]\/]', '', $aiprompt);
+            $prompt = preg_replace("/\[\[response\]\]/", $response, $aiprompt);
 
             if (strpos($aiprompt, '[[userlang]]') !== false) {
                 $prompt .= ' '.current_language();
             }
             return $prompt;
-            $expertmode = true;
         }
 
         $responsetext = strip_tags($response);
