@@ -52,6 +52,12 @@ class qtype_aitext_test_helper extends question_test_helper {
         $question->markscheme = $options['markscheme'] ?? '';
         $question->aiprompt = $options['aiprompt'] ?? '';
         $question->contextid = 1;
+        $question->spellcheck = 0;
+        $question->step = new class {
+            public function get_id() {
+                return 1;
+            }
+        };
 
         test_question_maker::initialise_a_question($question);
         $question->qtype = question_bank::get_qtype('aitext');

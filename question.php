@@ -225,7 +225,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $spellcheckresponse = $this->get_spellchecking($response);
             $this->insert_attempt_step_data('-spellcheckresponse', $spellcheckresponse);
         }
-
         if (!$this->is_complete_response($response)) {
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
@@ -257,6 +256,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             }
             $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
+
          // The -aicontent data is used in question preview. Only needs to happen in preview.
         $this->insert_attempt_step_data('-aiprompt', $fullaiprompt);
         $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);

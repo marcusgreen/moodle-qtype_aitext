@@ -152,6 +152,17 @@ final class question_test extends \advanced_testcase {
         $this->assertStringContainsString($markscheme, $result);
     }
 
+    function test_expert_mode(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $question = qtype_aitext_test_helper::make_aitext_question(['aiprompt' => '[[expert]] Write an English sentence in the past tense']);
+        $question->questiontext = 'Write an English sentence in the past tense';
+        $response = ['answer' => 'Yesterday I went to the park', 'answerformat' => 2];
+        $question->grade_response($response);
+        $result = $DB->get_record('question_attempt_step_data', ['name' => '-aicontent']);
+        $this->assertStringContainsString($result->value, 'If the prompt contains[[expert]] or [[response]] it must contain both');
+    }
+
     /**
      * Check that non valid json returned from the LLM is
      * dealt with gracefully

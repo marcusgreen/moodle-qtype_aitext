@@ -97,9 +97,9 @@ if ($ADMIN->fulltree) {
     ));
 
     $settings->add(new admin_setting_configcheckbox(
-        'qtype_aitext/advancedmode',
-        new lang_string('advancedmode', 'qtype_aitext'),
-        new lang_string('advancedmode_setting', 'qtype_aitext'),
+        'qtype_aitext/expertmode',
+        get_string('expertmode', 'qtype_aitext'),
+        get_string('expertmode_setting', 'qtype_aitext'),
         0
     ));
 
