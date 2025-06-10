@@ -147,7 +147,7 @@ class qtype_aitext_renderer extends qtype_renderer {
             if ($qa->has_manual_comment()) {
                  return "<div class='xhidden'> <label for='feedback'>Your feedback here:</label><br>
                       <textarea id='feedback' name='feedback' rows='4' cols='50'></textarea>
-                      <button id='send_feedback' type='submit' class='btn btn-primary' form='feedback'>Send feedback</button></div>";
+                      <button id='send_feedback' class='btn btn-primary' form='feedback'>Send feedback</button></div>";
             }
 
         }
@@ -293,6 +293,11 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
         $uniqid = uniqid();
         $readonlyareaid = 'aitext_readonly_area' . $uniqid;
         $spellcheckeditbuttonid = 'aitext_spellcheckedit' . $uniqid;
+        xdebug_break();
+        $this->page->requires->js_call_amd('qtype_aitext/userfeedback', 'init');
+        xdebug_break();
+        $stepid = $question->step->get_id();
+
 
         if ($question->spellcheck) {
             $this->page->requires->js_call_amd('qtype_aitext/diff');

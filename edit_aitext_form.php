@@ -163,6 +163,7 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         // Load any JS that we need to make things happen, specifically the prompt tester.
         $PAGE->requires->js_call_amd('qtype_aitext/responserun', 'init', [$this->context->id]);
+
     }
 
     /**
