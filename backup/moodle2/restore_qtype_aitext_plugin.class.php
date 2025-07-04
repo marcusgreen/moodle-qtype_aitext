@@ -40,9 +40,23 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
      * Returns the paths to be handled by the plugin at question level
      */
     protected function define_question_plugin_structure() {
-        return [
-            new restore_path_element('aitext', $this->get_pathfor('/aitext')),
-        ];
+
+        $paths = [];
+
+        // This qtype uses question_answers, add them.
+        $this->add_question_question_answers($paths);
+
+        // Add own qtype stuff.
+        $elename = 'aitext';
+        // We use get_recommended_name() so this works.
+        $elepath = $this->get_pathfor('/aitext');
+        $paths[] = new restore_path_element($elename, $elepath);
+
+        $elename = 'sampleresponse';
+        $elepath = $this->get_pathfor('/sampleresponses/sampleresponse');
+        $paths[] = new restore_path_element($elename, $elepath);
+        return $paths;
+
     }
 
     /**
@@ -88,6 +102,33 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
     }
 
     /**
+     * Process the settings for sampleresponses
+     *
+     * @param array $data
+     */
+    public function process_sampleresponse($data) {
+        global $DB;
+
+        $data = (object) $data;
+        $oldid = $data->id;
+
+        // Detect if the question is created or mapped.
+        $oldquestionid = $this->get_old_parentid('question');
+        $newquestionid = $this->get_new_parentid('question');
+        $questioncreated = $this->get_mappingid('question_created', $oldquestionid) ? true : false;
+
+        // If the question has been created by restore, we need to create its question_aitext too.
+        if ($questioncreated) {
+            // Adjust value to link back to the questions table.
+            $data->question = $newquestionid;
+            // Insert record.
+            $newitemid = $DB->insert_record('qtype_aitext_sampleresponses', $data);
+            // Create mapping (needed for decoding links).
+            $this->set_mapping('qtype_aitext_sampleresponses', $oldid, $newitemid);
+        }
+    }
+
+    /**
      * Return the contents of this qtype to be processed by the links decoder
      */
     public static function define_decode_contents() {
@@ -102,8 +143,7 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
      */
     protected function after_execute_question() {
         global $DB;
-
-        $aitextswithoutoptions = $DB->get_records_sql("
+        $qwithoutoptions = $DB->get_records_sql("
                     SELECT q.*
                       FROM {question} q
                       JOIN {backup_ids_temp} bi ON bi.newitemid = q.id
@@ -114,12 +154,12 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
                        AND bi.itemname = ?
                 ", ['aitext', $this->get_restoreid(), 'question_created']);
 
-        foreach ($aitextswithoutoptions as $q) {
+        foreach ($qwithoutoptions as $q) {
             $defaultoptions = new stdClass();
             $defaultoptions->questionid = $q->id;
             $defaultoptions->aiprompt = '';
             $defaultoptions->markscheme = '';
-            $defaultoptions->sampleanswer = '';
+            $defaultoptions->sampleresponses = [];
             $defaultoptions->responseformat = 'editor';
             $defaultoptions->responsefieldlines = 15;
             $defaultoptions->minwordlimit = null;

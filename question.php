@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 
+
 /**
  * Represents an aitext question.
  *
@@ -63,11 +64,18 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
 
     /**
+     * Options including from sampleanswers table
+     * @var array
+     */
+    public $options;
+
+
+    /**
      * used in the question editing interface
      *
-     * @var string
+     * @var array
      */
-    public $sampleanswer;
+    public $sampleresponses;
 
     /**
      * Information on how to manually grade
@@ -123,6 +131,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     /** @var bool $spellcheck if spellcheck is enabled */
     public bool $spellcheck;
 
+
+    /** @var array  */
+    public $sampleanswers;
+
     /**
      * Required by the interface question_automatically_gradable_with_countback.
      *
@@ -170,12 +182,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             return $llmresponse->get_content();
         } else if ($backend == 'core_ai_subsystem') {
             global $USER;
-            $manager = new \core_ai\manager();
             $action = new \core_ai\aiactions\generate_text(
                 contextid: $this->contextid,
                 userid: $USER->id,
                 prompttext: $prompt
             );
+            $manager = \core\di::get(\core_ai\manager::class);
             $llmresponse = $manager->process_action($action);
             $responsedata = $llmresponse->get_response_data();
             return $responsedata['generatedcontent'];
@@ -259,6 +271,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return string;
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
+
+        // Check if [questiontext] is in the aiprompt and replace it with the question text.
+        if (strpos($aiprompt, '[questiontext]') !== false) {
+            $aiprompt = str_replace('[questiontext]', strip_tags($this->questiontext), $aiprompt);
+        }
+
         $responsetext = strip_tags($response);
             $responsetext = '[['.$responsetext.']]';
             $prompt = get_config('qtype_aitext', 'prompt');

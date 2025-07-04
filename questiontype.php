@@ -37,6 +37,25 @@ require_once($CFG->libdir . '/questionlib.php');
 class qtype_aitext extends question_type {
 
     /**
+     * value from id column of quesiton table
+     *
+     * @var int
+     */
+    public $id;
+
+    /**
+     * Get the URL for questiontestrun.php for a question.
+     *
+     * @param stdClass|qtype_stack_question $question question data, as from question_bank::load_question
+     *      or question_bank::load_question_data.
+     * @return moodle_url the URL.
+     */
+    public function get_question_test_url($question) {
+        $linkparams = $this->get_question_url_params($question);
+        return new moodle_url('/question/type/aitext/questiontestrun.php', $linkparams);
+    }
+
+    /**
      * Question type is manually graded, though with this type it is
      * marked by the AI/LLM system
      *
@@ -64,6 +83,12 @@ class qtype_aitext extends question_type {
         global $DB;
         $question->options = $DB->get_record('qtype_aitext',
                 ['questionid' => $question->id], '*', MUST_EXIST);
+        $question->options->sampleresponses = $DB->get_records(
+            'qtype_aitext_sampleresponses',
+            ['question' => $question->id],
+            'id ASC',
+            '*'
+        );
         parent::get_question_options($question);
     }
 
@@ -78,7 +103,6 @@ class qtype_aitext extends question_type {
         $this->set_default_value('responseformat', $fromform->responseformat);
         $this->set_default_value('responsefieldlines', $fromform->responsefieldlines);
         $this->set_default_value('markscheme', $fromform->markscheme);
-        $this->set_default_value('sampleanswer', $fromform->sampleanswer);
 
     }
     /**
@@ -96,10 +120,10 @@ class qtype_aitext extends question_type {
             $options->questionid = $formdata->id;
             $options->id = $DB->insert_record('qtype_aitext', $options);
         }
+
         $options->spellcheck = !empty($formdata->spellcheck);
         $options->aiprompt = $formdata->aiprompt;
         $options->markscheme = $formdata->markscheme;
-        $options->sampleanswer = $formdata->sampleanswer;
         $options->model = trim($formdata->model);
         $options->responseformat = $formdata->responseformat;
         $options->responsefieldlines = $formdata->responsefieldlines;
@@ -108,7 +132,6 @@ class qtype_aitext extends question_type {
 
         $options->maxbytes = $formdata->maxbytes ?? 0;
         if (is_array($formdata->graderinfo)) {
-            // TODO find out what it should save and ensure it is available as text not arrays.
             $formdata->graderinfo = [
                 'text' => '',
                 'format' => FORMAT_HTML,
@@ -126,6 +149,11 @@ class qtype_aitext extends question_type {
         $options->responsetemplateformat = $formdata->responsetemplate['format'];
 
         $DB->update_record('qtype_aitext', $options);
+        foreach ($formdata->sampleresponses as $sr) {
+            $sampleresponse['question'] = $formdata->id;
+            $sampleresponse['response'] = $sr;
+            $DB->insert_record('qtype_aitext_sampleresponses', $sampleresponse);
+        }
     }
     /**
      * Called when previewing a question or when displayed in a quiz
@@ -147,7 +175,9 @@ class qtype_aitext extends question_type {
         $question->responsetemplateformat = $questiondata->options->responsetemplateformat;
         $question->aiprompt = $questiondata->options->aiprompt;
         $question->markscheme = $questiondata->options->markscheme;
-        $question->sampleanswer = $questiondata->options->sampleanswer;
+        parent::get_question_options($question);
+        $question->sampleresponses = $this->get_sampleresponses($question);
+
         /* Legacy quesitons may not have a model set, so assign the first in the settings */
         if (empty($question->model)) {
             $model = explode(",", get_config('tool_aiconnect', 'model'))[0];
@@ -156,6 +186,19 @@ class qtype_aitext extends question_type {
             $question->model = $questiondata->options->model;
         }
     }
+
+    /**
+     * Get the structure from the database
+     *
+     * @param qtype_aitext $question
+     * @return array
+     */
+    public function get_sampleresponses($question) {
+        global $DB;
+        $sampleresponses = $DB->get_records('qtype_aitext_sampleresponses', ['question' => $question->id]);
+        return $sampleresponses;
+    }
+
     /**
      * Delete a question from the database
      *
@@ -214,7 +257,7 @@ class qtype_aitext extends question_type {
 
     /**
      * The choices that should be offered for the number of attachments.
-     * @todo remove method and calls to it as file is no longer a submit option
+     * Note: remove method and calls to it as file is no longer a submit option
      *
      * @return array
      */
@@ -230,7 +273,7 @@ class qtype_aitext extends question_type {
 
     /**
      * The choices that should be offered for the number of required attachments.
-     * @todo remove as file has been removed as a submission type
+     * Note: remove as file has been removed as a submission type
      *
      * @return array
      */
@@ -260,7 +303,6 @@ class qtype_aitext extends question_type {
             'responsetemplateformat',
             'aiprompt',
             'markscheme',
-            'sampleanswer',
             'model',
             'spellcheck',
         ];
@@ -293,7 +335,7 @@ class qtype_aitext extends question_type {
         foreach ($extraquestionfields as $field) {
             $qo->$field = $format->getpath($data, ['#', $field, 0, '#'], '');
         }
-        // TODO add in other text fields.
+        // Note: add in other text fields.
         $textfields = ['responsetemplate'];
         foreach ($textfields as $field) {
             $fmt = $format->get_format($format->getpath($data, ['#', $field.'format', 0, '#'], 0));
@@ -310,7 +352,12 @@ class qtype_aitext extends question_type {
         if (is_array($extraanswersfields)) {
             array_shift($extraanswersfields);
         }
-
+        if (isset($data['#']['sampleresponse'])) {
+            $sampleresponses = $data['#']['sampleresponse'];
+            foreach ($sampleresponses as $key => $srxml) {
+                $qo->sampleresponses[$key] = $format->getpath($srxml, ['#', 'response', 0, '#'], 0);
+            }
+        }
         return $qo;
     }
     /**
@@ -347,7 +394,12 @@ class qtype_aitext extends question_type {
                 $output .= "    <$field>".$format->xml_escape($value)."</$field>\n";
             }
         }
-
+        foreach ($question->options->sampleresponses as $sampleresponse) {
+            $output .= "     <sampleresponse>\n";
+            $output .= '      <question>' . $sampleresponse->question . "</question>\n";
+            $output .= '      <response>' . $sampleresponse->response . "</response>\n";
+            $output .= "     </sampleresponse>\n";
+        }
         return $output;
     }
     /**

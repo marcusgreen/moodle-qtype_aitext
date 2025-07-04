@@ -20,6 +20,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->libdir . "/phpunit/classes/restore_date_testcase.php");
+require_once($CFG->dirroot . '/question/type/aitext/tests/helper.php');
 
 /**
  * Test restore logic.
@@ -39,8 +40,12 @@ final class restore_test extends \restore_date_testcase {
      * During restore, we add default options for any questions like that.
      * That is what is tested in this file.
      */
-    public function test_restore_create_missing_qtype_aitext_options(): void {
+    public function test_backup_and_restore(): void {
         global $DB;
+
+        // Login as admin user.
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
 
         // Create a course with one essay question in its question bank.
         $generator = $this->getDataGenerator();
@@ -48,7 +53,7 @@ final class restore_test extends \restore_date_testcase {
         $contexts = new \core_question\local\bank\question_edit_contexts(\context_course::instance($course->id));
         $category = question_make_default_categories($contexts->all());
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $aitext = $questiongenerator->create_question('aitext', null, ['category' => $category->id]);
+        $aitext = $questiongenerator->create_question('aitext', 'editor', ['category' => $category->id]);
 
         // Remove the options record, which means that the backup will look like a backup made in an old Moodle.
         $DB->delete_records('qtype_aitext', ['questionid' => $aitext->id]);
