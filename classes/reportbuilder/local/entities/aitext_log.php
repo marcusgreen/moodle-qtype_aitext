@@ -98,19 +98,14 @@ class aitext_log extends base {
         $tablealias = $this->get_table_alias('qtype_aitext_log');
 
         $columns = [];
-
-
-        // AI text ID column.
-        $columns[] = (new column(
-            'aitext',
-            new lang_string('aitextid', 'qtype_aitext'),
-            $this->get_entity_name()
-        ))
-            ->add_joins($this->get_joins())
-            ->set_type(column::TYPE_INTEGER)
-            ->add_fields("{$tablealias}.aitext")
-            ->set_is_sortable(true);
-
+            $columns[] = (new column(
+                'questionname',
+                new lang_string('questionname', 'qtype_aitext'),
+                $this->get_entity_name()
+            ))
+            ->add_field("(SELECT questiontext FROM {question} WHERE id = " . $this->get_table_alias('qtype_aitext_log') . ".aitext)", 'questiontext')
+            ->set_type(column::TYPE_TEXT)
+            ->set_is_sortable(false);
 
         // Prompt column.
         $columns[] = (new column(
@@ -191,4 +186,5 @@ class aitext_log extends base {
 
         return $filters;
     }
+
 }

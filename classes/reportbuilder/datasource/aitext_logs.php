@@ -48,7 +48,6 @@ class aitext_logs extends datasource {
      * Initialise report
      */
     protected function initialise(): void {
-        xdebug_break();
         $aitextlogentity = new aitext_log();
         $aitextlogalias = $aitextlogentity->get_table_alias('qtype_aitext_log');
 
@@ -72,7 +71,7 @@ class aitext_logs extends datasource {
      */
     public function get_default_columns(): array {
         return [
-            'user:fullname',
+            'aitext_log:questionname',
             'aitext_log:prompt',
             'aitext_log:regex',
             'aitext_log:timecreated',

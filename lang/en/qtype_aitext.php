@@ -101,6 +101,7 @@ $string['prompt'] = 'Prompt';
 $string['prompt_setting'] = 'Wrapper text for the prompt set to the AI System, [responsetext] is whatever the student typed as an answer. The ai prompt value from the question will be appended to this';
 $string['prompttester'] = 'Prompt Tester';
 $string['qtype_aitext_log'] ='Log for AI Text';
+$string['questionname'] = 'Question name';
 $string['responsetester'] = 'Response Tester';
 $string['responsetesthelp'] = 'Response test help';
 $string['responsetesthelp_help'] = 'When the form is saved only the test response is saved, not the value returned by the LLM';
