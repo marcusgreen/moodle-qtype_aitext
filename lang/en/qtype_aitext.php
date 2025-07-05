@@ -26,6 +26,13 @@
 $string['acceptedfiletypes'] = 'Accepted file types';
 $string['addsample'] = 'Add a sample response';
 $string['aiprompt'] = 'AI Prompt';
+
+// Report builder strings.
+$string['aitextlog'] = 'AI text log';
+$string['aitextlogs'] = 'AI text logs';
+$string['aitextid'] = 'AI text question ID';
+$string['regex'] = 'Regex pattern';
+
 $string['aiprompt_help'] = 'A prompt for the Ai Grader. This is the guideline that AI uses to give feedback on the student response.';
 $string['aipromptmissing'] = 'The ai prompt is missing. Please enter a prompt on the basis of which the feedback is generated.';
 $string['answerfiles'] = 'Answer files';

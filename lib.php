@@ -41,3 +41,29 @@ function qtype_aitext_pluginfile($course, $cm, $context, $filearea, $args, $forc
     require_once($CFG->libdir . '/questionlib.php');
     question_pluginfile($course, $context, 'qtype_aitext', $filearea, $args, $forcedownload, $options);
 }
+/**
+ * Callback to add report sources to the list of available sources
+ *
+ * @param array $sources List of report sources
+ * @return array
+ */
+function qtype_aitext_reportbuilder_source_list(array $sources): array {
+    $sources[] = [
+        'value' => 'qtype_aitext\\reportbuilder\\datasource\\aitext_logs',
+        'visiblename' => get_string('aitextlogs', 'qtype_aitext'),
+    ];
+    return $sources;
+}
+
+/**
+ * Callback to register custom report sources
+ *
+ * This function is called by the report builder system to register
+ * custom report sources provided by this plugin.
+ */
+function qtype_aitext_reportbuilder_source_register(): void {
+    // Register the aitext_logs datasource.
+    \core_reportbuilder\manager::register_custom_report_source(
+        'qtype_aitext\\reportbuilder\\datasource\\aitext_logs'
+    );
+}
