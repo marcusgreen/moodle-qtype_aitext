@@ -155,6 +155,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     public function apply_attempt_state(question_attempt_step $step) {
         $this->step = $step;
     }
+
     /**
      * Call the llm using either the 4.5 core api or the backend provided by
      * local_ai_manager (mebis) or tool_aimanager
@@ -163,9 +164,24 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param string $purpose
      */
     public function perform_request(string $prompt, string $purpose = 'feedback'): string {
-        xdebug_break();
-        $log = new qtype_aitext\log();
-        $log->insert($this->id, $prompt);
+
+        $config = get_config('qtype_aitext');
+        if($config->logallprompts === '1' || $config->logbyregex === '1') {
+            if($config->logbyregex === '1') {
+              $regex = explode(PHP_EOL,$config->regularexpressions);
+              foreach($regex as $regex) {
+                if(preg_match($regex, $prompt)) {
+                    $log = new qtype_aitext\log();
+                    $log->insert($this->id, $prompt);
+                    break;
+                }
+              }
+            } else {
+                $log = new qtype_aitext\log();
+                $log->insert($this->id, $prompt);
+            }
+        }
+
         $backend = get_config('qtype_aitext', 'backend');
         if ($backend == 'local_ai_manager') {
             $manager = new local_ai_manager\manager($purpose);
