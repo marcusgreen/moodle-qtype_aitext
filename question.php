@@ -172,7 +172,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
               foreach($regex as $regex) {
                 if(preg_match($regex, $prompt)) {
                     $log = new qtype_aitext\log();
-                    $log->insert($this->id, $prompt);
+                    $log->insert($this->id, $prompt, $regex);
                     break;
                 }
               }

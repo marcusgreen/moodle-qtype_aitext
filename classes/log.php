@@ -24,14 +24,14 @@ namespace qtype_aitext;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class log {
-    public function insert(int $questionid, string $prompt) :bool {
+    public function insert(int $questionid, string $prompt, $regex ='') :bool {
         global $DB, $USER;
         if(get_config('qtype_aitext', 'logallprompts') == '1') {
             $record = new \stdClass();
             $record->aitext = $questionid;
             $record->userid = $USER->id;
             $record->prompt = $prompt;
-            $record->regex = '';
+            $record->regex = $regex;
             $record->timecreated = time();
 
             $DB->insert_record('qtype_aitext_log', $record);

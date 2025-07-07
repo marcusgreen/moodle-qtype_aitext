@@ -105,7 +105,7 @@ class aitext_log extends base {
             ))
             ->add_field("(SELECT username FROM {user} WHERE id = " . $this->get_table_alias('qtype_aitext_log') . ".userid)", 'username')
             ->set_type(column::TYPE_TEXT)
-            ->set_is_sortable(false);
+            ->set_is_sortable(true);
             $columns[] = (new column(
                 'questionname',
                 new lang_string('questionname', 'qtype_aitext'),

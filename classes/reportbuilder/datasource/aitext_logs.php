@@ -87,6 +87,8 @@ class aitext_logs extends datasource {
         return [
             'user:fullname',
             'aitext_log:timecreated',
+            'aitext_log:regex',
+            'aitext_log:questionname',
         ];
     }
 
@@ -96,9 +98,6 @@ class aitext_logs extends datasource {
      * @return string[]
      */
     public function get_default_conditions(): array {
-        // return [
-        //     'aitext_log:timecreated',
-        // ];
         return [];
     }
 }
