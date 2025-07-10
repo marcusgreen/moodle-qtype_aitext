@@ -93,7 +93,7 @@ class qtype_aitext extends question_type {
     }
 
     /**
-     * Markscheme may not be required here
+     * Store default to user preferences.
      *
      * @param stdClass $fromform
      * @return void
@@ -102,8 +102,6 @@ class qtype_aitext extends question_type {
         parent::save_defaults_for_new_questions($fromform);
         $this->set_default_value('responseformat', $fromform->responseformat);
         $this->set_default_value('responsefieldlines', $fromform->responsefieldlines);
-        $this->set_default_value('markscheme', $fromform->markscheme);
-
     }
     /**
      * Write the question data from the editing form to the database
