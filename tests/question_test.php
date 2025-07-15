@@ -63,6 +63,7 @@ final class question_test extends \advanced_testcase {
      * @return void
      */
     protected function setUp(): void {
+        parent::setUp();
         $this->question = new \qtype_aitext();
         if (defined('TEST_LLM_APIKEY') && defined('TEST_LLM_ORGID')) {
             set_config('apikey', TEST_LLM_APIKEY, 'aiprovider_openai');

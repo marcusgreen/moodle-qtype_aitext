@@ -18,10 +18,11 @@
  * Test helpers for the aitext question type.
  *
  * @package    qtype_aitext
- * @copyright  2013 The Open University
+ * @copyright  2025 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
@@ -29,7 +30,7 @@ require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 /**
  * Test helper class for the aitext question type.
  *
- * @copyright  2013 The Open University
+ * @copyright  2025 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_test_helper extends question_test_helper {
