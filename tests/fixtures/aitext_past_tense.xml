@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+<!-- question: 14966  -->
+  <question type="aitext">
+    <name>
+      <text>English past tense</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Write a sentence in the past tense</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber></idnumber>
+    <responseformat>plain</responseformat>
+    <responsefieldlines>10</responsefieldlines>
+    <minwordlimit></minwordlimit>
+    <maxwordlimit></maxwordlimit>
+    <graderinfo format="html">
+      <text></text>
+    </graderinfo>
+    <responsetemplate format="html">
+      <text></text>
+    </responsetemplate>
+    <aiprompt>Explain if there is anything wrong with the grammar and spelling in the text.</aiprompt>
+    <markscheme>Deduct a point from the total score for each grammar or spelling mistake.</markscheme>
+    <model>gpt-4o</model>
+    <spellcheck>0</spellcheck>
+     <sampleresponse>
+      <question>14966</question>
+      <response>response1</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>14966</question>
+      <response>response2</response>
+     </sampleresponse>
+  </question>
+
+</quiz>

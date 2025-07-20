@@ -29,11 +29,12 @@ defined('MOODLE_INTERNAL') || die();
 use qtype_aitext\constants;
 
 require_once($CFG->dirroot . '/question/type/questionbase.php');
-use tool_aiconnect\ai;
+
+
 /**
  * Represents an aitext question.
  *
- * @copyright  2009 The Open University
+ * @copyright  2025 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_question extends question_graded_automatically_with_countback {
@@ -67,11 +68,18 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
 
     /**
+     * Options including from sampleanswers table
+     * @var array
+     */
+    public $options;
+
+
+    /**
      * used in the question editing interface
      *
-     * @var string
+     * @var array
      */
-    public $sampleanswer;
+    public $sampleresponses;
 
     /**
      * Information on how to manually grade
@@ -123,6 +131,14 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
     /** @var array The string array of file types accepted upon file submission. */
     public $filetypeslist;
+
+    /** @var bool $spellcheck if spellcheck is enabled */
+    public bool $spellcheck;
+
+
+    /** @var array  */
+    public $sampleanswers;
+
     /**
      * Required by the interface question_automatically_gradable_with_countback.
      *
@@ -143,6 +159,62 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     public function apply_attempt_state(question_attempt_step $step) {
         $this->step = $step;
     }
+    /**
+     * Call the llm using either the 4.5 core api or the backend provided by
+     * local_ai_manager (mebis) or tool_aimanager
+     *
+     * @param string $prompt
+     * @param string $purpose
+     */
+    public function perform_request(string $prompt, string $purpose = 'feedback'): string {
+        $backend = get_config('qtype_aitext', 'backend');
+        if ($backend == 'local_ai_manager') {
+            $manager = new local_ai_manager\manager($purpose);
+            $llmresponse = (object) $manager->perform_request($prompt, 'qtype_aitext', $this->contextid);
+            if ($llmresponse->get_code() !== 200) {
+                throw new moodle_exception(
+                'err_retrievingfeedback',
+                'qtype_aitext',
+                '',
+                $llmresponse->get_errormessage(),
+                $llmresponse->get_debuginfo()
+                );
+            }
+            return $llmresponse->get_content();
+        } else if ($backend == 'core_ai_subsystem') {
+            global $USER;
+            $action = new \core_ai\aiactions\generate_text(
+                contextid: $this->contextid,
+                userid: $USER->id,
+                prompttext: $prompt
+            );
+            $manager = \core\di::get(\core_ai\manager::class);
+            $llmresponse = $manager->process_action($action);
+            $responsedata = $llmresponse->get_response_data();
+            return $responsedata['generatedcontent'];
+        } else if ($backend == 'tool_aimanager') {
+            $ai = new tool_aiconnect\ai\ai();
+            $llmresponse = $ai->prompt_completion($prompt);
+            return $llmresponse['response']['choices'][0]['message']['content'];
+        }
+        throw new moodle_exception('err_invalidbackend', 'qtype_aitext');
+
+    }
+
+    /**
+     * Get the spellchecking response.
+     *
+     * @param array $response
+     * @return string
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
+    private function get_spellchecking(array $response): string {
+        $fullaiprompt = $this->build_full_ai_spellchecking_prompt($response['answer']);
+        $response = $this->perform_request($fullaiprompt, 'feedback');
+        return $response;
+    }
 
     /**
      * Grade response by making a call to external
@@ -153,7 +225,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      *
      */
     public function grade_response(array $response): array {
-        global $DB;
+
+        if ($this->spellcheck) {
+            $spellcheckresponse = $this->get_spellchecking($response);
+            $this->insert_attempt_step_data('-spellcheckresponse', $spellcheckresponse);
+        }
+
         if (!$this->is_complete_response($response)) {
             return [0 => 0, question_state::$needsgrading];
         }
@@ -188,19 +265,22 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
             $contentobject = $this->process_feedback($feedback);
         }
+        if (is_array($response)) {
+            $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
+                 $this->defaultmark, $this->markscheme);
+            $feedback = $this->perform_request($fullaiprompt, 'feedback');
+        }
+        $contentobject = $this->process_feedback($feedback);
 
         // If there are no marks, write the feedback and set to needs grading .
         if (is_null($contentobject->marks)) {
             $grade = [0 => 0, question_state::$needsgrading];
         } else {
-            // Calculate the fraction of the marks but AI sometimes gives more marks than possible, so cap it.
-            $fraction = $contentobject->marks > $this->defaultmark ? 1 : $contentobject->marks / $this->defaultmark;
-
-            // Relevance penalty.
-            if (isset($contentobject->relevance) && $contentobject->relevance !== null) {
-                $fraction = $fraction * ($contentobject->relevance * 0.01);
+            if (is_numeric($contentobject->marks)) {
+                $fraction = $contentobject->marks / $this->defaultmark;
+            } else {
+                $fraction = 0.0;
             }
-
             $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
         $this->insert_feedback_and_prompt($fullaiprompt, $contentobject);
@@ -262,9 +342,17 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return string;
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
-        $prompttemplate = "You are evaluating a student's {{responselanguage}} language response to a question. ";
-        $prompttemplate .= " {{jsonprompt}}. ";
-        // $prompttemplate .=  "  Return only a JSON object which enumerates a set of 3 elements.The JSON object should be in this format: {"feedback":"string","marks":"number", "relevance": "number"} where marks is a single number summing all marks. ";
+
+        // Check if [questiontext] is in the aiprompt and replace it with the question text.
+        if (strpos($aiprompt, '[questiontext]') !== false) {
+            $aiprompt = str_replace('[questiontext]', strip_tags($this->questiontext), $aiprompt);
+        }
+
+        $responsetext = strip_tags($response);
+            $responsetext = '[['.$responsetext.']]';
+            $prompt = get_config('qtype_aitext', 'prompt');
+            $prompt = preg_replace("/\[responsetext\]/", $responsetext, $prompt);
+            $prompt .= ' '.trim($aiprompt);
 
         $prompttemplate .= get_config('qtype_aitext', 'prompt');
         // $prompttemplate  =  "In [{{responsetext}}] analyse but do not mention the part between [[ and ]] as follows: ";
@@ -310,6 +398,18 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $prompt = strtr($prompttemplate, $params);
         return $prompt;
     }
+
+    /**
+     * Build the full ai spellchecking prompt.
+     *
+     * @param string $response
+     * @return string
+     * @throws coding_exception
+     */
+    public function build_full_ai_spellchecking_prompt(string $response): string {
+        return get_string('spellcheck_prompt', 'qtype_aitext') . ($response);
+    }
+
     /**
      *
      * Convert string json returned from LLM call to an object,
@@ -319,6 +419,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return \stdClass
      */
     public function process_feedback(string $feedback) {
+        preg_match_all('#\{(?:[^{}]|(?R))*\}#s', $feedback, $feedbackjsonstrings);
+        if (empty($feedbackjsonstrings)) {
+            throw new moodle_exception('Could not parse feedback of AI tool');
+        }
         if (preg_match('/\{[^{}]*\}/', $feedback, $matches)) {
             // Array $matches[1] contains the captured text inside the braces.
             $feedback = $matches[0];
@@ -338,8 +442,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 $contentobject->feedback  .= $contentobject->correctedtext;
             }
             $disclaimer = get_config('qtype_aitext', 'disclaimer');
-            $disclaimer = str_replace("[[model]]", $this->model, $disclaimer);
-            $contentobject->feedback .= '<br/>' . $this->llm_translate($disclaimer);
+            $contentobject->feedback .= ' '.$this->llm_translate($disclaimer);
         } else {
             $contentobject = (object) [
                                         "feedback" => $feedback,
@@ -360,17 +463,21 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (current_language() == 'en') {
             return $text;
         }
-        $ai = new ai\ai();
+        if (get_config('qtype_aitext', 'translatepostfix') == 0) {
+            return $text;
+        }
+
         $cache = cache::make('qtype_aitext', 'stringdata');
         if (($translation = $cache->get(current_language().'_'.$text)) === false) {
-            $prompt = 'translate "'.$text .'" into '.current_language();
-            $llmresponse = $ai->prompt_completion($prompt);
-            $translation = $llmresponse['response']['choices'][0]['message']['content'];
+            $prompt = 'translate "'.$text .'" into '.current_language() .
+                    'Only return the exact text, do not wrap it in other text.';
+            $translation = $this->perform_request($prompt, 'translate');
             $translation = trim($translation, '"');
             $cache->set(current_language().'_'.$text, $translation);
         }
         return $translation;
     }
+
     /**
      * Fake manual grading
      *

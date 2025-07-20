@@ -22,7 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 /**
  * Upgrade code for the aitext question type.
  *
@@ -34,7 +33,6 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2024050300) {
-
         $table = new xmldb_table('qtype_aitext');
         // Used for prompt testing in the edit form.
         $field = new xmldb_field('sampleanswer', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
@@ -44,11 +42,9 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
 
         // Savepoint reached.
         upgrade_plugin_savepoint(true, 2024050300, 'qtype', 'aitext');
-
     }
 
     if ($oldversion < 2024051100) {
-
         // Define field model to be added to qtype_aitext.
         $table = new xmldb_table('qtype_aitext');
         $field = new xmldb_field('model', XMLDB_TYPE_CHAR, '60', null, null, null, null, 'sampleanswer');
@@ -101,10 +97,52 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
             $newprompt .= " where marks is a single number summing all marks.";
             set_config('jsonprompt', $newprompt, 'qtype_aitext');
         }
+          // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2024051103, 'qtype', 'aitext');
 
+    }
+    if ($oldversion < 2024051101) {
+        // Define field spellcheck to be added to qtype_aitext.
+        $table = new xmldb_table('qtype_aitext');
+        $field = new xmldb_field('spellcheck', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'model');
+
+        // Conditionally launch add field spellcheck.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
 
         // Aitext savepoint reached.
-        upgrade_plugin_savepoint(true, 2024051103, 'qtype', 'aitext');
+        upgrade_plugin_savepoint(true, 2024051101, 'qtype', 'aitext');
+    }
+
+    if ($oldversion < 2025041002) {
+        // Define table qtype_aitext_sampleresponses to be created.
+        $table = new xmldb_table('qtype_aitext_sampleresponses');
+
+        // Adding fields to table qtype_aitext_sampleresponses.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('question', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('response', XMLDB_TYPE_TEXT, null, null, null, null, null);
+
+        // Adding keys to table qtype_aitext_sampleresponses.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('ait_sampleresponses', XMLDB_KEY_FOREIGN, ['question'], 'qtype_aitext', ['id']);
+
+        // Conditionally launch create table for qtype_aitext_sampleresponses.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        // Move existing sampleanswers to sampleresponses table.
+        $sampleanswers = $DB->get_records('qtype_aitext', null, '', 'id,sampleanswer');
+        foreach ($sampleanswers as $sampleanswer) {
+                $record = ['question' => $sampleanswer->id, 'response' => $sampleanswer->sampleanswer];
+                $DB->insert_record('qtype_aitext_sampleresponses', $record);
+        }
+        // At some point remove sampleanswer field from qtype_aitext table.
+
+        // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2025041002, 'qtype', 'aitext');
+
     }
 
     return true;

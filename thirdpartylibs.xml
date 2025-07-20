@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>amd/src/diff.js</location>
+        <name>jsdiff</name>
+        <license>BSD-3-Clause</license>
+        <version>7.0.0</version>
+        <repository>https://github.com/kpdecker/jsdiff</repository>
+    </library>
+</libraries>

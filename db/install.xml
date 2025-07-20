@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="question/type/aitext/db" VERSION="20231230" COMMENT="XMLDB file for Moodle question/type/aitext"
+<XMLDB PATH="question/type/aitext/db" VERSION="20240718" COMMENT="XMLDB file for Moodle question/type/aitext"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
@@ -26,11 +26,22 @@
         <FIELD NAME="maxtime" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The time limit for audio recording responses"/>
         <FIELD NAME="relevance" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"  SEQUENCE="false" COMMENT="Setting for how relevance should be determined"/>
         <FIELD NAME="relevanceanswer" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="An authorative answer for establishing relevance of student response"/>
-
-</FIELDS>
+        <FIELD NAME="spellcheck" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="questionid" TYPE="foreign-unique" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="qtype_aitext_sampleresponses" COMMENT="id of the question being linked to">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="question" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="response" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Student responses to be tested during question authoring"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="ait_sampleresponses" TYPE="foreign" FIELDS="question" REFTABLE="qtype_aitext" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
   </TABLES>
