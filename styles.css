@@ -1,4 +1,3 @@
-
 .que.aitext textarea.qtype_aitext_response {
     width: 100%;
 }
@@ -9,13 +8,16 @@
 }
 
 .que.aitext .qtext {
-    color:inherit;;
+    color: inherit;
+    ;
 }
+
 .que.aitext .formulation .answer {
-    font-size:12pt;
+    font-size: 12pt;
 }
+
 .que.aitext .answer {
-    color:inherit;
+    color: inherit;
 }
 
 .que.aitext textarea.qtype_aitext_response.qtype_aitext_monospaced {
@@ -38,6 +40,7 @@
 .que.aitext .ablock .filemanager .fp-restrictions {
     margin-top: 1em;
 }
+
 .qtype_aitext_sampleanswereval {
     font-size: 12pt;
     margin: 3px;
@@ -112,3 +115,13 @@
     margin: auto;
 }
 
+.qtype_aitext_spellcheck_wrong {
+    color: red;
+    text-decoration: line-through;
+    font-weight: 400;
+}
+
+.qtype_aitext_spellcheck_new {
+    color: green;
+    font-weight: 800;
+}

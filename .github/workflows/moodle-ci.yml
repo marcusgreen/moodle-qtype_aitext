@@ -30,11 +30,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - php: '8.1'
-            moodle-branch: 'MOODLE_403_STABLE'
+          - php: '8.3'
+            moodle-branch: 'MOODLE_500_STABLE'
             database: 'mariadb'
-          # - php: '8.0'
-          #   moodle-branch: 'master'
+          # - php: '8.3'
+          #   moodle-branch: 'main'
           #   database: 'pgsql'
     steps:
       - name: Checkout
@@ -51,17 +51,9 @@ jobs:
           # none to use phpdbg fallback. Specify pcov (Moodle 3.10 and up) or xdebug to use them instead.
           coverage: none
 
-      - name: Install NVM and Node
-        run: |
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          nvm install 20
-          nvm use 20
-
       - name: Deploy moodle-plugin-ci
         run: |
-          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^3
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
           # Add dirs to $PATH
           echo $(cd ci/bin; pwd) >> $GITHUB_PATH
           echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH

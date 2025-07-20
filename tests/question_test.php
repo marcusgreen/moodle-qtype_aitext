@@ -17,11 +17,9 @@
 namespace qtype_aitext;
 
 use coding_exception;
-use dml_exception;
-use moodle_exception;
+use core_reportbuilder\external\filters\set;
 use PHPUnit\Framework\ExpectationFailedException;
 use question_attempt_step;
-use question_display_options;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 defined('MOODLE_INTERNAL') || die();
@@ -29,17 +27,88 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 require_once($CFG->dirroot . '/question/type/aitext/tests/helper.php');
+require_once($CFG->dirroot . '/question/type/aitext/questiontype.php');
+
 use qtype_aitext_test_helper;
-use Random\RandomException;
+use qtype_aitext;
 
 /**
  * Unit tests for the matching question definition class.
  *
  * @package qtype_aitext
- * @author  Marcus Green 2024
+ * @copyright 2025 Marcus Green
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class question_test extends \advanced_testcase {
+
+    /**
+     * Instance of the question type class
+     * @var question
+     */
+    public $question;
+
+    /**
+     * There is a live connection to the External AI system
+     * When run locally it will make a connection. Otherwise the
+     * tests will be skipped
+     * @var bool
+     */
+    protected bool $islive = false;
+
+    /**
+     * Config.php should include the apikey and orgid in the form
+     * define("TEST_LLM_APIKEY", "XXXXXXXXXXXX");
+     * define("TEST_LLM_ORGID", "XXXXXXXXXXXX");
+     * Summary of setUp
+     * @return void
+     */
+    protected function setUp(): void {
+        parent::setUp();
+        $this->question = new \qtype_aitext();
+        if (defined('TEST_LLM_APIKEY') && defined('TEST_LLM_ORGID')) {
+            set_config('apikey', TEST_LLM_APIKEY, 'aiprovider_openai');
+            set_config('orgid', TEST_LLM_ORGID, 'aiprovider_openai');
+            set_config('enabled', true, 'aiprovider_openai');
+            $this->islive = true;
+        }
+    }
+
+    /**
+     * Test the upgrade process that migrates sample answers from the old table structure to the new one.
+     *
+     * @covers \qtype_aitext\db\upgrade
+     * @return void
+     */
+    public function test_upgrade(): void {
+        $this->resetAfterTest(true);
+        global $DB;
+        $aitext = ['questionid' => 1, 'sampleanswer' => 'sampleanswer'];
+        $DB->insert_record('qtype_aitext', $aitext);
+
+        $sampleanswers = $DB->get_records('qtype_aitext', null, '', 'id,sampleanswer');
+        foreach ($sampleanswers as $sampleanswer) {
+                $record = ['question' => $sampleanswer->id, 'response' => $sampleanswer->sampleanswer];
+                $DB->insert_record('qtype_aitext_sampleresponses', $record);
+        }
+    }
+    /**
+     * Make a trivial request to the LLM to check the code works
+     * Only designed to test the 4.5 subsystem when run locally
+     * not when in GHA ci
+     *
+     * @covers \qtype_aitext\question::perform_request
+     * @return void
+     */
+    public function test_perform_request(): void {
+        $this->resetAfterTest(true);
+        if (!$this->islive) {
+                $this->markTestSkipped('No live connection to the AI system');
+        }
+        $aitext = qtype_aitext_test_helper::make_aitext_question([]);
+        $aitext->questiontext = 'What is 2 * 4?';
+        $response = $aitext->perform_request('What is 2 * 4 only return a single number');
+        $this->assertEquals('8', $response);
+    }
 
 
     /**
@@ -55,6 +124,33 @@ final class question_test extends \advanced_testcase {
             $aitext = qtype_aitext_test_helper::make_aitext_question([]);
             $aitext->questiontext = 'Hello <img src="http://example.com/globe.png" alt="world" />';
             $this->assertEquals('Hello [world]', $aitext->get_question_summary());
+    }
+
+    /**
+     * Check the student response gets interpolated into the prompt ready to send
+     * off to the LLM
+     * @covers \qtype_aitext\question::build_full_ai_prompt
+     */
+    public function test_build_full_ai_prompt(): void {
+        $this->resetAfterTest(true);
+        $question = qtype_aitext_test_helper::make_aitext_question([]);
+        $question->questiontext = 'Write an English sentence in the past tense';
+        $aiprompt = "Is the text gramatically correct?";
+        $markscheme  = 'One mark if the response is gramatically correct';
+        $studentresponse = 'Yesterday I went to the park';
+        $defaultmark = 1;
+
+        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+
+        // Student response is within [ ] delimters. Angle brackets might be better.
+        $pattern = '/\[\[' . $studentresponse . '\]\]/';
+        $this->assertEquals(1, preg_match($pattern, $result));
+
+        // HTML tags should be stripped out, though that might change in the future.
+        $this->assertStringNotContainsString('<p>', $result);
+
+        // Marks scheme should be in result ready to send to LLm. Though it is optional.
+        $this->assertStringContainsString($markscheme, $result);
     }
 
     /**

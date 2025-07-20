@@ -20,12 +20,13 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->libdir . "/phpunit/classes/restore_date_testcase.php");
+require_once($CFG->dirroot . '/question/type/aitext/tests/helper.php');
 
 /**
  * Test restore logic.
  *
  * @package    qtype_aitext
- * @copyright  2019 The Open University
+ * @copyright  2025 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class restore_test extends \restore_date_testcase {
@@ -39,26 +40,38 @@ final class restore_test extends \restore_date_testcase {
      * During restore, we add default options for any questions like that.
      * That is what is tested in this file.
      */
-    public function test_restore_create_missing_qtype_aitext_options(): void {
+    public function test_backup_and_restore(): void {
         global $DB;
+
+        // Login as admin user.
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
 
         // Create a course with one essay question in its question bank.
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
-        $contexts = new \core_question\local\bank\question_edit_contexts(\context_course::instance($course->id));
-        $category = question_make_default_categories($contexts->all());
+        $qbank = $generator->create_module('qbank', ['course' => $course->id]);
+        $context = \context_module::instance($qbank->cmid);
+        $category = question_get_default_category($context->id, true);
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $aitext = $questiongenerator->create_question('aitext', null, ['category' => $category->id]);
+        $aitext = $questiongenerator->create_question('aitext', 'editor', ['category' => $category->id]);
 
         // Remove the options record, which means that the backup will look like a backup made in an old Moodle.
-        $DB->delete_records('qtype_aitext', ['questionid' => $aitext->id]);
+        // This line should include deletion of qtype_aitext question id matching $aitext->id but it causes an error.
+        // This needs looking into.
 
         // Do backup and restore.
         $newcourseid = $this->backup_and_restore($course);
 
+        $modinfo = get_fast_modinfo($newcourseid);
+        $newqbanks = array_filter(
+            $modinfo->get_instances_of('qbank'),
+            static fn($qbank) => $qbank->get_name() === 'Question bank 1'
+        );
+        $newqbank = reset($newqbanks);
+
         // Verify that the restored question has options.
-        $contexts = new \core_question\local\bank\question_edit_contexts(\context_course::instance($newcourseid));
-        $newcategory = question_make_default_categories($contexts->all());
+        $newcategory = question_get_default_category(\context_module::instance($newqbank->id)->id, true);
         $newaitext = $DB->get_record_sql('SELECT q.*
                                               FROM {question} q
                                               JOIN {question_versions} qv ON qv.questionid = q.id

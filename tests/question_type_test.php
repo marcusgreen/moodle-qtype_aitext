@@ -30,8 +30,8 @@ require_once($CFG->dirroot . '/question/type/aitext/questiontype.php');
  * Unit tests for the aitext question type class.
  *
  * @package    qtype_aitext
- * @copyright  2013 The Open University
- * @author     Marcus Green 2023
+ * @copyright  Marcus Green 2025
+ * @author     Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class question_type_test extends \advanced_testcase {
@@ -43,11 +43,13 @@ final class question_type_test extends \advanced_testcase {
     protected $qtype;
 
     protected function setUp(): void {
+        parent::setUp();
         $this->qtype = new qtype_aitext();
     }
 
     protected function tearDown(): void {
         $this->qtype = null;
+        parent::tearDown();
     }
 
     /**

@@ -1,0 +1,9 @@
+{
+  "name": "moodle-qtype_aitext",
+  "scripts": {
+    "deployJsDiff": "cp node_modules/diff/dist/diff.js amd/src/diff.js && grunt amd --force"
+  },
+  "dependencies": {
+    "diff": "^7.0.0"
+  }
+}

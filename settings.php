@@ -32,7 +32,7 @@ if ($ADMIN->fulltree) {
         new lang_string('defaultprompt_setting', 'qtype_aitext'),
         new lang_string('thedefaultprompt', 'qtype_aitext')));
 
-    $settings->add(new admin_setting_configtextarea('qtype_aitext/defaultmarksscheme',
+        $settings->add(new admin_setting_configtextarea('qtype_aitext/defaultmarksscheme',
         new lang_string('defaultmarksscheme', 'qtype_aitext'),
         new lang_string('defaultmarksscheme_setting', 'qtype_aitext'),
 
@@ -42,16 +42,16 @@ if ($ADMIN->fulltree) {
         'qtype_aitext/disclaimer',
         new lang_string('disclaimer', 'qtype_aitext'),
         new lang_string('disclaimer_setting', 'qtype_aitext'),
-        '(Response provided by [[model]])'
+        '(Response provided by an AI System)'
         ));
     $settings->add(new admin_setting_configtextarea(
         'qtype_aitext/prompt',
         new lang_string('prompt', 'qtype_aitext'),
         new lang_string('prompt_setting', 'qtype_aitext'),
-        'in [responsetext] analyse but do not mention the part between [[ and ]] as follows:',
+        'in [responsetext] analyse the part delimited by double brackets without mentioning the brackets as follows:',
         PARAM_RAW,
-        20,
-        3
+        80,
+        6
     ));
     $settings->add(new admin_setting_configtextarea(
         'qtype_aitext/jsonprompt',
@@ -61,7 +61,7 @@ if ($ADMIN->fulltree) {
         ' The JSON object should be in this format: {"feedback": "string", "correctedtext": "string", "marks": "number", "relevance": "number"}' .
         ' where marks is a single number summing all marks.',
         PARAM_RAW,
-        20,
+        80,
         6
     ));
 
@@ -110,6 +110,34 @@ if ($ADMIN->fulltree) {
         new lang_string('relevance', 'qtype_aitext'),
         new lang_string('relevance_setting', 'qtype_aitext'),
         constants::RELEVANCE_NONE, constants::get_relevance_opts()
+    ));
+    // Define the choices for the radio buttons.
+    $backends = [
+        'local_ai_manager' => get_string('localaimanager', 'qtype_aitext'),
+        'core_ai_subsystem' => get_string('coreaisubsystem', 'qtype_aitext'),
+        'tool_aimanager' => get_string('toolaimanager', 'qtype_aitext'),
+    ];
+    // Add the radio buttons setting.
+    $settings->add(new admin_setting_configselect(
+        'qtype_aitext/backend',
+        get_string('backends', 'qtype_aitext'),
+        get_string('backends_text', 'qtype_aitext'),
+        'core_ai_subsystem',
+        $backends
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'qtype_aitext/markprompt_required',
+        new lang_string('markprompt_required', 'qtype_aitext'),
+        new lang_string('markprompt_required_setting', 'qtype_aitext'),
+        0
+    ));
+
+    $settings->add( new admin_setting_configcheckbox(
+            'qtype_aitext/translatepostfix',
+        new lang_string('translatepostfix', 'qtype_aitext'),
+        new lang_string('translatepostfix_text', 'qtype_aitext'),
+        1
     ));
 
 }
