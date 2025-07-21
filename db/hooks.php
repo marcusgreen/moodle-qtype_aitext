@@ -15,17 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for the aitext question type.
+ * Hook listener callbacks.
  *
  * @package    qtype_aitext
- * @copyright  2024 Marcus Green
+ * @copyright  2025 ISB Bayern
+ * @author     Philipp Memmel
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'qtype_aitext';
-$plugin->version   = 2025071200;
-$plugin->requires  = 2020110900;
-$plugin->release = '0.03';
-$plugin->maturity  = MATURITY_BETA;
+$callbacks = [
+        [
+                'hook' => \local_ai_manager\hook\purpose_usage::class,
+                'callback' => \qtype_aitext\local\hook_callbacks::class . '::handle_purpose_usage',
+        ],
+];
