@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/question/type/questionbase.php');
 /**
  * Represents an aitext question.
  *
- * @copyright  2009 The Open University
+ * @copyright  2025 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_question extends question_graded_automatically_with_countback {
@@ -230,7 +230,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
         }
-        xdebug_break();
         if (is_array($response)) {
 
             $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
@@ -274,7 +273,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
         $expertmode = false;
-        xdebug_break();
 
         if (get_config('qtype_aitext', 'advancedmode') !== false) {
 

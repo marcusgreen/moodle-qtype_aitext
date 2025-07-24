@@ -517,7 +517,7 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
  *
  * @todo remove along with calls to it as file submission is not supported
  *
- * @copyright  2011 The Open University
+ * @copyright  2025 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_editor_renderer {
