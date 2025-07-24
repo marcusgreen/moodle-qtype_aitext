@@ -58,20 +58,6 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024051100, 'qtype', 'aitext');
     }
 
-    if ($oldversion < 2024051101) {
-        // Define field spellcheck to be added to qtype_aitext.
-        $table = new xmldb_table('qtype_aitext');
-        $field = new xmldb_field('spellcheck', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'model');
-
-        // Conditionally launch add field spellcheck.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Aitext savepoint reached.
-        upgrade_plugin_savepoint(true, 2024051101, 'qtype', 'aitext');
-    }
-
     if ($oldversion < 2025041002) {
         // Define table qtype_aitext_sampleresponses to be created.
         $table = new xmldb_table('qtype_aitext_sampleresponses');
@@ -100,6 +86,19 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         // Aitext savepoint reached.
         upgrade_plugin_savepoint(true, 2025041002, 'qtype', 'aitext');
 
+    }
+    if ($oldversion < 2025072200) {
+        // Define field spellcheck to be added to qtype_aitext.
+        $table = new xmldb_table('qtype_aitext');
+        $field = new xmldb_field('spellcheck', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'model');
+
+        // Conditionally launch add field spellcheck.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2025072200, 'qtype', 'aitext');
     }
 
     return true;

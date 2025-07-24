@@ -1,3 +1,7 @@
+### Release 0.04 of the Moodle AIText question type July 2025
+
+Merge of callbacks code for upcoming mebis local_ai_connect features.
+Fix upgrade.db which was missing the spellcheck fields and breaking the plugin
 
 ### Release 0.03 of the Moodle AIText question type May 2025
 

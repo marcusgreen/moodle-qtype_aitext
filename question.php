@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/question/type/questionbase.php');
 /**
  * Represents an aitext question.
  *
- * @copyright  2009 The Open University
+ * @copyright  2025 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_question extends question_graded_automatically_with_countback {
