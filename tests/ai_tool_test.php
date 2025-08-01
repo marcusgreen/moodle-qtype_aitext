@@ -37,7 +37,7 @@ use qtype_aitext;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-final class ai_tool_test extends \advanced_testcase {
+final class ai_tool_test extends \qbehaviour_walkthrough_test_base {
 
     /**
      * Instance of the question type class
@@ -82,10 +82,34 @@ final class ai_tool_test extends \advanced_testcase {
                 $this->markTestSkipped('No live connection to the AI system');
         }
 
-        $aitext = qtype_aitext_test_helper::make_aitext_question([]);
+        $question = qtype_aitext_test_helper::make_aitext_question([]);
+        $aiprompt = 'Evaluate the grammer in this text';
+        $response = 'Yesterday I go prk';
+        $defaultmark = 1;
+        $markscheme = '';
+        $response = [
+            'answer' => 'Yesterday I go prk',
+            'answerformat => 1',
+        ];
+        $maxmark = 2;
+
+        $question->questiontext = $options['questiontext'] = 'Write an English sentence in the past tense';
+
+        $question->aiprompt = $options['aiprompt'] = 'Evaluate the grammar in this text';
+        $response = [
+            'answer' => 'Yesterday I go prk',
+            'answerformat => 1',
+        ];
+        xdebug_break();
+        $this->start_attempt_at_question($question, 'deferredfeedback', $maxmark);
+       // $this->process_submission();
+
+        $question->grade_response($response);
+
+        $question->build_full_ai_prompt($response,$aiprompt,$defaultmark,$markscheme);
+
         $aitext->questiontext = 'What is 2 * 4?';
         $response = $aitext->perform_request('What is 2 * 4 only return a single number');
-        xdebug_break();
         $this->assertEquals('8', $response);
     }
 
