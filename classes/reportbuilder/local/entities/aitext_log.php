@@ -32,14 +32,13 @@ use core_reportbuilder\local\filters\text;
 use core_reportbuilder\local\helpers\format;
 use core_reportbuilder\local\report\column;
 use core_reportbuilder\local\report\filter;
-use \lang_string;
+use lang_string;
 
 
 /**
  * AI text log entity
  */
 class aitext_log extends base {
-
     /**
      * Database tables that this entity uses and their default aliases
      *
@@ -99,10 +98,10 @@ class aitext_log extends base {
 
         $columns = [];
         $columns[] = (new column(
-                'username',
-                new lang_string('username', 'core'),
-                $this->get_entity_name()
-            ))
+            'username',
+            new lang_string('username', 'core'),
+            $this->get_entity_name()
+        ))
             ->add_field("(SELECT username FROM {user} WHERE id = " . $this->get_table_alias('qtype_aitext_log') . ".userid)", 'username')
             ->set_type(column::TYPE_TEXT)
             ->set_is_sortable(true);
@@ -194,5 +193,4 @@ class aitext_log extends base {
 
         return $filters;
     }
-
 }

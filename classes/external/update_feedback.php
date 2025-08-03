@@ -41,11 +41,8 @@ class qtype_aitext_external extends external_api {
         return new external_function_parameters(
             [
             'questionattemptid' => new \external_value(PARAM_INT, 'The ID of the question attempt'),
-            'data' => new \external_value(PARAM_RAW, 'Optional JSON encoded data for the step.', VALUE_DEFAULT, null)
+            'data' => new \external_value(PARAM_RAW, 'Optional JSON encoded data for the step.', VALUE_DEFAULT, null),
             ]
         );
-
     }
 }
-
-
