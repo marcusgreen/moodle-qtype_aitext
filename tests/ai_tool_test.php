@@ -81,36 +81,16 @@ final class ai_tool_test extends \qbehaviour_walkthrough_test_base {
         if (!$this->islive) {
                 $this->markTestSkipped('No live connection to the AI system');
         }
-
         $question = qtype_aitext_test_helper::make_aitext_question([]);
         $aiprompt = 'Evaluate the grammer in this text';
         $response = 'Yesterday I go prk';
         $defaultmark = 1;
-        $markscheme = '';
-        $response = [
-            'answer' => 'Yesterday I go prk',
-            'answerformat => 1',
-        ];
-        $maxmark = 2;
-
-        $question->questiontext = $options['questiontext'] = 'Write an English sentence in the past tense';
-
-        $question->aiprompt = $options['aiprompt'] = 'Evaluate the grammar in this text';
-        $response = [
-            'answer' => 'Yesterday I go prk',
-            'answerformat => 1',
-        ];
-        xdebug_break();
-        $this->start_attempt_at_question($question, 'deferredfeedback', $maxmark);
-       // $this->process_submission();
-
-        $question->grade_response($response);
-
-        $question->build_full_ai_prompt($response,$aiprompt,$defaultmark,$markscheme);
-
-        $aitext->questiontext = 'What is 2 * 4?';
-        $response = $aitext->perform_request('What is 2 * 4 only return a single number');
-        $this->assertEquals('8', $response);
+        $markscheme = 'Give 0 marks if there are any grammatical errors';
+        $fullprompt = $question->build_full_ai_prompt($response,$aiprompt,$defaultmark,$markscheme);
+        $airesponse = $question->perform_request($fullprompt);
+        $this->assertIsString($airesponse);
+        $objectresponse = json_decode($airesponse);
+        $this->assertEquals(0,$objectresponse->marks);
     }
 
 }
