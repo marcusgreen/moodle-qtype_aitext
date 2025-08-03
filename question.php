@@ -36,7 +36,6 @@ require_once($CFG->dirroot . '/question/type/questionbase.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_question extends question_graded_automatically_with_countback {
-
     /**
      * Plain text or html
      * @var string
@@ -169,11 +168,11 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $llmresponse = (object) $manager->perform_request($prompt, 'qtype_aitext', $this->contextid);
             if ($llmresponse->get_code() !== 200) {
                 throw new moodle_exception(
-                'err_retrievingfeedback',
-                'qtype_aitext',
-                '',
-                $llmresponse->get_errormessage(),
-                $llmresponse->get_debuginfo()
+                    'err_retrievingfeedback',
+                    'qtype_aitext',
+                    '',
+                    $llmresponse->get_errormessage(),
+                    $llmresponse->get_debuginfo()
                 );
             }
             return $llmresponse->get_content();
@@ -194,7 +193,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             return $llmresponse['response']['choices'][0]['message']['content'];
         }
         throw new moodle_exception('err_invalidbackend', 'qtype_aitext');
-
     }
 
     /**
@@ -231,8 +229,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             return $grade;
         }
         if (is_array($response)) {
-            $fullaiprompt = $this->build_full_ai_prompt($response['answer'], $this->aiprompt,
-                 $this->defaultmark, $this->markscheme);
+            $fullaiprompt = $this->build_full_ai_prompt(
+                $response['answer'],
+                $this->aiprompt,
+                $this->defaultmark,
+                $this->markscheme
+            );
             $feedback = $this->perform_request($fullaiprompt, 'feedback');
         }
         $contentobject = $this->process_feedback($feedback);
@@ -275,22 +277,22 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
 
         $responsetext = strip_tags($response);
-            $responsetext = '[['.$responsetext.']]';
+            $responsetext = '[[' . $responsetext . ']]';
             $prompt = get_config('qtype_aitext', 'prompt');
             $prompt = preg_replace("/\[responsetext\]/", $responsetext, $prompt);
-            $prompt .= ' '.trim($aiprompt);
+            $prompt .= ' ' . trim($aiprompt);
 
         if ($markscheme > '') {
             // Tell the LLM how to mark the submission.
             $prompt .= " The total score is: $defaultmark .";
-            $prompt .= ' '.$markscheme;
+            $prompt .= ' ' . $markscheme;
         } else {
             // Todo should this be a plugin setting value?.
-            $prompt .= ' Set marks to null in the json object.'.PHP_EOL;
+            $prompt .= ' Set marks to null in the json object.' . PHP_EOL;
         }
-        $prompt .= ' '.trim(get_config('qtype_aitext', 'jsonprompt'));
+        $prompt .= ' ' . trim(get_config('qtype_aitext', 'jsonprompt'));
         if (get_config('qtype_aitext', 'translatepostfix')) {
-            $prompt .= ' translate the feedback to the language '.current_language();
+            $prompt .= ' translate the feedback to the language ' . current_language();
         };
 
         return $prompt;
@@ -329,7 +331,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $contentobject->feedback = trim($contentobject->feedback);
             $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"', $contentobject->feedback);
             $disclaimer = get_config('qtype_aitext', 'disclaimer');
-            $contentobject->feedback .= ' '.$this->llm_translate($disclaimer);
+            $contentobject->feedback .= ' ' . $this->llm_translate($disclaimer);
         } else {
             $contentobject = (object) [
                                         "feedback" => $feedback,
@@ -355,12 +357,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
 
         $cache = cache::make('qtype_aitext', 'stringdata');
-        if (($translation = $cache->get(current_language().'_'.$text)) === false) {
-            $prompt = 'translate "'.$text .'" into '.current_language() .
+        if (($translation = $cache->get(current_language() . '_' . $text)) === false) {
+            $prompt = 'translate "' . $text . '" into ' . current_language() .
                     'Only return the exact text, do not wrap it in other text.';
             $translation = $this->perform_request($prompt, 'translate');
             $translation = trim($translation, '"');
-            $cache->set(current_language().'_'.$text, $translation);
+            $cache->set(current_language() . '_' . $text, $translation);
         }
         return $translation;
     }
@@ -372,7 +374,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param string $value
      * @return void
      */
-    protected function insert_attempt_step_data(string $name, string $value ): void {
+    protected function insert_attempt_step_data(string $name, string $value): void {
         global $DB;
         $data = [
             'attemptstepid' => $this->step->get_id(),
@@ -412,8 +414,11 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     public function summarise_response(array $response) {
         $output = null;
         if (isset($response['answer'])) {
-            $output .= question_utils::to_plain_text($response['answer'],
-                $response['answerformat'], ['para' => false]);
+            $output .= question_utils::to_plain_text(
+                $response['answer'],
+                $response['answerformat'],
+                ['para' => false]
+            );
         }
 
         return $output;
@@ -489,8 +494,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         // Determine if the given response has online text and attachments.
         if (array_key_exists('answer', $response) && ($response['answer'] !== '')) {
             return true;
-        } else if (array_key_exists('attachments', $response)
-                && $response['attachments'] instanceof question_response_files) {
+        } else if (
+            array_key_exists('attachments', $response)
+                && $response['attachments'] instanceof question_response_files
+        ) {
             return true;
         } else {
             return false;
@@ -521,7 +528,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
         return $value1 === $value2 && ($this->attachments == 0 ||
                 question_utils::arrays_same_at_key_missing_is_blank(
-                $prevresponse, $newresponse, 'attachments'));
+                    $prevresponse,
+                    $newresponse,
+                    'attachments'
+                ));
     }
 
     /**
@@ -539,17 +549,20 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if ($component == 'question' && $filearea == 'response_attachments') {
             // Response attachments visible if the question has them.
             return $this->attachments != 0;
-
         } else if ($component == 'question' && $filearea == 'response_answer') {
             // Response attachments visible if the question has them.
             return $this->responseformat === 'editorfilepicker';
-
         } else if ($component == 'qtype_aitext' && $filearea == 'graderinfo') {
             return $options->manualcomment && $args[0] == $this->id;
-
         } else {
-            return parent::check_file_access($qa, $options, $component,
-                    $filearea, $args, $forcedownload);
+            return parent::check_file_access(
+                $qa,
+                $options,
+                $component,
+                $filearea,
+                $args,
+                $forcedownload
+            );
         }
     }
 
@@ -594,11 +607,17 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         // Count the number of words in the response string.
         $count = count_words($responsestring);
         if ($this->maxwordlimit && $count > $this->maxwordlimit) {
-            return get_string('maxwordlimitboundary', 'qtype_aitext',
-                    ['limit' => $this->maxwordlimit, 'count' => $count]);
+            return get_string(
+                'maxwordlimitboundary',
+                'qtype_aitext',
+                ['limit' => $this->maxwordlimit, 'count' => $count]
+            );
         } else if ($count < $this->minwordlimit) {
-            return get_string('minwordlimitboundary', 'qtype_aitext',
-                    ['limit' => $this->minwordlimit, 'count' => $count]);
+            return get_string(
+                'minwordlimitboundary',
+                'qtype_aitext',
+                ['limit' => $this->minwordlimit, 'count' => $count]
+            );
         } else {
             return null;
         }
@@ -625,11 +644,17 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         $count = count_words($response['answer']);
         if ($this->maxwordlimit && $count > $this->maxwordlimit) {
-            return get_string('wordcounttoomuch', 'qtype_aitext',
-                    ['limit' => $this->maxwordlimit, 'count' => $count]);
+            return get_string(
+                'wordcounttoomuch',
+                'qtype_aitext',
+                ['limit' => $this->maxwordlimit, 'count' => $count]
+            );
         } else if ($count < $this->minwordlimit) {
-            return get_string('wordcounttoofew', 'qtype_aitext',
-                    ['limit' => $this->minwordlimit, 'count' => $count]);
+            return get_string(
+                'wordcounttoofew',
+                'qtype_aitext',
+                ['limit' => $this->minwordlimit, 'count' => $count]
+            );
         } else {
             return get_string('wordcount', 'qtype_aitext', $count);
         }

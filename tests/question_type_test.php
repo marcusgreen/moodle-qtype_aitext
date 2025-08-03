@@ -110,6 +110,5 @@ final class question_type_test extends \advanced_testcase {
     public function test_get_possible_responses(): void {
         $q = $this->get_test_question_data();
         $this->assertEquals([], $this->qtype->get_possible_responses($q));
-
     }
 }

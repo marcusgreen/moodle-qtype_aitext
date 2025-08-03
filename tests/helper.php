@@ -188,5 +188,4 @@ class qtype_aitext_test_helper extends question_test_helper {
         $q->responseformat = 'noinline';
         return $q;
     }
-
 }

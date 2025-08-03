@@ -40,7 +40,6 @@ use qtype_aitext;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class question_test extends \advanced_testcase {
-
     /**
      * Instance of the question type class
      * @var question
@@ -172,7 +171,7 @@ final class question_test extends \advanced_testcase {
 
         $feedback = $aitext->process_feedback($goodjson);
         $this->assertIsObject($feedback);
-        $badjson = 'Some random string'. $goodjson;
+        $badjson = 'Some random string' . $goodjson;
         $feedback = $aitext->process_feedback($badjson);
         $this->assertIsObject($feedback);
     }
@@ -194,7 +193,8 @@ final class question_test extends \advanced_testcase {
         $aitext->responseformat = 'editor';
 
         $this->assertEquals($questiontext, $aitext->summarise_response(
-            ['answer' => $questiontext, 'answerformat' => FORMAT_HTML]));
+            ['answer' => $questiontext, 'answerformat' => FORMAT_HTML]
+        ));
     }
 
 
@@ -214,40 +214,49 @@ final class question_test extends \advanced_testcase {
         $aitext->start_attempt(new question_attempt_step(), 1);
 
         $this->assertTrue($aitext->is_same_response(
-                [],
-                ['answer' => '']));
+            [],
+            ['answer' => '']
+        ));
 
         $this->assertTrue($aitext->is_same_response(
-                ['answer' => ''],
-                ['answer' => '']));
+            ['answer' => ''],
+            ['answer' => '']
+        ));
 
         $this->assertTrue($aitext->is_same_response(
-                ['answer' => ''],
-                []));
+            ['answer' => ''],
+            []
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => 'Hello'],
-                []));
+            ['answer' => 'Hello'],
+            []
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => 'Hello'],
-                ['answer' => '']));
+            ['answer' => 'Hello'],
+            ['answer' => '']
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => 0],
-                ['answer' => '']));
+            ['answer' => 0],
+            ['answer' => '']
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => ''],
-                ['answer' => 0]));
+            ['answer' => ''],
+            ['answer' => 0]
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => '0'],
-                ['answer' => '']));
+            ['answer' => '0'],
+            ['answer' => '']
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => ''],
-                ['answer' => '0']));
+            ['answer' => ''],
+            ['answer' => '0']
+        ));
     }
 
 
@@ -264,40 +273,48 @@ final class question_test extends \advanced_testcase {
         $aitext->start_attempt(new question_attempt_step(), 1);
 
         $this->assertTrue($aitext->is_same_response(
-                [],
-                ['answer' => 'Once upon a time']));
+            [],
+            ['answer' => 'Once upon a time']
+        ));
 
         $this->assertTrue($aitext->is_same_response(
-                ['answer' => ''],
-                ['answer' => 'Once upon a time']));
+            ['answer' => ''],
+            ['answer' => 'Once upon a time']
+        ));
 
         $this->assertTrue($aitext->is_same_response(
-                ['answer' => 'Once upon a time'],
-                ['answer' => '']));
+            ['answer' => 'Once upon a time'],
+            ['answer' => '']
+        ));
 
         $this->assertTrue($aitext->is_same_response(
-                ['answer' => ''],
-                []));
+            ['answer' => ''],
+            []
+        ));
 
         $this->assertTrue($aitext->is_same_response(
-                ['answer' => 'Once upon a time'],
-                []));
+            ['answer' => 'Once upon a time'],
+            []
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => 0],
-                ['answer' => '']));
+            ['answer' => 0],
+            ['answer' => '']
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => ''],
-                ['answer' => 0]));
+            ['answer' => ''],
+            ['answer' => 0]
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => '0'],
-                ['answer' => '']));
+            ['answer' => '0'],
+            ['answer' => '']
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => ''],
-                ['answer' => '0']));
+            ['answer' => ''],
+            ['answer' => '0']
+        ));
     }
-
 }

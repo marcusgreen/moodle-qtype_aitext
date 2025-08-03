@@ -35,7 +35,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_qtype_aitext_plugin extends restore_qtype_plugin {
-
     /**
      * Returns the paths to be handled by the plugin at question level
      */
@@ -56,7 +55,6 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
         $elepath = $this->get_pathfor('/sampleresponses/sampleresponse');
         $paths[] = new restore_path_element($elename, $elepath);
         return $paths;
-
     }
 
 
@@ -82,8 +80,12 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
 
         $questiondata = parent::convert_backup_to_questiondata($backupdata);
 
-        $questiondata->options = $DB->get_record('qtype_aitext',
-            ['questionid' => $questiondata->id], '*', MUST_EXIST);
+        $questiondata->options = $DB->get_record(
+            'qtype_aitext',
+            ['questionid' => $questiondata->id],
+            '*',
+            MUST_EXIST
+        );
         $questiondata->options->sampleresponses = $DB->get_records(
             'qtype_aitext_sampleresponses',
             ['question' => $questiondata->id],
@@ -148,8 +150,10 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
         }
 
         // Detect if the question is created or mapped.
-        $questioncreated = $this->get_mappingid('question_created',
-                $this->get_old_parentid('question')) ? true : false;
+        $questioncreated = $this->get_mappingid(
+            'question_created',
+            $this->get_old_parentid('question')
+        ) ? true : false;
 
         // If the question has been created by restore, we need to create its
         // qtype_aitext too.
