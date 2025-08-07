@@ -322,10 +322,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (empty($feedbackjsonstrings)) {
             throw new moodle_exception('Could not parse feedback of AI tool');
         }
-        if (preg_match('/\{[^{}]*\}/', $feedback, $matches)) {
-            // Array $matches[1] contains the captured text inside the braces.
-            $feedback = $matches[0];
-        }
         $contentobject = json_decode($feedback);
         if (json_last_error() === JSON_ERROR_NONE) {
             $contentobject->feedback = trim($contentobject->feedback);
