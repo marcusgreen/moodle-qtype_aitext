@@ -241,12 +241,11 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         // If there are no marks, write the feedback and set to needs grading .
         if (is_null($contentobject->marks)) {
-            $grade = [0 => 0, question_state::$needsgrading];
+            $grade = [0.0, question_state::$needsgrading];
         } else {
-            if (is_numeric($contentobject->marks)) {
-                $fraction = $contentobject->marks / $this->defaultmark;
-            } else {
-                $fraction = 0.0;
+            $fraction = 0.0;
+            if (is_numeric($contentobject->marks) && $this->defaultmark > 0) {
+                $fraction = (float) $contentobject->marks / $this->defaultmark;
             }
             $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
