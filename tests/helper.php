@@ -49,7 +49,7 @@ class qtype_aitext_test_helper extends question_test_helper {
     public static function make_aitext_question(array $options) {
         question_bank::load_question_definition_classes('aitext');
         $question = new qtype_aitext_question();
-        $question->questiontext = $options['questiontext'] ?? '';
+        $question->questiontext = $options['questiontext'] ?? "Write an English sentence in the past tense";
         $question->model = $options['model'] ?? '';
         $question->sampleanswers = $options['sampleanswers'] ?? '';
 
