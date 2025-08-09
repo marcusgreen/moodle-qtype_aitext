@@ -290,9 +290,20 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $prompt .= ' Set marks to null in the json object.' . PHP_EOL;
         }
         $prompt .= ' ' . trim(get_config('qtype_aitext', 'jsonprompt'));
-        if (get_config('qtype_aitext', 'translatepostfix')) {
+
+        // Check for language specification in aiprompt.
+        $langcode = null;
+        if (preg_match('/\[\[lang=([a-zA-Z]{2})\]\]/', $aiprompt, $matches)) {
+            $langcode = $matches[1];
+        }
+
+        if ($langcode !== null) {
+            // If language code is found in aiprompt, always add translation instruction.
+            $prompt .= ' translate the feedback to the language ' . $langcode;
+        } else if (get_config('qtype_aitext', 'translatepostfix')) {
+            // Only use current_language() if translatepostfix setting is enabled and no langcode found.
             $prompt .= ' translate the feedback to the language ' . current_language();
-        };
+        }
 
         return $prompt;
     }

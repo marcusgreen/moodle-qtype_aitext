@@ -133,7 +133,6 @@ final class question_test extends \advanced_testcase {
      */
     public function test_build_full_ai_prompt(): void {
         $this->resetAfterTest(true);
-        xdebug_break();
 
         $question = qtype_aitext_test_helper::make_aitext_question([]);
         $aiprompt = "Is the text gramatically correct?";
@@ -141,16 +140,20 @@ final class question_test extends \advanced_testcase {
         $studentresponse = 'Yesterday I went to the park';
         $defaultmark = 1;
 
+        // Default request to translate feedback to en.
         set_config('translatepostfix', true, 'qtype_aitext');
         $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
         $this->assertStringContainsString('translate the feedback to the language en', $result);
 
-        $aiprompt = "Is the text gramatically correct? [[lang=jp]]";
-        $this->assertStringContainsString('translate the feedback to the language en', $result);
-
+        // Set config to not auto translate feedback to en.
         set_config('translatepostfix', false, 'qtype_aitext');
         $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
-        $this->assertStringNotContainsString('translate the feedback', $result);
+        $this->assertStringNotContainsString('translate the feedback to the language en', $result);
+
+        // Request feedback translation on a question by question basis.
+        $aiprompt = "Is the text gramatically correct? [[lang=jp]]";
+        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+        $this->assertStringContainsString('translate the feedback to the language jp', $result);
 
         // Student response is within [ ] delimters. Angle brackets might be better.
         $pattern = '/\[\[' . $studentresponse . '\]\]/';
