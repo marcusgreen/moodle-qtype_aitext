@@ -120,6 +120,7 @@ final class question_test extends \advanced_testcase {
      * @throws ExpectationFailedException
      */
     public function test_get_question_summary(): void {
+            $this->resetAfterTest(true);
             $aitext = qtype_aitext_test_helper::make_aitext_question([]);
             $aitext->questiontext = 'Hello <img src="http://example.com/globe.png" alt="world" />';
             $this->assertEquals('Hello [world]', $aitext->get_question_summary());
@@ -132,14 +133,27 @@ final class question_test extends \advanced_testcase {
      */
     public function test_build_full_ai_prompt(): void {
         $this->resetAfterTest(true);
+
         $question = qtype_aitext_test_helper::make_aitext_question([]);
-        $question->questiontext = 'Write an English sentence in the past tense';
         $aiprompt = "Is the text gramatically correct?";
         $markscheme  = 'One mark if the response is gramatically correct';
         $studentresponse = 'Yesterday I went to the park';
         $defaultmark = 1;
 
+        // Default request to translate feedback to en.
+        set_config('translatepostfix', true, 'qtype_aitext');
         $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+        $this->assertStringContainsString('translate the feedback to the language en', $result);
+
+        // Set config to not auto translate feedback to en.
+        set_config('translatepostfix', false, 'qtype_aitext');
+        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+        $this->assertStringNotContainsString('translate the feedback to the language en', $result);
+
+        // Request feedback translation on a question by question basis.
+        $aiprompt = "Is the text gramatically correct? [[lang=jp]]";
+        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+        $this->assertStringContainsString('translate the feedback to the language jp', $result);
 
         // Student response is within [ ] delimters. Angle brackets might be better.
         $pattern = '/\[\[' . $studentresponse . '\]\]/';
@@ -161,6 +175,8 @@ final class question_test extends \advanced_testcase {
      */
     public function test_get_feedback(): void {
         // Create the aitext question under test.
+        $this->resetAfterTest();
+
         $questiontext = 'AI question text';
         $aitext = qtype_aitext_test_helper::make_aitext_question(['questiontext' => $questiontext, 'model' => 'llama3']);
         $testdata = [
@@ -206,6 +222,7 @@ final class question_test extends \advanced_testcase {
      * @return void
      */
     public function test_is_same_response(): void {
+        $this->resetAfterTest();
 
         $aitext = qtype_aitext_test_helper::make_aitext_question([]);
 
@@ -266,6 +283,7 @@ final class question_test extends \advanced_testcase {
      * @covers ::is_same_response_with_template()
      */
     public function test_is_same_response_with_template(): void {
+        $this->resetAfterTest();
         $aitext = qtype_aitext_test_helper::make_aitext_question([]);
 
         $aitext->responsetemplate = 'Once upon a time';

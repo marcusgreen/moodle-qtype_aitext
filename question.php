@@ -260,12 +260,11 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         // If there are no marks, write the feedback and set to needs grading .
         if (is_null($contentobject->marks)) {
-            $grade = [0 => 0, question_state::$needsgrading];
+            $grade = [0.0, question_state::$needsgrading];
         } else {
-            if (is_numeric($contentobject->marks)) {
-                $fraction = $contentobject->marks / $this->defaultmark;
-            } else {
-                $fraction = 0.0;
+            $fraction = 0.0;
+            if (is_numeric($contentobject->marks) && $this->defaultmark > 0) {
+                $fraction = (float) $contentobject->marks / $this->defaultmark;
             }
             $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
@@ -310,9 +309,20 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $prompt .= ' Set marks to null in the json object.' . PHP_EOL;
         }
         $prompt .= ' ' . trim(get_config('qtype_aitext', 'jsonprompt'));
-        if (get_config('qtype_aitext', 'translatepostfix')) {
+
+        // Check for language specification in aiprompt.
+        $langcode = null;
+        if (preg_match('/\[\[lang=([a-zA-Z]{2})\]\]/', $aiprompt, $matches)) {
+            $langcode = $matches[1];
+        }
+
+        if ($langcode !== null) {
+            // If language code is found in aiprompt, always add translation instruction.
+            $prompt .= ' translate the feedback to the language ' . $langcode;
+        } else if (get_config('qtype_aitext', 'translatepostfix')) {
+            // Only use current_language() if translatepostfix setting is enabled and no langcode found.
             $prompt .= ' translate the feedback to the language ' . current_language();
-        };
+        }
 
         return $prompt;
     }
@@ -340,10 +350,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         preg_match_all('#\{(?:[^{}]|(?R))*\}#s', $feedback, $feedbackjsonstrings);
         if (empty($feedbackjsonstrings)) {
             throw new moodle_exception('Could not parse feedback of AI tool');
-        }
-        if (preg_match('/\{[^{}]*\}/', $feedback, $matches)) {
-            // Array $matches[1] contains the captured text inside the braces.
-            $feedback = $matches[0];
         }
         $contentobject = json_decode($feedback);
         if (json_last_error() === JSON_ERROR_NONE) {
