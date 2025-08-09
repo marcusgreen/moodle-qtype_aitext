@@ -291,18 +291,21 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
         $prompt .= ' ' . trim(get_config('qtype_aitext', 'jsonprompt'));
 
-        // Check for language specification in aiprompt.
-        $langcode = null;
-        if (preg_match('/\[\[language=([a-zA-Z]{2})\]\]/', $aiprompt, $matches)) {
-            $langcode = $matches[1];
-        }
+        // Only process language if the disable tag [[language=""]] is not present.
+        if (strpos($aiprompt, '[[language=""]]') === false) {
+            // Check for a specific language specification in aiprompt.
+            $langcode = null;
+            if (preg_match('/\[\[language=([a-zA-Z]{2})\]\]/', $aiprompt, $matches)) {
+                $langcode = $matches[1];
+            }
 
-        if ($langcode !== null) {
-            // If language code is found in aiprompt, always add translation instruction.
-            $prompt .= ' translate the feedback to the language ' . $langcode;
-        } else if (get_config('qtype_aitext', 'translatepostfix')) {
-            // Only use current_language() if translatepostfix setting is enabled and no langcode found.
-            $prompt .= ' translate the feedback to the language ' . current_language();
+            if ($langcode !== null) {
+                // If a specific language code (e.g., "fr") is found, add the translation instruction.
+                $prompt .= ' translate the feedback to the language ' . $langcode;
+            } else if (get_config('qtype_aitext', 'translatepostfix')) {
+                // Otherwise, if the setting is enabled, use the user's current language.
+                $prompt .= ' translate the feedback to the language ' . current_language();
+            }
         }
 
         return $prompt;

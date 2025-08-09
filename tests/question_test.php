@@ -155,6 +155,11 @@ final class question_test extends \advanced_testcase {
         $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
         $this->assertStringContainsString('translate the feedback to the language jp', $result);
 
+        // Disable insertion of the translation string.
+        $aiprompt = 'Is the text gramatically correct? [[language=""]]';
+        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+        $this->assertStringNotContainsString('translate the feedback to the language', $result);
+
         // Student response is within [ ] delimters. Angle brackets might be better.
         $pattern = '/\[\[' . $studentresponse . '\]\]/';
         $this->assertEquals(1, preg_match($pattern, $result));
