@@ -293,7 +293,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         // Check for language specification in aiprompt.
         $langcode = null;
-        if (preg_match('/\[\[lang=([a-zA-Z]{2})\]\]/', $aiprompt, $matches)) {
+        if (preg_match('/\[\[language=([a-zA-Z]{2})\]\]/', $aiprompt, $matches)) {
             $langcode = $matches[1];
         }
 

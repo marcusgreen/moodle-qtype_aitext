@@ -1,7 +1,14 @@
 ### Release 0.04 of the Moodle AIText question type July 2025
 
+Fixes:
 Merge of callbacks code for upcoming mebis local_ai_connect features.
-Fix upgrade.db which was missing the spellcheck fields and breaking the plugin
+Fix upgrade.db which was missing the spellcheck fields and breaking the plugin.
+Removed the code that was trimming any extraneious curly braces. This particularly broke any programming code. Deal with divide by zero scenario in grade_response.
+
+Feature:
+
+
+Unit tests to check on translatepostifx config setting.     Process lang strings slugs like [[lang=jd]] and add to unit tests
 
 ### Release 0.03 of the Moodle AIText question type May 2025
 

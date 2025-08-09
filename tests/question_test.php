@@ -151,7 +151,7 @@ final class question_test extends \advanced_testcase {
         $this->assertStringNotContainsString('translate the feedback to the language en', $result);
 
         // Request feedback translation on a question by question basis.
-        $aiprompt = "Is the text gramatically correct? [[lang=jp]]";
+        $aiprompt = "Is the text gramatically correct? [[language=jp]]";
         $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
         $this->assertStringContainsString('translate the feedback to the language jp', $result);
 
