@@ -91,8 +91,13 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         // The question_edit_form that this class extends expects a general feedback field.
         $mform->addElement('html', '<div class="hidden">');
-        $mform->addElement('editor', 'generalfeedback', get_string('generalfeedback', 'question'),
-             ['rows' => 10], $this->editoroptions);
+        $mform->addElement(
+            'editor',
+            'generalfeedback',
+            get_string('generalfeedback', 'question'),
+            ['rows' => 10],
+            $this->editoroptions
+        );
         $mform->addElement('html', '</div>');
 
         // Add repeated sample answer options along with the field for returned responses.
