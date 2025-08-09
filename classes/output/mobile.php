@@ -32,7 +32,6 @@ namespace qtype_aitext\output;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mobile {
-
     /**
      * Returns the aite question type for the quiz in the mobile app.
      * @param array $args
@@ -41,7 +40,7 @@ class mobile {
     public static function mobile_get_aitext($args) {
         global $CFG;
         $args = (object) $args;
-        $templatepath = $CFG->dirroot."/question/type/aitext/mobile/qtype_aitext.html";
+        $templatepath = $CFG->dirroot . "/question/type/aitext/mobile/qtype_aitext.html";
         return [
             'templates' => [
                 [

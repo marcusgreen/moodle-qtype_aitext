@@ -44,23 +44,36 @@ class qtype_aitext_edit_form extends question_edit_form {
         $qtype = question_bank::get_qtype('aitext');
         $mform->removeelement('generalfeedback');
         $mform->removeelement('questiontext');
-        $mform->addElement('editor', 'questiontext', get_string('questiontext', 'mod_quiz'),
-            ['maxlen' => 50, 'rows' => 8, 'size' => 30], $this->editoroptions);
+        $mform->addElement(
+            'editor',
+            'questiontext',
+            get_string('questiontext', 'mod_quiz'),
+            ['maxlen' => 50, 'rows' => 8, 'size' => 30],
+            $this->editoroptions
+        );
 
         // Spelling correction.
         $mform->addElement('checkbox', 'spellcheck', get_string('automatic_spellcheck', 'qtype_aitext'));
 
         // Ai prompt.
-        $mform->addElement('textarea', 'aiprompt', get_string('aiprompt', 'qtype_aitext'),
-             ['maxlen' => 50, 'rows' => 5, 'size' => 30]);
+        $mform->addElement(
+            'textarea',
+            'aiprompt',
+            get_string('aiprompt', 'qtype_aitext'),
+            ['maxlen' => 50, 'rows' => 5, 'size' => 30]
+        );
         $mform->setType('aiprompt', PARAM_RAW);
         $mform->setDefault('aiprompt', get_config('qtype_aitext', 'defaultprompt'));
         $mform->addHelpButton('aiprompt', 'aiprompt', 'qtype_aitext');
         $mform->addRule('aiprompt', get_string('aipromptmissing', 'qtype_aitext'), 'required');
 
         // Markscheme.
-        $mform->addElement('textarea', 'markscheme', get_string('markscheme', 'qtype_aitext'),
-             ['maxlen' => 50, 'rows' => 6, 'size' => 30]);
+        $mform->addElement(
+            'textarea',
+            'markscheme',
+            get_string('markscheme', 'qtype_aitext'),
+            ['maxlen' => 50, 'rows' => 6, 'size' => 30]
+        );
         $mform->setType('markscheme', PARAM_RAW);
         $mform->setDefault('markscheme', get_config('qtype_aitext', 'defaultmarksscheme'));
         $mform->addHelpButton('markscheme', 'markscheme', 'qtype_aitext');
@@ -68,10 +81,9 @@ class qtype_aitext_edit_form extends question_edit_form {
             $mform->addRule('markscheme', get_string('markschememissing', 'qtype_aitext'), 'required');
         }
         $models = explode(",", get_config('tool_aiconnect', 'model'));
-        if (count($models) > 1 ) {
+        if (count($models) > 1) {
             $models = array_combine($models, $models);
             $mform->addElement('select', 'model', get_string('model', 'qtype_aitext'), $models);
-
         } else {
             $mform->addElement('hidden', 'model', $models[0]);
         }
@@ -79,8 +91,8 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         // The question_edit_form that this class extends expects a general feedback field.
         $mform->addElement('html', '<div class="hidden">');
-        $mform->addElement('editor', 'generalfeedback', get_string('generalfeedback', 'question')
-        , ['rows' => 10], $this->editoroptions);
+        $mform->addElement('editor', 'generalfeedback', get_string('generalfeedback', 'question'),
+             ['rows' => 10], $this->editoroptions);
         $mform->addElement('html', '</div>');
 
         // Add repeated sample answer options along with the field for returned responses.
@@ -122,12 +134,20 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addElement('header', 'responseoptions', get_string('responseoptions', 'qtype_aitext'));
         $mform->setExpanded('responseoptions');
 
-        $mform->addElement('select', 'responseformat',
-                get_string('responseformat', 'qtype_aitext'), $qtype->response_formats());
+        $mform->addElement(
+            'select',
+            'responseformat',
+            get_string('responseformat', 'qtype_aitext'),
+            $qtype->response_formats()
+        );
         $mform->setDefault('responseformat', get_config('qtype_aitext', 'responseformat'));
 
-        $mform->addElement('select', 'responsefieldlines',
-                get_string('responsefieldlines', 'qtype_aitext'), $qtype->response_sizes());
+        $mform->addElement(
+            'select',
+            'responsefieldlines',
+            get_string('responsefieldlines', 'qtype_aitext'),
+            $qtype->response_sizes()
+        );
         $mform->setDefault('responsefieldlines', $this->get_default_value('responsefieldlines', 10));
         $mform->hideIf('responsefieldlines', 'responseformat', 'eq', 'noinline');
 
@@ -152,14 +172,24 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->hideIf('maxgroup', 'responseformat', 'eq', 'noinline');
 
         $mform->addElement('header', 'responsetemplateheader', get_string('responsetemplateheader', 'qtype_aitext'));
-        $mform->addElement('editor', 'responsetemplate', get_string('responsetemplate', 'qtype_aitext'),
-                ['rows' => 10],  array_merge($this->editoroptions, ['maxfiles' => 0]));
+        $mform->addElement(
+            'editor',
+            'responsetemplate',
+            get_string('responsetemplate', 'qtype_aitext'),
+            ['rows' => 10],
+            array_merge($this->editoroptions, ['maxfiles' => 0])
+        );
         $mform->addHelpButton('responsetemplate', 'responsetemplate', 'qtype_aitext');
 
         $mform->addElement('header', 'graderinfoheader', get_string('graderinfoheader', 'qtype_aitext'));
         $mform->setExpanded('graderinfoheader');
-        $mform->addElement('editor', 'graderinfo', get_string('graderinfo', 'qtype_aitext'),
-                ['rows' => 10], $this->editoroptions);
+        $mform->addElement(
+            'editor',
+            'graderinfo',
+            get_string('graderinfo', 'qtype_aitext'),
+            ['rows' => 10],
+            $this->editoroptions
+        );
 
         // Load any JS that we need to make things happen, specifically the prompt tester.
         $PAGE->requires->js_call_amd('qtype_aitext/responserun', 'init', [$this->context->id]);
@@ -253,8 +283,10 @@ class qtype_aitext_edit_form extends question_edit_form {
             }
         }
         if (isset($fromform['maxwordenabled']) && isset($fromform['minwordenabled'])) {
-            if ($fromform['maxwordlimit'] < $fromform['minwordlimit'] &&
-                $fromform['maxwordlimit'] > 0 && $fromform['minwordlimit'] > 0) {
+            if (
+                $fromform['maxwordlimit'] < $fromform['minwordlimit'] &&
+                $fromform['maxwordlimit'] > 0 && $fromform['minwordlimit'] > 0
+            ) {
                 $errors['maxgroup'] = get_string('err_maxminmismatch', 'qtype_aitext');
             }
         }

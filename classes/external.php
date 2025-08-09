@@ -50,7 +50,6 @@ class qtype_aitext_external extends external_api {
                 'contextid' => new external_value(PARAM_INT, 'The context id'),
             ]
         );
-
     }
 
     /**
@@ -63,16 +62,22 @@ class qtype_aitext_external extends external_api {
      * @param int $contextid the context id
      * @return stdClass the response
      */
-    public static function fetch_ai_grade(string $response, int $defaultmark,
-            string $prompt, string $marksscheme, int $contextid): stdClass {
+    public static function fetch_ai_grade(
+        string $response,
+        int $defaultmark,
+        string $prompt,
+        string $marksscheme,
+        int $contextid
+    ): stdClass {
         [
                 'response' => $response,
                 'defaultmark' => $defaultmark,
                 'prompt' => $prompt,
                 'marksscheme' => $marksscheme,
                 'contextid' => $contextid,
-        ] = self::validate_parameters(self::fetch_ai_grade_parameters(),
-                [
+        ] = self::validate_parameters(
+            self::fetch_ai_grade_parameters(),
+            [
                         'response' => $response,
                         'defaultmark' => $defaultmark,
                         'prompt' => $prompt,
@@ -114,7 +119,5 @@ class qtype_aitext_external extends external_api {
             'feedback' => new external_value(PARAM_RAW, 'text feedback for display to student', VALUE_DEFAULT),
             'marks' => new external_value(PARAM_FLOAT, 'AI grader awarded marks for student response', VALUE_DEFAULT),
         ]);
-
     }
-
 }

@@ -109,6 +109,7 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
 
         // Aitext savepoint reached.
         upgrade_plugin_savepoint(true, 2025050905, 'qtype', 'aitext');
+        upgrade_plugin_savepoint(true, 2025041002, 'qtype', 'aitext');
     }
     if ($oldversion < 2025072200) {
         // Define field spellcheck to be added to qtype_aitext.

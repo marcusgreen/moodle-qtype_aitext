@@ -41,7 +41,7 @@ $addons = [
                     'mobile_get_aitext' => [], // Function in classes/output/mobile.php.
                 ], // Function needs caching for offline.
                 'styles' => [
-                    'url' => $CFG->wwwroot.'/question/type/aitext/mobile/qtype_aitext_app.css',
+                    'url' => $CFG->wwwroot . '/question/type/aitext/mobile/qtype_aitext_app.css',
                     'version' => '0.1',
                 ],
             ],

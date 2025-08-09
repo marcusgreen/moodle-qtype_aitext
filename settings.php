@@ -24,22 +24,25 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
-
-    $settings->add(new admin_setting_configtextarea('qtype_aitext/defaultprompt',
+    $settings->add(new admin_setting_configtextarea(
+        'qtype_aitext/defaultprompt',
         new lang_string('defaultprompt', 'qtype_aitext'),
         new lang_string('defaultprompt_setting', 'qtype_aitext'),
-        new lang_string('thedefaultprompt', 'qtype_aitext')));
+        new lang_string('thedefaultprompt', 'qtype_aitext')
+    ));
 
-        $settings->add(new admin_setting_configtextarea('qtype_aitext/defaultmarksscheme',
-        new lang_string('defaultmarksscheme', 'qtype_aitext'),
-        new lang_string('defaultmarksscheme_setting', 'qtype_aitext'),
-        new lang_string('thedefaultmarksscheme', 'qtype_aitext')));
+        $settings->add(new admin_setting_configtextarea(
+            'qtype_aitext/defaultmarksscheme',
+            new lang_string('defaultmarksscheme', 'qtype_aitext'),
+            new lang_string('defaultmarksscheme_setting', 'qtype_aitext'),
+            new lang_string('thedefaultmarksscheme', 'qtype_aitext')
+        ));
     $settings->add(new admin_setting_configtext(
         'qtype_aitext/disclaimer',
         new lang_string('disclaimer', 'qtype_aitext'),
         new lang_string('disclaimer_setting', 'qtype_aitext'),
         '(Response provided by an AI System)'
-        ));
+    ));
     $settings->add(new admin_setting_configtextarea(
         'qtype_aitext/prompt',
         new lang_string('prompt', 'qtype_aitext'),
@@ -64,7 +67,8 @@ if ($ADMIN->fulltree) {
         'qtype_aitext/responseformat',
         new lang_string('responseformat', 'qtype_aitext'),
         new lang_string('responseformat_setting', 'qtype_aitext'),
-        0, ['plain' => 'plain', 'editor' => 'editor', 'monospaced' => 'monospaced']
+        0,
+        ['plain' => 'plain', 'editor' => 'editor', 'monospaced' => 'monospaced']
     ));
     // Define the choices for the radio buttons.
     $backends = [
@@ -88,8 +92,8 @@ if ($ADMIN->fulltree) {
         0
     ));
 
-    $settings->add( new admin_setting_configcheckbox(
-            'qtype_aitext/translatepostfix',
+    $settings->add(new admin_setting_configcheckbox(
+        'qtype_aitext/translatepostfix',
         new lang_string('translatepostfix', 'qtype_aitext'),
         new lang_string('translatepostfix_text', 'qtype_aitext'),
         1
@@ -127,4 +131,3 @@ if ($ADMIN->fulltree) {
 
 
 }
-

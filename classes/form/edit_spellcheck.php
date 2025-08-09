@@ -30,7 +30,6 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edit_spellcheck extends dynamic_form {
-
     /** @var context|null Variable to store the context because it is expensive to retrieve. */
     private ?context $context = null;
 
@@ -95,7 +94,6 @@ class edit_spellcheck extends dynamic_form {
         ) {
             throw new \moodle_exception('nocapabilitytousethisservice');
         }
-
     }
 
     /**
