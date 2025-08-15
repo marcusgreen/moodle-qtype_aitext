@@ -135,9 +135,10 @@ final class question_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         $question = qtype_aitext_test_helper::make_aitext_question([]);
-        $aiprompt = "Is the text gramatically correct?";
+        $question->questiontext = 'Write a poem';
+        $aiprompt = "Does this answer the request to '[[questiontext]]' ";
         $markscheme  = 'One mark if the response is gramatically correct';
-        $studentresponse = 'Yesterday I went to the park';
+        $studentresponse = 'The rain in Spain';
         $defaultmark = 1;
 
         // Default request to translate feedback to en.
@@ -149,6 +150,9 @@ final class question_test extends \advanced_testcase {
         set_config('translatepostfix', false, 'qtype_aitext');
         $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
         $this->assertStringNotContainsString('translate the feedback to the language en', $result);
+
+        // The questiontext should have been interpolated into the prompt.
+        $this->assertStringContainsString('Write a poem', $result);
 
         // Request feedback translation on a question by question basis.
         $aiprompt = "Is the text gramatically correct? [[language=jp]]";
