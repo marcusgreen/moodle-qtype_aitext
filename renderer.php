@@ -39,8 +39,10 @@ class qtype_aitext_renderer extends qtype_renderer {
      * @param question_display_options $options
      * @return string
      */
-    public function formulation_and_controls(question_attempt $qa,
-            question_display_options $options) {
+    public function formulation_and_controls(
+        question_attempt $qa,
+        question_display_options $options
+    ) {
         global $CFG, $USER;
 
         /** @var qtype_aitext_question $question */
@@ -59,12 +61,21 @@ class qtype_aitext_renderer extends qtype_renderer {
         }
 
         if (empty($options->readonly)) {
-            $answer = $responseoutput->response_area_input('answer', $qa,
-                    $step, $question->responsefieldlines, $options->context);
-
+            $answer = $responseoutput->response_area_input(
+                'answer',
+                $qa,
+                $step,
+                $question->responsefieldlines,
+                $options->context
+            );
         } else {
-            $answer = $responseoutput->response_area_read_only('answer', $qa,
-                    $step, $question->responsefieldlines, $options->context);
+            $answer = $responseoutput->response_area_read_only(
+                'answer',
+                $qa,
+                $step,
+                $question->responsefieldlines,
+                $options->context
+            );
             $answer .= html_writer::nonempty_tag('p', $question->get_word_count_message_for_review($step->get_qt_data()));
 
             if (!empty($CFG->enableplagiarism)) {
@@ -84,7 +95,6 @@ class qtype_aitext_renderer extends qtype_renderer {
         if (isset($question->attachments) && $question->attachments) {
             if (empty($options->readonly)) {
                 $files = $this->files_input($qa, $question->attachments, $options);
-
             } else {
                 $files = $this->files_read_only($qa, $options);
             }
@@ -93,30 +103,48 @@ class qtype_aitext_renderer extends qtype_renderer {
         $result = '';
         if (get_config('qtype_aitext', 'backend') === 'local_ai_manager') {
             $uniqid = uniqid();
-            $result .= html_writer::tag('div', '',
-                    ['data-content' => 'local_ai_manager_infobox', 'data-boxid' => $uniqid]);
-            $this->page->requires->js_call_amd('local_ai_manager/infobox', 'renderInfoBox',
-                    ['qtype_aitext', $USER->id, '[data-content="local_ai_manager_infobox"][data-boxid="' . $uniqid . '"]',
-                            ['feedback']]);
+            $result .= html_writer::tag(
+                'div',
+                '',
+                ['data-content' => 'local_ai_manager_infobox', 'data-boxid' => $uniqid]
+            );
+            $this->page->requires->js_call_amd(
+                'local_ai_manager/infobox',
+                'renderInfoBox',
+                ['qtype_aitext', $USER->id, '[data-content="local_ai_manager_infobox"][data-boxid="' . $uniqid . '"]',
+                ['feedback']]
+            );
         }
-        $result .= html_writer::tag('div', $question->format_questiontext($qa),
-                ['class' => 'qtext']);
+        $result .= html_writer::tag(
+            'div',
+            $question->format_questiontext($qa),
+            ['class' => 'qtext']
+        );
 
         $result .= html_writer::start_tag('div', ['class' => 'ablock']);
         $result .= html_writer::tag('div', $answer, ['class' => 'answer']);
 
         // If there is a response and min/max word limit is set in the form then check the response word count.
         if ($qa->get_state() == question_state::$invalid) {
-            $result .= html_writer::nonempty_tag('div',
-                $question->get_validation_error($step->get_qt_data()), ['class' => 'validationerror']);
+            $result .= html_writer::nonempty_tag(
+                'div',
+                $question->get_validation_error($step->get_qt_data()),
+                ['class' => 'validationerror']
+            );
         }
         $result .= html_writer::tag('div', $files, ['class' => 'attachments']);
         $result .= html_writer::end_tag('div');
         if (get_config('qtype_aitext', 'backend') === 'local_ai_manager') {
-            $result .= html_writer::tag('div', '',
-                    ['data-content' => 'local_ai_manager_warningbox', 'data-boxid' => $uniqid]);
-            $this->page->requires->js_call_amd('local_ai_manager/warningbox', 'renderWarningBox',
-                    ['[data-content="local_ai_manager_warningbox"][data-boxid="' . $uniqid . '"]']);
+            $result .= html_writer::tag(
+                'div',
+                '',
+                ['data-content' => 'local_ai_manager_warningbox', 'data-boxid' => $uniqid]
+            );
+            $this->page->requires->js_call_amd(
+                'local_ai_manager/warningbox',
+                'renderWarningBox',
+                ['[data-content="local_ai_manager_warningbox"][data-boxid="' . $uniqid . '"]']
+            );
         }
 
         return $result;
@@ -138,9 +166,10 @@ class qtype_aitext_renderer extends qtype_renderer {
             if ($comment[0] > '') {
                 $this->page->requires->js_call_amd('qtype_aitext/showprompt', 'init', []);
                 $prompt = $qa->get_last_qt_var('-aiprompt');
-                $showprompt = '<br/><button  id=showprompt class="rounded">'. get_string('showprompt', 'qtype_aitext').'</button>';
-                $showprompt .= '<div id="fullprompt" class="hidden">'.$prompt .'</div>';
-                $comment[0] = $comment[0].$showprompt;
+                $showprompt = '<br/><button  id=showprompt class="rounded">' .
+                     get_string('showprompt', 'qtype_aitext') . '</button>';
+                $showprompt .= '<div id="fullprompt" class="hidden">' . $prompt . '</div>';
+                $comment[0] = $comment[0] . $showprompt;
             }
             return $comment[0];
         }
@@ -161,9 +190,15 @@ class qtype_aitext_renderer extends qtype_renderer {
         $step = $qa->get_last_step_with_qt_var('attachments');
 
         foreach ($files as $file) {
-            $out = html_writer::link($qa->get_response_file_url($file),
-                $this->output->pix_icon(file_file_icon($file), get_mimetype_description($file),
-                    'moodle', ['class' => 'icon']) . ' ' . s($file->get_filename()));
+            $out = html_writer::link(
+                $qa->get_response_file_url($file),
+                $this->output->pix_icon(
+                    file_file_icon($file),
+                    get_mimetype_description($file),
+                    'moodle',
+                    ['class' => 'icon']
+                ) . ' ' . s($file->get_filename())
+            );
             if (!empty($CFG->enableplagiarism)) {
                 require_once($CFG->libdir . '/plagiarismlib.php');
 
@@ -196,8 +231,11 @@ class qtype_aitext_renderer extends qtype_renderer {
      * @param question_display_options $options controls what should and should
      *      not be displayed. Used to get the context.
      */
-    public function files_input(question_attempt $qa, $numallowed,
-            question_display_options $options) {
+    public function files_input(
+        question_attempt $qa,
+        $numallowed,
+        question_display_options $options
+    ) {
         global $CFG, $COURSE;
         require_once($CFG->dirroot . '/lib/form/filemanager.php');
 
@@ -205,12 +243,16 @@ class qtype_aitext_renderer extends qtype_renderer {
         $pickeroptions->mainfile = null;
         $pickeroptions->maxfiles = $numallowed;
         $pickeroptions->itemid = $qa->prepare_response_files_draft_itemid(
-                'attachments', $options->context->id);
+            'attachments',
+            $options->context->id
+        );
         $pickeroptions->context = $options->context;
         $pickeroptions->return_types = FILE_INTERNAL | FILE_CONTROLLED_LINK;
 
         $pickeroptions->itemid = $qa->prepare_response_files_draft_itemid(
-                'attachments', $options->context->id);
+            'attachments',
+            $options->context->id
+        );
         $pickeroptions->accepted_types = $qa->get_question()->filetypeslist;
 
         $fm = new form_filemanager($pickeroptions);
@@ -256,7 +298,6 @@ class qtype_aitext_renderer extends qtype_renderer {
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
-
     /** @var question_display_options Question display options instance for any necessary information for rendering the question. */
     protected $displayoptions;
 
@@ -289,8 +330,11 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
 
         if ($question->spellcheck) {
             $this->page->requires->js_call_amd('qtype_aitext/diff');
-            $this->page->requires->js_call_amd('qtype_aitext/spellcheck', 'init',
-                    ['#' . $readonlyareaid, '#' . $spellcheckeditbuttonid]);
+            $this->page->requires->js_call_amd(
+                'qtype_aitext/spellcheck',
+                'init',
+                ['#' . $readonlyareaid, '#' . $spellcheckeditbuttonid]
+            );
             $stepspellcheck = $qa->get_last_step_with_qt_var('-spellcheckresponse');
             $stepanswer = $qa->get_last_step_with_qt_var('answer');
         }
@@ -327,13 +371,13 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
         ) {
             $btnoptions = ['id' => $spellcheckeditbuttonid, 'class' => 'btn btn-link'];
             $output .= html_writer::tag(
-                    'button',
-                    $this->output->pix_icon(
-                            'i/edit',
-                            get_string('spellcheckedit', 'qtype_aitext'),
-                            'moodle'
-                    ) . " " . get_string('spellcheckedit', 'qtype_aitext'),
-                    $btnoptions
+                'button',
+                $this->output->pix_icon(
+                    'i/edit',
+                    get_string('spellcheckedit', 'qtype_aitext'),
+                    'moodle'
+                ) . " " . get_string('spellcheckedit', 'qtype_aitext'),
+                $btnoptions
             );
         }
         // Height $lines * 1.25 because that is a typical line-height on web pages.
@@ -351,8 +395,13 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
      * @param object $context the context teh output belongs to.
      * @return string html to display the response for editing.
      */
-    abstract public function response_area_input($name, question_attempt $qa,
-            question_attempt_step $step, $lines, $context);
+    abstract public function response_area_input(
+        $name,
+        question_attempt $qa,
+        question_attempt_step $step,
+        $lines,
+        $context
+    );
 
     /**
      * Specific class name to add to the input element.
@@ -404,12 +453,18 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
             $formats[$fid] = $strformats[$fid];
         }
 
-        list($draftitemid, $response) = $this->prepare_response_for_editing(
-                $name, $step, $context);
+        [$draftitemid, $response] = $this->prepare_response_for_editing(
+            $name,
+            $step,
+            $context
+        );
 
         $editor->set_text($response);
-        $editor->use_editor($id, $this->get_editor_options($context),
-                $this->get_filepicker_options($context, $draftitemid));
+        $editor->use_editor(
+            $id,
+            $this->get_editor_options($context),
+            $this->get_filepicker_options($context, $draftitemid)
+        );
 
         $responselabel = $this->displayoptions->add_question_identifier_to_label(get_string('answertext', 'qtype_aitext'));
         $output = html_writer::tag('label', $responselabel, [
@@ -418,15 +473,17 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
         ]);
         $output .= html_writer::start_tag('div', ['class' =>
                 $this->class_name() . ' qtype_aitext_response']);
-        $output .= html_writer::tag('div', html_writer::tag('textarea', s($response),
-                ['id' => $id, 'name' => $inputname, 'rows' => $lines, 'cols' => 60, 'class' => 'form-control']));
+        $output .= html_writer::tag('div', html_writer::tag(
+            'textarea',
+            s($response),
+            ['id' => $id, 'name' => $inputname, 'rows' => $lines, 'cols' => 60, 'class' => 'form-control']
+        ));
 
         $output .= html_writer::start_tag('div');
         if (count($formats) == 1) {
             reset($formats);
             $output .= html_writer::empty_tag('input', ['type' => 'hidden',
                     'name' => $inputname . 'format', 'value' => key($formats)]);
-
         } else {
             $output .= html_writer::label(get_string('format'), 'menu' . $inputname . 'format', false);
             $output .= ' ';
@@ -449,16 +506,23 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
      * @param object $context the context the attempt belongs to.
      * @return string the response prepared for display.
      */
-    protected function prepare_response($name, question_attempt $qa,
-            question_attempt_step $step, $context) {
+    protected function prepare_response(
+        $name,
+        question_attempt $qa,
+        question_attempt_step $step,
+        $context
+    ) {
         if (!$step->has_qt_var($name)) {
             return '';
         }
 
         $formatoptions = new stdClass();
         $formatoptions->para = false;
-        return format_text($step->get_qt_var($name), $step->get_qt_var($name . 'format'),
-                $formatoptions);
+        return format_text(
+            $step->get_qt_var($name),
+            $step->get_qt_var($name . 'format'),
+            $formatoptions
+        );
     }
 
     /**
@@ -468,8 +532,11 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
      * @param object $context the context the attempt belongs to.
      * @return array the response prepared for display.
      */
-    protected function prepare_response_for_editing($name,
-            question_attempt_step $step, $context) {
+    protected function prepare_response_for_editing(
+        $name,
+        question_attempt_step $step,
+        $context
+    ) {
         return [0, $step->get_qt_var($name)];
     }
 
@@ -538,16 +605,24 @@ class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_
      * @param object $context
      * @return string
      */
-    protected function prepare_response($name, question_attempt $qa,
-            question_attempt_step $step, $context) {
+    protected function prepare_response(
+        $name,
+        question_attempt $qa,
+        question_attempt_step $step,
+        $context
+    ) {
         if (!$step->has_qt_var($name)) {
             return '';
         }
 
         $formatoptions = new stdClass();
         $formatoptions->para = false;
-        $text = $qa->rewrite_response_pluginfile_urls($step->get_qt_var($name),
-                $context->id, 'answer', $step);
+        $text = $qa->rewrite_response_pluginfile_urls(
+            $step->get_qt_var($name),
+            $context->id,
+            'answer',
+            $step
+        );
         return format_text($text, $step->get_qt_var($name . 'format'), $formatoptions);
     }
 
@@ -559,10 +634,16 @@ class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_
      * @param object $context
      * @return void
      */
-    protected function prepare_response_for_editing($name,
-            question_attempt_step $step, $context) {
+    protected function prepare_response_for_editing(
+        $name,
+        question_attempt_step $step,
+        $context
+    ) {
         return $step->prepare_response_files_draft_itemid_with_text(
-                $name, $context->id, $step->get_qt_var($name));
+            $name,
+            $context->id,
+            $step->get_qt_var($name)
+        );
     }
 
     /**
@@ -634,10 +715,12 @@ class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_
 
         return html_writer::empty_tag('input', ['type' => 'hidden',
                 'name' => $inputname . ':itemid', 'value' => $draftitemid]) .
-                html_writer::tag('noscript', html_writer::tag('div',
+                html_writer::tag('noscript', html_writer::tag(
+                    'div',
                     html_writer::tag('object', '', ['type' => 'text/html',
                         'data' => $nonjspickerurl, 'height' => 160, 'width' => 600,
-                        'style' => 'border: 1px solid #000;'])));
+                    'style' => 'border: 1px solid #000;'])
+                ));
     }
 }
 
@@ -649,7 +732,6 @@ class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_base {
-
     /**
      * Where the student keys in the response
      *
@@ -705,8 +787,12 @@ class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_ba
      * @param object $context the context the attempt belongs to.
      * @return string the response prepared for display.
      */
-    protected function prepare_response($name, question_attempt $qa,
-            question_attempt_step $step, $context) {
+    protected function prepare_response(
+        $name,
+        question_attempt $qa,
+        question_attempt_step $step,
+        $context
+    ) {
         if (!$step->has_qt_var($name)) {
             return '';
         }

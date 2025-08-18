@@ -43,14 +43,15 @@ class qtype_aitext_external extends external_api {
      */
     public static function fetch_ai_grade_parameters(): external_function_parameters {
         return new external_function_parameters(
-            ['response' => new external_value(PARAM_TEXT, 'The students response to question'),
-                'defaultmark' => new external_value(PARAM_INT, 'The total possible score'),
-                'prompt' => new external_value(PARAM_TEXT, 'The AI Prompt'),
-                'marksscheme' => new external_value(PARAM_TEXT, 'The marks scheme'),
-                'contextid' => new external_value(PARAM_INT, 'The context id'),
+            [
+             'response'    => new external_value(PARAM_TEXT, 'The students response to question'),
+             'defaultmark' => new external_value(PARAM_INT, 'The total possible score'),
+             'prompt'      => new external_value(PARAM_TEXT, 'The AI Prompt'),
+             'marksscheme' => new external_value(PARAM_TEXT, 'The marks scheme'),
+             'questiontext' => new external_value(PARAM_RAW, 'The question text'),
+             'contextid'   => new external_value(PARAM_INT, 'The context id'),
             ]
         );
-
     }
 
     /**
@@ -63,23 +64,44 @@ class qtype_aitext_external extends external_api {
      * @param int $contextid the context id
      * @return stdClass the response
      */
-    public static function fetch_ai_grade(string $response, int $defaultmark,
-            string $prompt, string $marksscheme, int $contextid): stdClass {
+    /**
+     * Grade response using AI, optionally including question text.
+     *
+     * @param string $response     The student's response.
+     * @param int    $defaultmark  The total possible score.
+     * @param string $prompt       The AI prompt template.
+     * @param string $marksscheme  The marks scheme instructions.
+     * @param string $questiontext The question text content.
+     * @param int    $contextid    The context id.
+     * @return stdClass the AI feedback and marks
+     */
+    public static function fetch_ai_grade(
+        string $response,
+        int $defaultmark,
+        string $prompt,
+        string $marksscheme,
+        string $questiontext,
+        int $contextid
+    ): stdClass {
         [
-                'response' => $response,
+            'response'    => $response,
+            'defaultmark' => $defaultmark,
+            'prompt'      => $prompt,
+            'marksscheme' => $marksscheme,
+            'questiontext' => $questiontext,
+            'contextid'   => $contextid,
+        ] = self::validate_parameters(
+            self::fetch_ai_grade_parameters(),
+            [
+                'response'    => $response,
                 'defaultmark' => $defaultmark,
-                'prompt' => $prompt,
+                'prompt'      => $prompt,
                 'marksscheme' => $marksscheme,
-                'contextid' => $contextid,
-        ] = self::validate_parameters(self::fetch_ai_grade_parameters(),
-                [
-                        'response' => $response,
-                        'defaultmark' => $defaultmark,
-                        'prompt' => $prompt,
-                        'marksscheme' => $marksscheme,
-                        'contextid' => $contextid,
-                ]
+                'questiontext' => $questiontext,
+                'contextid'   => $contextid,
+            ]
         );
+        xdebug_break();
         $context = $contextid === 0 ? context_system::instance() : context::instance_by_id($contextid);
         self::validate_context($context);
 
@@ -92,6 +114,8 @@ class qtype_aitext_external extends external_api {
         $aiquestion = new qtype_aitext_question();
         $aiquestion->contextid = $contextid;
         $aiquestion->qtype = \question_bank::get_qtype('aitext');
+        // Provide the current question text for placeholder substitution.
+        $aiquestion->questiontext = $questiontext;
         // Make sure we have the right data for AI to work with.
         if (!empty($response) && !empty($prompt) && $defaultmark > 0) {
             $fullaiprompt = $aiquestion->build_full_ai_prompt($response, $prompt, $defaultmark, $marksscheme);
@@ -114,7 +138,5 @@ class qtype_aitext_external extends external_api {
             'feedback' => new external_value(PARAM_RAW, 'text feedback for display to student', VALUE_DEFAULT),
             'marks' => new external_value(PARAM_FLOAT, 'AI grader awarded marks for student response', VALUE_DEFAULT),
         ]);
-
     }
-
 }

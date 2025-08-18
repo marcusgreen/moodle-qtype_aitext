@@ -90,6 +90,9 @@ function clickSetup(contextid, Selectors) {
         const aiprompt = document.getElementById('id_aiprompt');
         const marksscheme = document.getElementById('id_markscheme');
         const defaultmark = document.getElementById('id_defaultmark');
+        // Include current question text for AI grading if referenced in prompt.
+        const questiontextElem = document.getElementById('id_questiontext');
+        const questiontext = questiontextElem ? questiontextElem.value : '';
 
         const spinnerOuter = document.querySelector('#fitem_id_spinner_' + id);
         const spinner = spinnerOuter.querySelector('#id_spinner');
@@ -111,6 +114,7 @@ function clickSetup(contextid, Selectors) {
                 defaultmark: defaultmark.value,
                 prompt: aiprompt.value,
                 marksscheme: marksscheme.value,
+                questiontext: questiontext,
                 contextid: contextid
             },
             async: false

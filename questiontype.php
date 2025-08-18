@@ -35,7 +35,6 @@ require_once($CFG->libdir . '/questionlib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext extends question_type {
-
     /**
      * value from id column of quesiton table
      *
@@ -81,8 +80,12 @@ class qtype_aitext extends question_type {
      */
     public function get_question_options($question) {
         global $DB;
-        $question->options = $DB->get_record('qtype_aitext',
-                ['questionid' => $question->id], '*', MUST_EXIST);
+        $question->options = $DB->get_record(
+            'qtype_aitext',
+            ['questionid' => $question->id],
+            '*',
+            MUST_EXIST
+        );
         $question->options->sampleresponses = $DB->get_records(
             'qtype_aitext_sampleresponses',
             ['question' => $question->id],
@@ -103,7 +106,6 @@ class qtype_aitext extends question_type {
         $this->set_default_value('responseformat', $fromform->responseformat);
         $this->set_default_value('responsefieldlines', $fromform->responsefieldlines);
         $this->set_default_value('markscheme', $fromform->markscheme);
-
     }
     /**
      * Write the question data from the editing form to the database
@@ -138,11 +140,15 @@ class qtype_aitext extends question_type {
             ];
             $options->responsetemplate = $formdata->responsetemplate['text'];
             $options->responsetemplateformat = $formdata->responsetemplate['format'];
-
         }
 
-        $options->graderinfo = $this->import_or_save_files($formdata->graderinfo,
-                $context, 'qtype_aitext', 'graderinfo', $formdata->id);
+        $options->graderinfo = $this->import_or_save_files(
+            $formdata->graderinfo,
+            $context,
+            'qtype_aitext',
+            'graderinfo',
+            $formdata->id
+        );
 
         $options->graderinfoformat = $formdata->graderinfo['format'];
         $options->responsetemplate = $formdata->responsetemplate['text'];
@@ -316,7 +322,7 @@ class qtype_aitext extends question_type {
      * @param stdClass $extra
      * @return boolean
      */
-    public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
+    public function import_from_xml($data, $question, qformat_xml $format, $extra = null) {
         $questiontype = $data['@']['type'];
         if ($questiontype != $this->name()) {
             return false;
@@ -338,7 +344,7 @@ class qtype_aitext extends question_type {
         // Note: add in other text fields.
         $textfields = ['responsetemplate'];
         foreach ($textfields as $field) {
-            $fmt = $format->get_format($format->getpath($data, ['#', $field.'format', 0, '#'], 0));
+            $fmt = $format->get_format($format->getpath($data, ['#', $field . 'format', 0, '#'], 0));
             $qo->$field = $format->import_text_with_files($data, ['#', $field, 0], '', $fmt);
         }
         if (isset($qo->maxwordlimit) && $qo->maxwordlimit > "") {
@@ -370,8 +376,9 @@ class qtype_aitext extends question_type {
      */
     public function export_to_xml($question, qformat_xml $format, $extra = null) {
         $fs = get_file_storage();
-        $textfields = $this->get_text_fields();;
-        $formatfield = '/^('.implode('|', $textfields).')format$/';
+        $textfields = $this->get_text_fields();
+        ;
+        $formatfield = '/^(' . implode('|', $textfields) . ')format$/';
         $fields = $this->extra_question_fields();
         array_shift($fields); // Remove table name.
 
@@ -382,8 +389,8 @@ class qtype_aitext extends question_type {
             }
             if (in_array($field, $textfields)) {
                 $files = $fs->get_area_files($question->contextid, 'question', $field, $question->id);
-                $output .= "    <$field ".$format->format($question->options->{$field.'format'}).">\n";
-                $output .= '      '.$format->writetext($question->options->$field);
+                $output .= "    <$field " . $format->format($question->options->{$field . 'format'}) . ">\n";
+                $output .= '      ' . $format->writetext($question->options->$field);
                 $output .= $format->write_files($files);
                 $output .= "    </$field>\n";
             } else {
@@ -391,7 +398,7 @@ class qtype_aitext extends question_type {
                 if ($field == 'errorcmid') {
                     $value = $this->export_errorcmid($value);
                 }
-                $output .= "    <$field>".$format->xml_escape($value)."</$field>\n";
+                $output .= "    <$field>" . $format->xml_escape($value) . "</$field>\n";
             }
         }
         foreach ($question->options->sampleresponses as $sampleresponse) {
@@ -450,5 +457,4 @@ class qtype_aitext extends question_type {
         }
         return parent::menu_name();
     }
-
 }

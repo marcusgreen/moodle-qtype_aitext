@@ -40,7 +40,6 @@ use qtype_aitext;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class question_test extends \advanced_testcase {
-
     /**
      * Instance of the question type class
      * @var question
@@ -121,6 +120,7 @@ final class question_test extends \advanced_testcase {
      * @throws ExpectationFailedException
      */
     public function test_get_question_summary(): void {
+            $this->resetAfterTest(true);
             $aitext = qtype_aitext_test_helper::make_aitext_question([]);
             $aitext->questiontext = 'Hello <img src="http://example.com/globe.png" alt="world" />';
             $this->assertEquals('Hello [world]', $aitext->get_question_summary());
@@ -133,14 +133,36 @@ final class question_test extends \advanced_testcase {
      */
     public function test_build_full_ai_prompt(): void {
         $this->resetAfterTest(true);
+
         $question = qtype_aitext_test_helper::make_aitext_question([]);
-        $question->questiontext = 'Write an English sentence in the past tense';
-        $aiprompt = "Is the text gramatically correct?";
+        $question->questiontext = 'Write a poem';
+        $aiprompt = "Does this answer the request to '[[questiontext]]' ";
         $markscheme  = 'One mark if the response is gramatically correct';
-        $studentresponse = 'Yesterday I went to the park';
+        $studentresponse = 'The rain in Spain';
         $defaultmark = 1;
 
+        // Default request to translate feedback to en.
+        set_config('translatepostfix', true, 'qtype_aitext');
         $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+        $this->assertStringContainsString('translate the feedback to the language en', $result);
+
+        // Set config to not auto translate feedback to en.
+        set_config('translatepostfix', false, 'qtype_aitext');
+        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+        $this->assertStringNotContainsString('translate the feedback to the language en', $result);
+
+        // The questiontext should have been interpolated into the prompt.
+        $this->assertStringContainsString('Write a poem', $result);
+
+        // Request feedback translation on a question by question basis.
+        $aiprompt = "Is the text gramatically correct? [[language=jp]]";
+        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+        $this->assertStringContainsString('translate the feedback to the language jp', $result);
+
+        // Disable insertion of the translation string.
+        $aiprompt = 'Is the text gramatically correct? [[language=""]]';
+        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+        $this->assertStringNotContainsString('translate the feedback to the language', $result);
 
         // Student response is within [ ] delimters. Angle brackets might be better.
         $pattern = '/\[\[' . $studentresponse . '\]\]/';
@@ -173,6 +195,8 @@ final class question_test extends \advanced_testcase {
      */
     public function test_get_feedback(): void {
         // Create the aitext question under test.
+        $this->resetAfterTest();
+
         $questiontext = 'AI question text';
         $aitext = qtype_aitext_test_helper::make_aitext_question(['questiontext' => $questiontext, 'model' => 'llama3']);
         $testdata = [
@@ -183,7 +207,7 @@ final class question_test extends \advanced_testcase {
 
         $feedback = $aitext->process_feedback($goodjson);
         $this->assertIsObject($feedback);
-        $badjson = 'Some random string'. $goodjson;
+        $badjson = 'Some random string' . $goodjson;
         $feedback = $aitext->process_feedback($badjson);
         $this->assertIsObject($feedback);
     }
@@ -205,7 +229,8 @@ final class question_test extends \advanced_testcase {
         $aitext->responseformat = 'editor';
 
         $this->assertEquals($questiontext, $aitext->summarise_response(
-            ['answer' => $questiontext, 'answerformat' => FORMAT_HTML]));
+            ['answer' => $questiontext, 'answerformat' => FORMAT_HTML]
+        ));
     }
 
 
@@ -217,6 +242,7 @@ final class question_test extends \advanced_testcase {
      * @return void
      */
     public function test_is_same_response(): void {
+        $this->resetAfterTest();
 
         $aitext = qtype_aitext_test_helper::make_aitext_question([]);
 
@@ -225,40 +251,49 @@ final class question_test extends \advanced_testcase {
         $aitext->start_attempt(new question_attempt_step(), 1);
 
         $this->assertTrue($aitext->is_same_response(
-                [],
-                ['answer' => '']));
+            [],
+            ['answer' => '']
+        ));
 
         $this->assertTrue($aitext->is_same_response(
-                ['answer' => ''],
-                ['answer' => '']));
+            ['answer' => ''],
+            ['answer' => '']
+        ));
 
         $this->assertTrue($aitext->is_same_response(
-                ['answer' => ''],
-                []));
+            ['answer' => ''],
+            []
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => 'Hello'],
-                []));
+            ['answer' => 'Hello'],
+            []
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => 'Hello'],
-                ['answer' => '']));
+            ['answer' => 'Hello'],
+            ['answer' => '']
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => 0],
-                ['answer' => '']));
+            ['answer' => 0],
+            ['answer' => '']
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => ''],
-                ['answer' => 0]));
+            ['answer' => ''],
+            ['answer' => 0]
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => '0'],
-                ['answer' => '']));
+            ['answer' => '0'],
+            ['answer' => '']
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => ''],
-                ['answer' => '0']));
+            ['answer' => ''],
+            ['answer' => '0']
+        ));
     }
 
 
@@ -268,6 +303,7 @@ final class question_test extends \advanced_testcase {
      * @covers ::is_same_response_with_template()
      */
     public function test_is_same_response_with_template(): void {
+        $this->resetAfterTest();
         $aitext = qtype_aitext_test_helper::make_aitext_question([]);
 
         $aitext->responsetemplate = 'Once upon a time';
@@ -275,40 +311,48 @@ final class question_test extends \advanced_testcase {
         $aitext->start_attempt(new question_attempt_step(), 1);
 
         $this->assertTrue($aitext->is_same_response(
-                [],
-                ['answer' => 'Once upon a time']));
+            [],
+            ['answer' => 'Once upon a time']
+        ));
 
         $this->assertTrue($aitext->is_same_response(
-                ['answer' => ''],
-                ['answer' => 'Once upon a time']));
+            ['answer' => ''],
+            ['answer' => 'Once upon a time']
+        ));
 
         $this->assertTrue($aitext->is_same_response(
-                ['answer' => 'Once upon a time'],
-                ['answer' => '']));
+            ['answer' => 'Once upon a time'],
+            ['answer' => '']
+        ));
 
         $this->assertTrue($aitext->is_same_response(
-                ['answer' => ''],
-                []));
+            ['answer' => ''],
+            []
+        ));
 
         $this->assertTrue($aitext->is_same_response(
-                ['answer' => 'Once upon a time'],
-                []));
+            ['answer' => 'Once upon a time'],
+            []
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => 0],
-                ['answer' => '']));
+            ['answer' => 0],
+            ['answer' => '']
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => ''],
-                ['answer' => 0]));
+            ['answer' => ''],
+            ['answer' => 0]
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => '0'],
-                ['answer' => '']));
+            ['answer' => '0'],
+            ['answer' => '']
+        ));
 
         $this->assertFalse($aitext->is_same_response(
-                ['answer' => ''],
-                ['answer' => '0']));
+            ['answer' => ''],
+            ['answer' => '0']
+        ));
     }
-
 }

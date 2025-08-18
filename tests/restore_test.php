@@ -30,7 +30,6 @@ require_once($CFG->dirroot . '/question/type/aitext/tests/helper.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class restore_test extends \restore_date_testcase {
-
     /**
      * Test missing qtype_aitext_options creation.
      *

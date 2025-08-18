@@ -36,9 +36,8 @@ use core_privacy\local\request\writer;
 class provider implements
         // This component has data.
         // We need to return default options that have been set a user preferences.
-        \core_privacy\local\metadata\provider,
-        \core_privacy\local\request\user_preference_provider {
-
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\user_preference_provider {
     /**
      * Returns meta data about this system.
      *
@@ -67,7 +66,7 @@ class provider implements
 
         $preference = get_user_preferences('qtype_aitext_responseformat', null, $userid);
         if (null !== $preference) {
-            switch($preference) {
+            switch ($preference) {
                 case 'editor':
                     $stringvalue = get_string('formateditor', 'qtype_aitext');
                     break;
@@ -105,8 +104,12 @@ class provider implements
         $preference = get_user_preferences('qtype_aitext_responsefieldlines', null, $userid);
         if (null !== $preference) {
             $desc = get_string('privacy:preference:responsefieldlines', 'qtype_aitext');
-            writer::export_user_preference('qtype_aitext', 'responsefieldlines',
-                    get_string('nlines', 'qtype_aitext', $preference), $desc);
+            writer::export_user_preference(
+                'qtype_aitext',
+                'responsefieldlines',
+                get_string('nlines', 'qtype_aitext', $preference),
+                $desc
+            );
         }
         $preference = get_user_preferences('qtype_aitext_attachments', null, $userid);
         if (null !== $preference) {
