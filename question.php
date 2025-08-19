@@ -282,9 +282,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $aiprompt = str_replace('[[questiontext]]', strip_tags($this->questiontext), $aiprompt);
         }
         if (strpos($aiprompt, '[[expert]]') !== false) {
-            // remove [[expert]] as it is just a flag.
-            $prompt = str_replace('/\[[expert]\/]', '', $aiprompt);
-            $prompt = preg_replace("/\[\[response\]\]/", $response, $aiprompt);
+            // Remove [[expert]] as it is just a flag.
+            $prompt = str_replace('[[expert]]', '', $aiprompt);
+            $prompt = preg_replace("/\[\[response\]\]/", $response, $prompt);
 
             if (strpos($aiprompt, '[[userlang]]') !== false) {
                 $prompt .= ' ' . current_language();

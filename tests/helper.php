@@ -58,6 +58,11 @@ class qtype_aitext_test_helper extends question_test_helper {
         $question->contextid = 1;
         $question->spellcheck = 0;
         $question->step = new class {
+            /**
+             * Placeholder to avoid error.
+             *
+             * @return int
+             */
             public function get_id() {
                 return 1;
             }

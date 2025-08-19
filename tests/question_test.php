@@ -18,7 +18,10 @@ namespace qtype_aitext;
 
 use coding_exception;
 use core_reportbuilder\external\filters\set;
+use Exception;
 use PHPUnit\Framework\ExpectationFailedException;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Container\ContainerExceptionInterface;
 use question_attempt_step;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
@@ -31,6 +34,7 @@ require_once($CFG->dirroot . '/question/type/aitext/questiontype.php');
 
 use qtype_aitext_test_helper;
 use qtype_aitext;
+use Random\RandomException;
 
 /**
  * Unit tests for the matching question definition class.
@@ -173,13 +177,26 @@ final class question_test extends \advanced_testcase {
 
         // Marks scheme should be in result ready to send to LLm. Though it is optional.
         $this->assertStringContainsString($markscheme, $result);
+
+        // Expert mode.
+        $aiprompt = '[[expert]] Is the text gramatically correct?';
+        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+
+        // The string [[expert]] is only a flag so it should have been stripped out.
+        $this->assertStringNotContainsString('[[expert]]', $result);
     }
 
-    function test_expert_mode(): void {
+    /**
+     * Check when [[expert]] is included no "boilerplate" will be added
+     * @return void
+     *
+     * @covers \qtype_aitext\question::grade_response($response)
+     *
+     */
+    public function test_expert_mode(): void {
         global $DB;
         $this->resetAfterTest(true);
-        $question = qtype_aitext_test_helper::make_aitext_question(['aiprompt' => '[[expert]] Write an English sentence in the past tense']);
-        $question->questiontext = 'Write an English sentence in the past tense';
+        $question = qtype_aitext_test_helper::make_aitext_question(['aiprompt' => '[[expert]] Write asentence in the past tense']);
         $response = ['answer' => 'Yesterday I went to the park', 'answerformat' => 2];
         $question->grade_response($response);
         $result = $DB->get_record('question_attempt_step_data', ['name' => '-aicontent']);
@@ -200,9 +217,9 @@ final class question_test extends \advanced_testcase {
         $questiontext = 'AI question text';
         $aitext = qtype_aitext_test_helper::make_aitext_question(['questiontext' => $questiontext, 'model' => 'llama3']);
         $testdata = [
-                "feedback" => "Feedback text",
-                "marks" => 0,
-                ];
+            "feedback" => "Feedback text",
+            "marks" => 0,
+            ];
         $goodjson = json_encode($testdata);
 
         $feedback = $aitext->process_feedback($goodjson);
