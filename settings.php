@@ -52,6 +52,7 @@ if ($ADMIN->fulltree) {
         80,
         6
     ));
+
     $settings->add(new admin_setting_configtextarea(
         'qtype_aitext/jsonprompt',
         new lang_string('jsonprompt', 'qtype_aitext'),
@@ -98,4 +99,12 @@ if ($ADMIN->fulltree) {
         new lang_string('translatepostfix_text', 'qtype_aitext'),
         1
     ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'qtype_aitext/expertmode',
+        get_string('expertmode', 'qtype_aitext'),
+        get_string('expertmode_setting', 'qtype_aitext'),
+        0
+    ));
+
 }

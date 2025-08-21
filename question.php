@@ -223,19 +223,26 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $spellcheckresponse = $this->get_spellchecking($response);
             $this->insert_attempt_step_data('-spellcheckresponse', $spellcheckresponse);
         }
-
         if (!$this->is_complete_response($response)) {
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
         }
         if (is_array($response)) {
-            $fullaiprompt = $this->build_full_ai_prompt(
-                $response['answer'],
-                $this->aiprompt,
-                $this->defaultmark,
-                $this->markscheme
-            );
-            $feedback = $this->perform_request($fullaiprompt, 'feedback');
+            $hasexpert = strpos($this->aiprompt, '[[expert]]') !== false;
+            $hasresponse = strpos($this->aiprompt, '[[response]]') !== false;
+               // If one is present but not both, return early with the message.
+            if ($hasexpert xor $hasresponse) {
+                $feedback = 'If the prompt contains[[expert]] or [[response]] it must contain both';
+                $fullaiprompt = $this->aiprompt;
+            } else {
+                $fullaiprompt = $this->build_full_ai_prompt(
+                    $response['answer'],
+                    $this->aiprompt,
+                    $this->defaultmark,
+                    $this->markscheme
+                );
+                $feedback = $this->perform_request($fullaiprompt, 'feedback');
+            }
         }
         $contentobject = $this->process_feedback($feedback);
 
@@ -249,6 +256,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             }
             $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
+
          // The -aicontent data is used in question preview. Only needs to happen in preview.
         $this->insert_attempt_step_data('-aiprompt', $fullaiprompt);
         $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);
@@ -269,10 +277,19 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return string;
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
-
         // Check if [questiontext] is in the aiprompt and replace it with the question text.
         if (strpos($aiprompt, '[[questiontext]]') !== false) {
             $aiprompt = str_replace('[[questiontext]]', strip_tags($this->questiontext), $aiprompt);
+        }
+        if (strpos($aiprompt, '[[expert]]') !== false && (get_config('qtype_aitext', 'expertmode') == 1)) {
+            // Remove [[expert]] as it is just a flag.
+            $prompt = str_replace('[[expert]]', '', $aiprompt);
+            $prompt = preg_replace("/\[\[response\]\]/", $response, $prompt);
+
+            if (strpos($aiprompt, '[[userlang]]') !== false) {
+                $prompt .= ' ' . current_language();
+            }
+            return $prompt;
         }
 
         $responsetext = strip_tags($response);
@@ -310,6 +327,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         return $prompt;
     }
+
 
     /**
      * Build the full ai spellchecking prompt.
