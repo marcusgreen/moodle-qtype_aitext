@@ -281,7 +281,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (strpos($aiprompt, '[[questiontext]]') !== false) {
             $aiprompt = str_replace('[[questiontext]]', strip_tags($this->questiontext), $aiprompt);
         }
-        if (strpos($aiprompt, '[[expert]]') !== false) {
+        if (strpos($aiprompt, '[[expert]]') !== false && (get_config('qtype_aitext', 'expertmode') == 1)) {
             // Remove [[expert]] as it is just a flag.
             $prompt = str_replace('[[expert]]', '', $aiprompt);
             $prompt = preg_replace("/\[\[response\]\]/", $response, $prompt);

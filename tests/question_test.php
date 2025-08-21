@@ -179,6 +179,7 @@ final class question_test extends \advanced_testcase {
         $this->assertStringContainsString($markscheme, $result);
 
         // Expert mode.
+        set_config('expertmode', 1, 'qtype_aitext');
         $aiprompt = '[[expert]] Is the text gramatically correct?';
         $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
 
