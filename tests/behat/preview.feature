@@ -6,21 +6,21 @@ Feature: Preview aitext questions
 
   Background:
     Given the following "users" exist:
-        | username | firstname | lastname | email               |
-        | teacher  | user      | user | teacher@example.org |
+          | username | firstname | lastname | email               |
+          | teacher  | user      | user     | teacher@example.org |
     And the following "courses" exist:
-        | fullname | shortname | category |
-        | Course 1 | C1        | 0        |
+          | fullname | shortname | category |
+          | Course 1 | C1        | 0        |
     And the following "course enrolments" exist:
-        | user    | course | role           |
-        | teacher | C1     | editingteacher |
+          | user    | course | role           |
+          | teacher | C1     | editingteacher |
     And the following "question categories" exist:
-        | contextlevel | reference | name           |
-        | Course       | C1        | Test questions |
+          | contextlevel | reference | name           |
+          | Course       | C1        | Test questions |
     And the following "questions" exist:
-        | questioncategory | qtype  | name       | template |
-        | Test questions   | aitext | aitext-001 | editor   |
-        | Test questions   | aitext | aitext-002 | plain    |
+          | questioncategory | qtype  | name       | template |
+          | Test questions   | aitext | aitext-001 | editor   |
+          | Test questions   | aitext | aitext-002 | plain    |
 
   @javascript
   Scenario: Preview an aitext question that uses the HTML editor.
@@ -32,6 +32,15 @@ Feature: Preview aitext questions
     # And I press "Start again with these options"
     And I press "saverestart"
     And I should see "Please write a story about a frog."
+    And I set the following fields to these values:
+          | Answer text Question 1 | Froggie went a courting |
+    And I press "Submit and finish"
+    And I should see "AI Feedback"
+    And I press "Close preview"
+    And I choose "Edit question" action for "aitext-001" in the question bank
+    And I expand all fieldsets
+    And I press "Evaluate Sample Response"
+    And I should see "AI Feedback"
 
   @javascript @_switch_window
   Scenario: Preview an aitext question that uses a plain text area.
@@ -41,3 +50,7 @@ Feature: Preview aitext questions
     # And I press "Start again with these options"
     And I press "saverestart"
     And I should see "Please write a story about a frog."
+    And I set the following fields to these values:
+          | Answer text Question 1 | Froggie went a courting |
+    And I press "Submit and finish"
+    And I should see "AI Feedback"

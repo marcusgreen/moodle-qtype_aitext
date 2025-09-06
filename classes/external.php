@@ -101,7 +101,6 @@ class qtype_aitext_external extends external_api {
                 'contextid'   => $contextid,
             ]
         );
-        xdebug_break();
         $context = $contextid === 0 ? context_system::instance() : context::instance_by_id($contextid);
         self::validate_context($context);
 

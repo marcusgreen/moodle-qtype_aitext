@@ -162,6 +162,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @param string $purpose
      */
     public function perform_request(string $prompt, string $purpose = 'feedback'): string {
+        if (defined('BEHAT_SITE_RUNNING') || (defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
+            return "AI Feedback";
+        }
         $backend = get_config('qtype_aitext', 'backend');
         if ($backend == 'local_ai_manager') {
             $manager = new local_ai_manager\manager($purpose);
