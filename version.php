@@ -18,14 +18,14 @@
  * Version information for the aitext question type.
  *
  * @package    qtype_aitext
- * @copyright  2024 Marcus Green
+ * @copyright  2025 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_aitext';
-$plugin->version   = 2025072201;
+$plugin->version   = 2025091400;
 $plugin->requires  = 2024100700;
-$plugin->release = '0.04';
+$plugin->release = '0.06';
 $plugin->maturity  = MATURITY_BETA;
