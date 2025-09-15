@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_aitext';
-$plugin->version   = 2025090700;
-$plugin->requires  = 2020110900;
-$plugin->release = '0.05';
+$plugin->version   = 2025091400;
+$plugin->requires  = 2024100700;
+$plugin->release = '0.06';
 $plugin->maturity  = MATURITY_BETA;
