@@ -201,9 +201,13 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             }
             return $responsedata['generatedcontent'];
         } else if ($backend == 'tool_aimanager') {
-            $ai = new tool_aiconnect\ai\ai();
-            $llmresponse = $ai->prompt_completion($prompt);
-            return $llmresponse['response']['choices'][0]['message']['content'];
+            if (class_exists('\tool_aiconnect\ai\ai')) {
+                $ai = new tool_aiconnect\ai\ai();
+                $llmresponse = $ai->prompt_completion($prompt);
+                return $llmresponse['response']['choices'][0]['message']['content'];
+            } else {
+                throw new moodle_exception('err_retrievingfeedback_checkconfig', 'qtype_aitext', '');
+            }
         }
         throw new moodle_exception('err_invalidbackend', 'qtype_aitext');
     }
