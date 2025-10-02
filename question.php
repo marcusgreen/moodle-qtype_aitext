@@ -189,6 +189,16 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $manager = \core\di::get(\core_ai\manager::class);
             $llmresponse = $manager->process_action($action);
             $responsedata = $llmresponse->get_response_data();
+            // #40 Check the response data is actually a string.
+            if (!is_array($responsedata) || !array_key_exists('generatedcontent', $responsedata) ||
+                $responsedata === null || $responsedata['generatedcontent'] === null
+                ) {
+                if ($responsedata === null || $responsedata['generatedcontent']) {
+                    throw new moodle_exception('err_retrievingfeedback_checkconfig', 'qtype_aitext');
+                } else {
+                    throw new moodle_exception('err_retrievingfeedback', 'qtype_aitext');
+                }
+            }
             return $responsedata['generatedcontent'];
         } else if ($backend == 'tool_aimanager') {
             $ai = new tool_aiconnect\ai\ai();
