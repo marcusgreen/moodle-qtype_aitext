@@ -17,14 +17,13 @@
  * PHP calls this from within
  * classes/output/mobile.php
  */
-/* eslint-disable no-console */
 /* eslint-env es6 */
 var that = this;
 var result = {
     componentInit: function() {
 
         // Check that "this.question" was provided.
-        if (! this.question) {
+        if (!this.question) {
             return that.CoreQuestionHelperProvider.showComponentError(that.onAbort);
         }
 
@@ -45,17 +44,17 @@ var result = {
 
         var textarea = div.querySelector('.answer textarea');
         if (textarea === null) {
-            // review or check
+            // Review or check.
             textarea = div.querySelector('.answer .qtype_aitext_response');
         }
         if (textarea) {
             textarea.style.borderRadius = '4px';
             textarea.style.padding = '6px 12px';
             if (textarea.matches('.readonly')) {
-                textarea.style.border = '2px #b8dce2 solid'; // light blue
-                textarea.style.backgroundColor = '#e7f3f5'; // lighter blue
+                textarea.style.border = '2px #b8dce2 solid'; // Light blue.
+                textarea.style.backgroundColor = '#e7f3f5'; // Lighter blue.
             } else {
-                textarea.style.backgroundColor = '#edf6f7'; // lightest blue
+                textarea.style.backgroundColor = '#edf6f7'; // Lightest blue.
             }
             this.question.textarea = textarea.outerHTML;
         }
@@ -67,7 +66,7 @@ var result = {
             // adding styles to 'mobile/styles_app.css' doesn't seem to be effective :-(
             that.replaceBootstrapClasses(itemcount);
 
-            itemcount.querySelectorAll('p').forEach(function(p){
+            itemcount.querySelectorAll('p').forEach(function(p) {
                 that.replaceBootstrapClasses(p);
             });
 
@@ -80,10 +79,7 @@ var result = {
             this.question.itemcount = itemcount.outerHTML;
         }
 
-        /**
-         * questionRendered
-         */
-        this.questionRendered = function(){
+        this.questionRendered = function() {
 
             var textarea = this.componentContainer.querySelector('textarea');
             var itemcount = this.componentContainer.querySelector('.itemcount');

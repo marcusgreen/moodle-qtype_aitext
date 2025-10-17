@@ -77,7 +77,7 @@ export const renderDiff = (readonlyareaselector) => {
             fullspellcheck += part.value.documentElement.textContent;
         }
     });
-
+    fullspellcheck = fullspellcheck.replace(/\u00A0/g, " ");
     fragment.innerHTML = fullspellcheck;
     document.querySelector(readonlyareaselector).replaceChildren(fragment);
 };

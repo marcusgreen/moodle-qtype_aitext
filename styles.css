@@ -9,13 +9,13 @@
 }
 
 .que.aitext .qtext {
-    color:inherit;
+    color: inherit;
 }
 .que.aitext .formulation .answer {
-    font-size:12pt;
+    font-size: 16px;
 }
 .que.aitext .answer {
-    color:inherit;
+    color: inherit;
 }
 
 .que.aitext textarea.qtype_aitext_response.qtype_aitext_monospaced {
@@ -39,15 +39,15 @@
     margin-top: 1em;
 }
 .qtype_aitext_sampleanswereval {
-    font-size: 12pt;
+    font-size: 16px;
     margin: 3px;
     padding: 3px;
     width: 100%;
     max-width: 800px;
-    background-color: #DDDDDD;
+    background-color: #ddd;
 }
 
-.qtype_aitext_spellcheck_wrong{
+.qtype_aitext_spellcheck_wrong {
     color: red;
     text-decoration: line-through;
     font-weight: 400;
