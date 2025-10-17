@@ -106,5 +106,4 @@ if ($ADMIN->fulltree) {
         get_string('expertmode_setting', 'qtype_aitext'),
         0
     ));
-
 }
