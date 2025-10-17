@@ -39,7 +39,7 @@ Feature: Preview aitext questions
     And I press "Close preview"
     And I choose "Edit question" action for "aitext-001" in the question bank
     And I expand all fieldsets
-    And I press "Evaluate Sample Response"
+    And I press "Evaluate sample response"
     And I should see "AI Feedback"
 
   @javascript @_switch_window
