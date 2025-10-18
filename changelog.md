@@ -1,4 +1,8 @@
 
+### Release 1.00 of the Moodle AIText question type Oct 2025
+Confirmed compatibility with Moodle 5.1 by running automated tests
+Fixed behat test that was broken by a change of case in a string
+
 ### Release 0.05 of the Moodle AIText question type Sep 2025
 
 Removed the code that was trimming any extraneious curly braces.

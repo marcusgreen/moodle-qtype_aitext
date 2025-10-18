@@ -25,7 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_aitext';
-$plugin->version   = 2025091400;
-$plugin->requires  = 2024100700;
-$plugin->release = '0.06';
-$plugin->maturity  = MATURITY_BETA;
+$plugin->version = 2025101800;
+$plugin->requires = 2025031400;  // Moodle 5.0.
+$plugin->release = '1.00';
+$plugin->supported = [500, 501];
+$plugin->maturity = MATURITY_STABLE;
