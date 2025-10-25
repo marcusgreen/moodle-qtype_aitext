@@ -109,7 +109,19 @@ class qtype_aitext_edit_form extends question_edit_form {
         $repeatarray = [
             $mform->createElement('static', 'spinner', '', '<div class =" col-md-9" id="id_spinner"></div>'),
             $mform->createElement('textarea', 'sampleresponses', get_string('sampleresponse', 'qtype_aitext'), $answeroptions),
-            $mform->createElement('textarea', 'sampleresponseeval', get_string('sampleresponseeval', 'qtype_aitext'), $evaloptions),
+            // Wrap the evaluation output in the same grid column width as Moodle form items (label + element pattern).
+            $mform->createElement(
+                'html',
+                '<div class="form-group row fitem">'
+                . '<div class="col-md-3 col-form-label d-flex pb-0 pt-0"><label>'
+                . get_string('sampleresponseeval', 'qtype_aitext')
+                . '</label></div>'
+                . '<div class="col-md-9 form-inline felement">'
+                . '<div id="id_sampleresponseeval_0" class="form-control w-100" style="min-height:5em; overflow:auto;"></div>'
+                . '</div>'
+                . '</div>'
+            ),
+            // Keep button name/id consistent with JS selectors (sampleresponsebtn_*).
             $mform->createelement('button', 'sampleresponsebtn', get_string('sampleresponseevaluate', 'qtype_aitext')),
             $mform->createElement('submit', 'delete', get_string('deletesample', 'qtype_aitext'), 0),
             $mform->createElement('html', '<hr/>'),
@@ -117,7 +129,7 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         $repeateloptions = [];
         $mform->setType('sampleresponses', PARAM_CLEANHTML);
-        $mform->setType('sampleresponseeval', PARAM_CLEANHTML);
+        // sampleresponseeval is static HTML; no input expected from user.
 
         $mform->setType('optionid', PARAM_INT);
         $samplecount = $this->get_sample_count();

@@ -121,7 +121,8 @@ function clickSetup(contextid, Selectors) {
         }])[0].then(function(airesponse) {
             Log.debug(airesponse);
             if (airesponse.feedback) {
-                sampleresponseeval.textContent = airesponse.feedback +
+                // Render HTML so tags are not escaped.
+                sampleresponseeval.innerHTML = airesponse.feedback +
                     ' (GRADE: ' + airesponse.marks + '/' + defaultmark.value + ')';
                 spinner.classList.add('hide');
             }
