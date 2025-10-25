@@ -113,16 +113,16 @@ class qtype_aitext_edit_form extends question_edit_form {
             $mform->createElement(
                 'html',
                 '<div class="form-group row fitem">'
-                . '<div class="col-md-3 col-form-label d-flex pb-0 pt-0"><label>'
-                . get_string('sampleresponseeval', 'qtype_aitext')
-                . '</label></div>'
-                . '<div class="col-md-9 form-inline felement">'
-                . '<div id="id_sampleresponseeval_0" class="form-control w-100" style="min-height:5em; overflow:auto;"></div>'
-                . '</div>'
+                    . '<div class="col-md-3 col-form-label d-flex pb-0 pt-0">'
+                        . '<label>' . get_string('sampleresponseeval', 'qtype_aitext') . '</label>'
+                    . '</div>'
+                    . '<div class="col-md-9 form-inline felement">'
+                        . '<div id="id_sampleresponseeval" class="form-control w-100" style="min-height:5em; overflow:auto;"></div>'
+                    . '</div>'
                 . '</div>'
             ),
             // Keep button name/id consistent with JS selectors (sampleresponsebtn_*).
-            $mform->createelement('button', 'sampleresponsebtn', get_string('sampleresponseevaluate', 'qtype_aitext')),
+            $mform->createElement('button', 'sampleresponsebtn', get_string('sampleresponseevaluate', 'qtype_aitext')),
             $mform->createElement('submit', 'delete', get_string('deletesample', 'qtype_aitext'), 0),
             $mform->createElement('html', '<hr/>'),
         ];

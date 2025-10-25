@@ -41,6 +41,43 @@ export const init = (contextid) => {
             sampleresponseeval: '#id_sampleresponseeval',
         },
     };
+    // Normalize evaluation container IDs by deriving the index from the nearest sampleresponses textarea.
+    // Note: The hardcoded HTML div has id="id_sampleresponseeval" (no suffix), repeated for each sample.
+    const allResponses = Array.from(document.querySelectorAll("[id^='id_sampleresponses_']"));
+    Log.debug('Found ' + allResponses.length + ' sampleresponses textareas');
+
+    allResponses.forEach((responseTextarea) => {
+        // Extract the index from the textarea ID (e.g., "id_sampleresponses_0" -> "0").
+        const match = responseTextarea.id.match(/_(\d+)$/);
+        if (!match) {
+            Log.debug('No match for textarea: ' + responseTextarea.id);
+            return;
+        }
+        const idx = match[1];
+        Log.debug('Processing textarea index: ' + idx);
+
+        // Find all eval divs with the base id.
+        const allEvals = Array.from(document.querySelectorAll('[id="id_sampleresponseeval"]'));
+        Log.debug('Found ' + allEvals.length + ' eval divs with base id');
+
+        // Find the nearest following eval div (should be in the same repeated group).
+        let evalEl = null;
+        for (const candidate of allEvals) {
+            if (responseTextarea.compareDocumentPosition(candidate) & Node.DOCUMENT_POSITION_FOLLOWING) {
+                evalEl = candidate;
+                Log.debug('Found matching eval div for index ' + idx);
+                break;
+            }
+        }
+
+        if (evalEl) {
+            const newId = 'id_responseeval_' + idx;
+            Log.debug('Renaming eval div to: ' + newId);
+            evalEl.id = newId;
+        } else {
+            Log.debug('No eval div found for index ' + idx);
+        }
+    });
     let elementcount = document.querySelectorAll("[id^='id_sampleresponsebtn']");
     let SelectorsWithCount = {};
 
@@ -85,7 +122,7 @@ function clickSetup(contextid, Selectors) {
         let id = e.target.id.slice(index + 1);
 
         const sampleresponse = document.getElementById('id_sampleresponses' + '_' + id);
-        const sampleresponseeval = document.getElementById('id_sampleresponseeval' + "_" + id);
+        const sampleresponseeval = document.getElementById('id_responseeval_' + id);
 
         const aiprompt = document.getElementById('id_aiprompt');
         const marksscheme = document.getElementById('id_markscheme');
