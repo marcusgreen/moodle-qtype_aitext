@@ -85,8 +85,8 @@ function clickSetup(contextid, Selectors) {
         let id = e.target.id.slice(index + 1);
 
         const sampleresponse = document.getElementById('id_sampleresponses' + '_' + id);
-        const sampleresponseeval = document.getElementById('id_sampleresponseeval' + "_" + id);
-
+        //const sampleresponseeval = document.getElementById('id_sampleresponseeval' + "_" + id);
+        const sampleresponseeval = document.querySelector('[id^="fitem_id_sampleresponseeval_"] .form-control-static');
         const aiprompt = document.getElementById('id_aiprompt');
         const marksscheme = document.getElementById('id_markscheme');
         const defaultmark = document.getElementById('id_defaultmark');
@@ -121,7 +121,7 @@ function clickSetup(contextid, Selectors) {
         }])[0].then(function(airesponse) {
             Log.debug(airesponse);
             if (airesponse.feedback) {
-                sampleresponseeval.textContent = airesponse.feedback +
+                sampleresponseeval.innerHTML = airesponse.feedback +
                     ' (GRADE: ' + airesponse.marks + '/' + defaultmark.value + ')';
                 spinner.classList.add('hide');
             }
