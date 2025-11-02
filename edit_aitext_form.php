@@ -107,11 +107,12 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         $answeroptions = ['maxlen' => 50, 'rows' => 6, 'size' => 30];
         $evaloptions = ['cols' => 50, 'rows' => 5, 'disabled' => 'disabled' ];
+
         $repeatarray = [
             $mform->createElement('static', 'spinner', '', '<div class =" col-md-9" id="id_spinner"></div>'),
             $mform->createElement('textarea', 'sampleresponses', get_string('sampleresponse', 'qtype_aitext'), $answeroptions),
             // Wrap the evaluation output in the same grid column width as Moodle form items (label + element pattern).
-           $mform->createElement('customtextarea', 'sampleresponseeval', get_string('sampleresponseeval', 'qtype_aitext'), $evaloptions),
+           $mform->createElement('static', 'sampleresponseeval', get_string('sampleresponseeval', 'qtype_aitext'), ''),
             // Keep button name/id consistent with JS selectors (sampleresponsebtn_*).
             $mform->createElement('button', 'sampleresponsebtn', get_string('sampleresponseevaluate', 'qtype_aitext')),
             $mform->createElement('submit', 'delete', get_string('deletesample', 'qtype_aitext'), 0),
@@ -120,12 +121,10 @@ class qtype_aitext_edit_form extends question_edit_form {
         $repeateloptions = [];
         $mform->setType('sampleresponses', PARAM_CLEANHTML);
         $mform->setType('sampleresponseeval', PARAM_CLEANHTML);
-        // sampleresponseeval is static HTML; no input expected from user.
-        $mform->addElement('customtextarea','sampleresponseeval', get_string('sampleresponse', 'qtype_aitext'));
-        $mform->setDefault('sampleresponseeval', '<h1>hello</h1>');
 
         $mform->setType('optionid', PARAM_INT);
         $samplecount = $this->get_sample_count();
+
         $mform->registerNoSubmitButton('delete');
         $this->repeat_elements(
             $repeatarray,

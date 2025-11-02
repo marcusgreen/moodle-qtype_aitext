@@ -28,7 +28,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once("HTML/QuickForm/textarea.php");
+require_once("HTML/QuickForm/static.php");
 
 /**
  * Custom textarea form element that renders HTML content.
@@ -43,7 +43,7 @@ require_once("HTML/QuickForm/textarea.php");
  * @copyright  2025 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_aitext_form_customtextarea extends HTML_QuickForm_textarea {
+class qtype_aitext_form_customtextarea extends HTML_QuickForm_static {
 
     /**
      * Returns HTML for the form element.
@@ -54,43 +54,28 @@ class qtype_aitext_form_customtextarea extends HTML_QuickForm_textarea {
      * @return string The HTML to display
      */
     public function toHtml() {
-        // Get the raw HTML content from the element's value.
         $value = $this->getValue();
-
-        // If no value, return empty div.
         if (empty($value)) {
             $value = '';
         }
+        $el = '<div "col-md-9 d-flex flex-wrap align-items-start felement" data-fieldtype="textarea">';
+        $el .= html_writer::tag(
+            'div',
+            $value,
+            [
+                'id'    => $this->getAttribute('id'),
+                'class' => 'form-control',
+                'style' => 'min-height:5em; overflow:auto; background-color:#f8f9fa; padding:.375rem .75rem;',
+            ]
+        );
+        $el .= '</div>';
+        return $el;
 
-        // Build attributes for the div.
-        $attributes = [
-            'id' => $this->getAttribute('id'),
-            'class' => 'form-control w-100',
-            'style' => 'min-height: 5em; overflow: auto; background-color: #f8f9fa; width: 100%; box-sizing: border-box;',
-        ];
-
-        // Add any additional classes from the element.
-        if ($class = $this->getAttribute('class')) {
-            $attributes['class'] .= ' ' . $class;
-        }
-
-        // Return the HTML content wrapped in a div.
-        // WARNING: $value is output as raw HTML without escaping.
-        // Ensure content is sanitized before setting as the element value.
-        return html_writer::div($value, $attributes['class'], [
-            'id' => $attributes['id'],
-            'style' => $attributes['style'],
-        ]);
     }
 
-    /**
-     * Gets the element's frozen HTML.
-     *
-     * @return string The frozen HTML
-     */
-    public function getFrozenHtml() {
-        return $this->toHtml();
-    }
+
+
+
 }
 
 // Register the element with Moodle's form system.

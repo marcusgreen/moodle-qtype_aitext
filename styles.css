@@ -1,4 +1,18 @@
 
+
+/* Target the content div inside the static element */
+
+[id^="fitem_id_sampleresponseeval"] .form-control-static {    /* Styles for the div containing the static form data, e.g., 'hello' */
+    background-color: #f8f9fa; /* Light grey background */
+    border: 1px solid black;
+    border-radius: 8px;
+    color: #495057; /* Darker text color */
+    width: 100%;
+    padding:12px;
+    min-height: 136px; /* Approx. 6 rows of text */
+}
+
+
 .que.aitext textarea.qtype_aitext_response {
     width: 100%;
 }
