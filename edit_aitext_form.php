@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+require_once($CFG->dirroot . '/question/type/aitext/classes/form/customtextarea.php');
 
 /**
  * Defines the editing form for the aitext question type.
@@ -110,26 +111,18 @@ class qtype_aitext_edit_form extends question_edit_form {
             $mform->createElement('static', 'spinner', '', '<div class =" col-md-9" id="id_spinner"></div>'),
             $mform->createElement('textarea', 'sampleresponses', get_string('sampleresponse', 'qtype_aitext'), $answeroptions),
             // Wrap the evaluation output in the same grid column width as Moodle form items (label + element pattern).
-            $mform->createElement(
-                'html',
-                '<div class="form-group row fitem">'
-                    . '<div class="col-md-3 col-form-label d-flex pb-0 pt-0">'
-                        . '<label>' . get_string('sampleresponseeval', 'qtype_aitext') . '</label>'
-                    . '</div>'
-                    . '<div class="col-md-9 form-inline felement">'
-                        . '<div id="id_sampleresponseeval" class="form-control w-100" style="min-height:5em; overflow:auto;"></div>'
-                    . '</div>'
-                . '</div>'
-            ),
+           $mform->createElement('customtextarea', 'sampleresponseeval', get_string('sampleresponseeval', 'qtype_aitext'), $evaloptions),
             // Keep button name/id consistent with JS selectors (sampleresponsebtn_*).
             $mform->createElement('button', 'sampleresponsebtn', get_string('sampleresponseevaluate', 'qtype_aitext')),
             $mform->createElement('submit', 'delete', get_string('deletesample', 'qtype_aitext'), 0),
             $mform->createElement('html', '<hr/>'),
         ];
-
         $repeateloptions = [];
         $mform->setType('sampleresponses', PARAM_CLEANHTML);
+        $mform->setType('sampleresponseeval', PARAM_CLEANHTML);
         // sampleresponseeval is static HTML; no input expected from user.
+        $mform->addElement('customtextarea','sampleresponseeval', get_string('sampleresponse', 'qtype_aitext'));
+        $mform->setDefault('sampleresponseeval', '<h1>hello</h1>');
 
         $mform->setType('optionid', PARAM_INT);
         $samplecount = $this->get_sample_count();
