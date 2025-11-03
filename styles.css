@@ -2,7 +2,7 @@
 
 /* Target the content div inside the static element */
 
-[id^="fitem_id_sampleresponseeval"] .form-control-static {    /* Styles for the div containing the static form data, e.g., 'hello' */
+[id^="fitem_id_sampleresponseeval"] {    /* Styles for the div containing the static form data, e.g., 'hello' */
     background-color: #f8f9fa; /* Light grey background */
     border: 1px solid black;
     border-radius: 8px;
