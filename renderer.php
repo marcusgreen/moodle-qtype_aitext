@@ -81,7 +81,7 @@ class qtype_aitext_renderer extends qtype_renderer {
             if (!empty($CFG->enableplagiarism)) {
                 require_once($CFG->libdir . '/plagiarismlib.php');
 
-                $answer .= plagiarism_get_links((object) [
+                $answer .= plagiarism_get_links([
                     'context' => $options->context->id,
                     'component' => $qa->get_question()->qtype->plugin_name(),
                     'area' => $qa->get_usage_id(),
