@@ -112,7 +112,7 @@ class qtype_aitext_edit_form extends question_edit_form {
             $mform->createElement('static', 'spinner', '', '<div class =" col-md-9" id="id_spinner"></div>'),
             $mform->createElement('textarea', 'sampleresponses', get_string('sampleresponse', 'qtype_aitext'), $answeroptions),
             // Wrap the evaluation output in the same grid column width as Moodle form items (label + element pattern).
-           $mform->createElement('static', 'sampleresponseeval', get_string('sampleresponseeval', 'qtype_aitext'), '<h2>h2</h2>'),
+           $mform->createElement('static', 'sampleresponseeval', get_string('sampleresponseeval', 'qtype_aitext')),
             // Keep button name/id consistent with JS selectors (sampleresponsebtn_*).
             $mform->createElement('button', 'sampleresponsebtn', get_string('sampleresponseevaluate', 'qtype_aitext')),
             $mform->createElement('submit', 'delete', get_string('deletesample', 'qtype_aitext'), 0),

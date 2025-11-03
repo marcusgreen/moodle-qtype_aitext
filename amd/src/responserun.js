@@ -86,7 +86,7 @@ function clickSetup(contextid, Selectors) {
 
         const sampleresponse = document.getElementById('id_sampleresponses' + '_' + id);
         //const sampleresponseeval = document.getElementById('id_sampleresponseeval' + "_" + id);
-        const sampleresponseeval = document.querySelector('[id^="fitem_id_sampleresponseeval_"] .form-control-static');
+        const sampleresponseeval = document.querySelector('[id^="fitem_id_sampleresponseeval_'+id+'"] .form-control-static');
         const aiprompt = document.getElementById('id_aiprompt');
         const marksscheme = document.getElementById('id_markscheme');
         const defaultmark = document.getElementById('id_defaultmark');
