@@ -106,4 +106,18 @@ if ($ADMIN->fulltree) {
         get_string('expertmode_setting', 'qtype_aitext'),
         0
     ));
+
+    // Add diagnostics download functionality
+    if ($ADMIN->fulltree && has_capability('moodle/site:config', context_system::instance())) {
+        $systemcontext = context_system::instance();
+        if (has_capability('moodle/site:config', $systemcontext)) {
+            $url = new moodle_url('/question/type/aitext/download_diagnostics.php');
+            $button = new single_button($url, get_string('download_diagnostics', 'qtype_aitext'), 'get');
+            $button->add_action(new popup_action('click', $url, 'diagnostics', array('height' => 600, 'width' => 800, 'title' => get_string('diagnostics', 'qtype_aitext'), 'menubar' => true, 'location' => false)));
+            $settings->add(new admin_setting_heading('qtype_aitext/diagnostics',
+                get_string('diagnostics', 'qtype_aitext'),
+                $OUTPUT->render($button)));
+        }
+    }
 }
+
