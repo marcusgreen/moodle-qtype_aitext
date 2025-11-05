@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help me improve Gapfill
+about: Create a report to help me improve The AIText Question type
 title: ''
 labels: ''
 assignees: ''
@@ -23,10 +23,13 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**Setup (please complete the following information):**
+ - Provider: Confirm aI provider with key is set up see: admin/settings.php?section=aiprovider
+ - AI Back End: What is selected /admin/settings.php?section=qtypesettingaitext
+ - Moodle Version: Scroll to the end of /admin/settings.php?section=qtypesettingaitext
+ - Version Of AI Text: Go to admin/plugins.php#additional and scroll down
+ - Is any other AI Functionality working e.g.enable all placements and test AI button in Tiny MCE
+
 
 **Additional context**
 Add any other context about the problem here.
