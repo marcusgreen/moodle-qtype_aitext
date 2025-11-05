@@ -70,15 +70,20 @@ function clickSetup(contextid, Selectors) {
             "key": "responsetester",
             "component": 'qtype_aitext'
         },
-        {
+            {
             "key": "sampleresponseempty",
             "component": 'qtype_aitext'
+        },
+        {
+            "key": "loading",
+            "component": 'moodle'
         },
 
     ]).done(function(s) {
         var i = 0;
         strings.responsetester = s[i++];
         strings.sampleresponseempty = s[i++];
+        strings.loading = s[i++];
     });
     document.querySelector(Selectors.fields.sampleresponsebtn).addEventListener('click', e => {
         let index = e.target.id.lastIndexOf("_");
@@ -103,7 +108,8 @@ function clickSetup(contextid, Selectors) {
         }
         // Put  spinner in place.
         spinner.innerHTML = '<span class="loading-icon icon-no-margin">';
-        spinner.innerHTML += ' <i class="fa fa-spinner fa-spin fa-3x fa-fw"" title="Loading" role="img" aria-label="Loading"></i>';
+        spinner.innerHTML += ' <i class="fa fa-spinner fa-spin fa-3x fa-fw"" title="' + strings.loading +
+            '" role="img" aria-label="' + strings.loading + '"></i>';
         spinner.innerHTML += '</span>';
 
         spinner.classList.remove('hide');
