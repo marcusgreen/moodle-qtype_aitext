@@ -84,7 +84,7 @@ class qtype_aitext_renderer extends qtype_renderer {
             if (!empty($CFG->enableplagiarism)) {
                 require_once($CFG->libdir . '/plagiarismlib.php');
 
-                $answer .= plagiarism_get_links((object) [
+                $answer .= plagiarism_get_links([
                     'context' => $options->context->id,
                     'component' => $qa->get_question()->qtype->plugin_name(),
                     'area' => $qa->get_usage_id(),
@@ -163,19 +163,29 @@ class qtype_aitext_renderer extends qtype_renderer {
      */
     public function feedback(question_attempt $qa, question_display_options $options) {
         // Get data written in the question.php grade_response method.
-        // This probably should be retrieved by an api call.
+        // This probably should be retrieved by an API call.
         $comment = $qa->get_current_manual_comment();
-        if ($this->page->pagetype == 'question-bank-previewquestion-preview') {
-            if ($comment[0] > '') {
+
+        if ($this->page->pagetype === 'question-bank-previewquestion-preview') {
+            // Ensure $comment is an array and has content.
+            if (is_array($comment) && !empty($comment[0])) {
                 $this->page->requires->js_call_amd('qtype_aitext/showprompt', 'init', []);
+
                 $prompt = $qa->get_last_qt_var('-aiprompt');
-                $showprompt = '<br/><button  id=showprompt class="rounded">' .
-                     get_string('showprompt', 'qtype_aitext') . '</button>';
+
+                $showprompt  = '<br /><button id="showprompt" class="rounded">';
+                $showprompt .= get_string('showprompt', 'qtype_aitext') . '</button>';
                 $showprompt .= '<div id="fullprompt" class="hidden">' . $prompt . '</div>';
-                $comment[0] = $comment[0] . $showprompt;
+
+                // Store the modified feedback in a variable.
+                $feedback = $comment[0] . $showprompt;
+                return $feedback;
             }
-            return $comment[0];
+
+            // Return the comment if it exists, otherwise empty string.
+            return (is_array($comment) && isset($comment[0])) ? $comment[0] : '';
         }
+
         return '';
     }
 
