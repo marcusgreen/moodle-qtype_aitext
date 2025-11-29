@@ -1,3 +1,11 @@
+### Release 1.01 of the Moodle AIText question type Dec 2025
+Switch sampleresponseeval element to html rather than text area. This means
+any HTML will be rendered rather than showing tags.
+
+Thanks to Mathieu Pelletier for a fix which addresses three reported issues
+https://github.com/marcusgreen/moodle-qtype_aitext/pull/47
+https://github.com/marcusgreen/moodle-qtype_aitext/issues/8
+https://github.com/marcusgreen/moodle-qtype_aitext/issues/46
 
 ### Release 1.00 of the Moodle AIText question type Oct 2025
 Confirmed compatibility with Moodle 5.1 by running automated tests
