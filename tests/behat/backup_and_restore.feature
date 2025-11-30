@@ -34,9 +34,9 @@ Feature: Test duplicating a quiz containing an aitext question
     And I press "Manage course backups"
     And I upload "question/type/aitext/tests/fixtures/aitext_english_quiz.mbz" file to "Files" filemanager
     And I press "Save changes"
-#   And I restore "aitext_english_quiz.mbz" backup into a new course using this options:
-#           | Schema | Course name | Restored course |
-#     Then I should see "Restored course"
+    And I restore "aitext_english_quiz.mbz" backup into a new course using this options:
+          | Schema | Course name | Restored course |
+    Then I should see "Restored course"
     And I log out
 
   @javascript

@@ -79,13 +79,6 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
         global $DB;
 
         $questiondata = parent::convert_backup_to_questiondata($backupdata);
-
-        $questiondata->options = $DB->get_record(
-            'qtype_aitext',
-            ['questionid' => $questiondata->id],
-            '*',
-            MUST_EXIST
-        );
         $questiondata->options->sampleresponses = $DB->get_records(
             'qtype_aitext_sampleresponses',
             ['question' => $questiondata->id],
