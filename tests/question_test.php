@@ -205,29 +205,84 @@ final class question_test extends \advanced_testcase {
     }
 
     /**
-     * Check that non valid json returned from the LLM is
-     * dealt with gracefully
-     * @covers ::process_feedback()
+     * Verify that all kinds of feedback JSONs are parsed properly.
      *
-     * @return void
+     * @covers ::process_feedback()
+     * @dataProvider \qtype_aitext\question_test::process_feedback_provider
      */
-    public function test_get_feedback(): void {
-        // Create the aitext question under test.
+    public function test_process_feedback(string $json, bool $valid, string $expectedfeedback, float $expectedmarks): void {
         $this->resetAfterTest();
+        set_config('disclaimer', '(example disclaimer)', 'qtype_aitext');
+        set_config('translatepostfix', false, 'qtype_aitext');
 
         $questiontext = 'AI question text';
         $aitext = qtype_aitext_test_helper::make_aitext_question(['questiontext' => $questiontext, 'model' => 'llama3']);
-        $testdata = [
-            "feedback" => "Feedback text",
-            "marks" => 0,
-            ];
-        $goodjson = json_encode($testdata);
 
-        $feedback = $aitext->process_feedback($goodjson);
-        $this->assertIsObject($feedback);
-        $badjson = 'Some random string' . $goodjson;
-        $feedback = $aitext->process_feedback($badjson);
-        $this->assertIsObject($feedback);
+        try {
+            $processedfeedback = $aitext->process_feedback($json);
+            $this->assertTrue($valid);
+        } catch (Exception $e) {
+            $this->assertFalse($valid);
+            return;
+        }
+        $this->assertIsObject($processedfeedback);
+        $this->assertEquals($processedfeedback->feedback,
+            format_text($expectedfeedback, FORMAT_MARKDOWN) . ' (example disclaimer)');
+        $this->assertEquals($processedfeedback->marks, $expectedmarks);
+    }
+
+    /**
+     * Data provider for test_process_feedback().
+     *
+     * Provides various generated JSON strings by an external LLM.
+     *
+     * @return array of test cases
+     */
+    public static function process_feedback_provider(): array {
+        return [
+            'valid_json' => [
+                'json' => '{"feedback": "Good job", "marks": 0}',
+                'valid' => true,
+                'expectedfeedback' => 'Good job',
+                'expectedmarks' => 0,
+            ],
+            'broken_json' => [
+                'json' => '{"feedback": "Good job", "marks": 0',
+                'valid' => false,
+                'expectedfeedback' => 'Good job',
+                'expectedmarks' => 0,
+            ],
+            'valid_json_markdown_formatted' => [
+                'json' => '```json{"feedback": "Good job", "marks": 1}```',
+                'valid' => true,
+                'expectedfeedback' => 'Good job',
+                'expectedmarks' => 1,
+            ],
+            'valid_json_with_text_around' => [
+                'json' => 'Here is the feedback: {"feedback": "Well done", "marks": 0.5} Thank you!',
+                'valid' => true,
+                'expectedfeedback' => 'Well done',
+                'expectedmarks' => 0.5,
+            ],
+            'valid_json_with_wrapped_html_tags' => [
+                'json' => '<p>{"feedback": "Well done", "marks": 0.5} Thank you!</p>',
+                'valid' => true,
+                'expectedfeedback' => 'Well done',
+                'expectedmarks' => 0.5,
+            ],
+            'valid_json_with_code' => [
+                'json' => '{"feedback": "The code has a syntax error: the opening brace \'{\' after the function signature is missing.", "marks": 0.5}',
+                'valid' => true,
+                'expectedfeedback' => 'The code has a syntax error: the opening brace \'{\' after the function signature is missing.',
+                'expectedmarks' => 0.5,
+            ],
+            'not_a_json_at_all' => [
+                'json' => 'Not a json string',
+                'valid' => false,
+                'expectedfeedback' => 'Not a json string',
+                'expectedmarks' => 0,
+            ],
+        ];
     }
 
     /**
