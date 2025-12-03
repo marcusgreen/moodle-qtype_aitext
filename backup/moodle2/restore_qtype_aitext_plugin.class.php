@@ -76,15 +76,18 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
      * @return \stdClass The questiondata object.
      */
     public static function convert_backup_to_questiondata(array $backupdata): \stdClass {
-        global $DB;
-
+        // Start with the standard conversion to questiondata.
         $questiondata = parent::convert_backup_to_questiondata($backupdata);
-        $questiondata->options->sampleresponses = $DB->get_records(
-            'qtype_aitext_sampleresponses',
-            ['question' => $questiondata->id],
-            'id ASC',
-            '*'
-        );
+
+        // Try to get sampleresponses from the backup plugin data rather than querying the DB.
+        $qtype = $questiondata->qtype;
+        $pluginkey = "plugin_qtype_{$qtype}_question";
+        $questiondata->options->sampleresponses = [];
+
+        if (isset($backupdata[$pluginkey]) && isset($backupdata[$pluginkey]['sampleresponses'])) {
+            $sampleresponses = $backupdata[$pluginkey]['sampleresponses']['sampleresponse'];
+            $questiondata->options->sampleresponses = array_map(fn($sr) => (object) $sr, $sampleresponses);
+        }
 
         return $questiondata;
     }
@@ -108,8 +111,8 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
         return [
             '/id',
             '/questionid',
-            '/sampleresponses/id',
-            '/sampleresponses/question',
+            '/options/sampleresponses/id',
+            '/options/sampleresponses/question',
         ];
     }
 
@@ -170,11 +173,12 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
 
         // Detect if the question is created or mapped.
         $oldquestionid = $this->get_old_parentid('question');
-        $newquestionid = $this->get_new_parentid('question');
         $questioncreated = $this->get_mappingid('question_created', $oldquestionid) ? true : false;
 
         // If the question has been created by restore, we need to create its question_aitext too.
         if ($questioncreated) {
+            // Get the new question ID from the parent question.
+            $newquestionid = $this->get_new_parentid('question');
             // Adjust value to link back to the questions table.
             $data->question = $newquestionid;
             // Insert record.
@@ -227,6 +231,8 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
             $defaultoptions->graderinfoformat = FORMAT_HTML;
             $defaultoptions->responsetemplate = '';
             $defaultoptions->responsetemplateformat = FORMAT_HTML;
+            $defaultoptions->maxbytes = 0;
+            $defaultoptions->spellcheck = 0;
             $DB->insert_record('qtype_aitext', $defaultoptions);
         }
     }
