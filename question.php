@@ -368,15 +368,18 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return \stdClass
      */
     public function process_feedback(string $feedback) {
-        preg_match_all('#\{(?:[^{}]|(?R))*\}#s', $feedback, $feedbackjsonstrings);
+        // LLMs sometimes do not return the plain JSON, but it is wrapped inside HTML tags, or some
+        // blabla like "Here is the JSON you asked for: ...". So we need to extract the JSON part.
+        preg_match('#\{(?:[^{}]|(?R))*\}#s', $feedback, $feedbackjsonstrings);
         if (empty($feedbackjsonstrings)) {
             throw new moodle_exception('Could not parse feedback of AI tool');
         }
-        $contentobject = json_decode($feedback);
+        $contentobject = json_decode($feedbackjsonstrings[0]);
         if (json_last_error() === JSON_ERROR_NONE) {
             $contentobject->feedback = trim($contentobject->feedback);
             $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"', $contentobject->feedback);
             $disclaimer = get_config('qtype_aitext', 'disclaimer');
+            $contentobject->feedback = format_text($contentobject->feedback, FORMAT_MARKDOWN);
             $contentobject->feedback .= ' ' . $this->llm_translate($disclaimer);
         } else {
             $contentobject = (object) [
