@@ -264,6 +264,7 @@ final class question_test extends \advanced_testcase {
                 'expectedmarks' => 0,
             ],
             'valid_json_markdown_formatted' => [
+                // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
                 'json' => '```json{"feedback": "Good job", "marks": 1}```',
                 'exceptionexpected' => true,
                 'expectedfeedback' => 'Good job',
@@ -282,9 +283,11 @@ final class question_test extends \advanced_testcase {
                 'expectedmarks' => 0.5,
             ],
             'valid_json_with_code' => [
-                'json' => '{"feedback": "The code has a syntax error: the opening brace \'{\' after the function signature is missing.", "marks": 0.5}',
+                'json' => '{"feedback": "The code has a syntax error: the opening brace '
+                    . '\'{\' after the function signature is missing.", "marks": 0.5}',
                 'exceptionexpected' => true,
-                'expectedfeedback' => 'The code has a syntax error: the opening brace \'{\' after the function signature is missing.',
+                'expectedfeedback' => 'The code has a syntax error: the opening brace '
+                    . '\'{\' after the function signature is missing.',
                 'expectedmarks' => 0.5,
             ],
             'not_a_json_at_all' => [
