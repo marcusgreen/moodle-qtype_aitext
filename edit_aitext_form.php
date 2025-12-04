@@ -129,7 +129,7 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         $repeateloptions = [];
         $mform->setType('sampleresponses', PARAM_CLEANHTML);
-        // sampleresponseeval is static HTML; no input expected from user.
+        // Sampleresponseeval is static HTML; no input expected from user.
 
         $mform->setType('optionid', PARAM_INT);
         $samplecount = $this->get_sample_count();
