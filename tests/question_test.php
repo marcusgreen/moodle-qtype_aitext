@@ -201,7 +201,7 @@ final class question_test extends \advanced_testcase {
         $response = ['answer' => 'Yesterday I went to the park', 'answerformat' => 2];
         $question->grade_response($response);
         $result = $DB->get_record('question_attempt_step_data', ['name' => '-aicontent']);
-        $this->assertStringContainsString($result->value, 'If the prompt contains[[expert]] or [[response]] it must contain both');
+        $this->assertStringContainsString('If the prompt contains[[expert]] or [[response]] it must contain both', $result->value);
     }
 
     /**
@@ -278,8 +278,14 @@ final class question_test extends \advanced_testcase {
             ],
             'not_a_json_at_all' => [
                 'json' => 'Not a json string',
-                'valid' => false,
+                'valid' => true,
                 'expectedfeedback' => 'Not a json string',
+                'expectedmarks' => 0,
+            ],
+            'empty_json' => [
+                'json' => '',
+                'valid' => false,
+                'expectedfeedback' => '',
                 'expectedmarks' => 0,
             ],
         ];
