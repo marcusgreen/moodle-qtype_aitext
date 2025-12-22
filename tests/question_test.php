@@ -94,6 +94,40 @@ final class question_test extends \advanced_testcase {
                 $DB->insert_record('qtype_aitext_sampleresponses', $record);
         }
     }
+
+    /**
+     * Ensure grader info is persisted when saving question options.
+     */
+    public function test_graderinfo_is_saved(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $cat = $generator->create_question_category([]);
+        $question = $generator->create_question('aitext', 'editor', ['category' => $cat->id]);
+
+        $formdata = \test_question_maker::get_question_form_data('aitext', 'editor');
+        $formdata->id = $question->id;
+        $formdata->context = \context::instance_by_id($cat->contextid);
+        $formdata->graderinfo = [
+            'text' => 'Information for graders',
+            'format' => FORMAT_HTML,
+            'itemid' => 0,
+        ];
+
+        $qtype = \question_bank::get_qtype('aitext');
+        $qtype->save_question_options($formdata);
+
+        $options = $DB->get_record(
+            'qtype_aitext',
+            ['questionid' => $question->id],
+            'graderinfo, graderinfoformat',
+            MUST_EXIST
+        );
+        $this->assertEquals('Information for graders', $options->graderinfo);
+        $this->assertEquals(FORMAT_HTML, $options->graderinfoformat);
+    }
     /**
      * Make a trivial request to the LLM to check the code works
      * Only designed to test the 4.5 subsystem when run locally

@@ -133,13 +133,11 @@ class qtype_aitext extends question_type {
         $options->maxwordlimit = isset($formdata->maxwordenabled) ? $formdata->maxwordlimit : null;
 
         $options->maxbytes = $formdata->maxbytes ?? 0;
-        if (is_array($formdata->graderinfo)) {
+        if (!is_array($formdata->graderinfo)) {
             $formdata->graderinfo = [
-                'text' => '',
+                'text' => (string) $formdata->graderinfo,
                 'format' => FORMAT_HTML,
             ];
-            $options->responsetemplate = $formdata->responsetemplate['text'];
-            $options->responsetemplateformat = $formdata->responsetemplate['format'];
         }
 
         $options->graderinfo = $this->import_or_save_files(
