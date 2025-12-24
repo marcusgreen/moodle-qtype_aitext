@@ -190,6 +190,33 @@ class qtype_aitext_renderer extends qtype_renderer {
     }
 
     /**
+     * Show grader information above the manual comment field when grading.
+     *
+     * @param question_attempt $qa
+     * @param question_display_options $options
+     * @return string
+     */
+    public function manual_comment(question_attempt $qa, question_display_options $options) {
+        if ($options->manualcomment != question_display_options::EDITABLE) {
+            return '';
+        }
+
+        $question = $qa->get_question();
+        return html_writer::nonempty_tag(
+            'div',
+            $question->format_text(
+                $question->graderinfo,
+                $question->graderinfoformat,
+                $qa,
+                'qtype_aitext',
+                'graderinfo',
+                $question->id
+            ),
+            ['class' => 'graderinfo']
+        );
+    }
+
+    /**
      * Displays any attached files when the question is in read-only mode.
      * @param question_attempt $qa the question attempt to display.
      * @param question_display_options $options controls what should and should
