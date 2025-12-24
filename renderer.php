@@ -190,6 +190,33 @@ class qtype_aitext_renderer extends qtype_renderer {
     }
 
     /**
+     * Show grader information above the manual comment field when grading.
+     *
+     * @param question_attempt $qa
+     * @param question_display_options $options
+     * @return string
+     */
+    public function manual_comment(question_attempt $qa, question_display_options $options) {
+        if ($options->manualcomment != question_display_options::EDITABLE) {
+            return '';
+        }
+
+        $question = $qa->get_question();
+        return html_writer::nonempty_tag(
+            'div',
+            $question->format_text(
+                $question->graderinfo,
+                $question->graderinfoformat,
+                $qa,
+                'qtype_aitext',
+                'graderinfo',
+                $question->id
+            ),
+            ['class' => 'graderinfo']
+        );
+    }
+
+    /**
      * Displays any attached files when the question is in read-only mode.
      * @param question_attempt $qa the question attempt to display.
      * @param question_display_options $options controls what should and should
@@ -423,152 +450,6 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
      */
     abstract protected function class_name();
 }
-
-/**
- * Use the HTML editor with the file picker.
- *
- * @todo remove along with calls to it as file submission is not supported
- *
- * @copyright  2025 Marcus Green
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class qtype_aitext_format_editorfilepicker_renderer extends qtype_aitext_format_editor_renderer {
-    /**
-     * Specific class name to add to the input element.
-     *
-     * @return string
-     */
-    protected function class_name() {
-        return 'qtype_aitext_editorfilepicker';
-    }
-
-    /**
-     * Ensure safe html is returned (?)
-     * @param string $name
-     * @param question_attempt $qa
-     * @param question_attempt_step $step
-     * @param object $context
-     * @return string
-     */
-    protected function prepare_response(
-        $name,
-        question_attempt $qa,
-        question_attempt_step $step,
-        $context
-    ) {
-        if (!$step->has_qt_var($name)) {
-            return '';
-        }
-
-        $formatoptions = new stdClass();
-        $formatoptions->para = false;
-        $text = $qa->rewrite_response_pluginfile_urls(
-            $step->get_qt_var($name),
-            $context->id,
-            'answer',
-            $step
-        );
-        return format_text($text, $step->get_qt_var($name . 'format'), $formatoptions);
-    }
-
-    /**
-     * Process any images included with the text (?)
-     *
-     * @param string $name
-     * @param question_attempt_step $step
-     * @param object $context
-     * @return void
-     */
-    protected function prepare_response_for_editing(
-        $name,
-        question_attempt_step $step,
-        $context
-    ) {
-        return $step->prepare_response_files_draft_itemid_with_text(
-            $name,
-            $context->id,
-            $step->get_qt_var($name)
-        );
-    }
-
-    /**
-     * Get editor options for question response text area.
-     * @param object $context the context the attempt belongs to.
-     * @return array options for the editor.
-     */
-    protected function get_editor_options($context) {
-        return question_utils::get_editor_options($context);
-    }
-
-    /**
-     * Get the options required to configure the filepicker for one of the editor
-     * toolbar buttons.
-     * @deprecated since 3.5
-     * @param mixed $acceptedtypes array of types of '*'.
-     * @param int $draftitemid the draft area item id.
-     * @param object $context the context.
-     * @return object the required options.
-     */
-    protected function specific_filepicker_options($acceptedtypes, $draftitemid, $context) {
-        debugging('qtype_aitext_format_editorfilepicker_renderer::specific_filepicker_options() is deprecated, ' .
-            'use question_utils::specific_filepicker_options() instead.', DEBUG_DEVELOPER);
-
-        $filepickeroptions = new stdClass();
-        $filepickeroptions->accepted_types = $acceptedtypes;
-        $filepickeroptions->return_types = FILE_INTERNAL | FILE_EXTERNAL;
-        $filepickeroptions->context = $context;
-        $filepickeroptions->env = 'filepicker';
-
-        $options = initialise_filepicker($filepickeroptions);
-        $options->context = $context;
-        $options->client_id = uniqid();
-        $options->env = 'editor';
-        $options->itemid = $draftitemid;
-
-        return $options;
-    }
-
-    /**
-     * Probably redunant with the removal of file submission as a response
-     * @todo     remove calls to this then remove this
-     *
-     * @param object $context the context the attempt belongs to.
-     * @param int $draftitemid draft item id.
-     * @return array filepicker options for the editor.
-     */
-    protected function get_filepicker_options($context, $draftitemid) {
-        return question_utils::get_filepicker_options($context, $draftitemid);
-    }
-
-    /**
-     * Redundant with the removal of the file submission option
-     * @todo remove calls and this function
-     *
-     * @param string $inputname
-     * @param int $draftitemid
-     * @return string
-     */
-    protected function filepicker_html($inputname, $draftitemid) {
-        $nonjspickerurl = new moodle_url('/repository/draftfiles_manager.php', [
-            'action' => 'browse',
-            'env' => 'editor',
-            'itemid' => $draftitemid,
-            'subdirs' => false,
-            'maxfiles' => -1,
-            'sesskey' => sesskey(),
-        ]);
-
-        return html_writer::empty_tag('input', ['type' => 'hidden',
-                'name' => $inputname . ':itemid', 'value' => $draftitemid]) .
-                html_writer::tag('noscript', html_writer::tag(
-                    'div',
-                    html_writer::tag('object', '', ['type' => 'text/html',
-                        'data' => $nonjspickerurl, 'height' => 160, 'width' => 600,
-                    'style' => 'border: 1px solid #000;'])
-                ));
-    }
-}
-
 
 /**
  * For aitexts with a plain text input box but with a proportional font

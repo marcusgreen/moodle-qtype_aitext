@@ -368,23 +368,61 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return \stdClass
      */
     public function process_feedback(string $feedback) {
-        preg_match_all('#\{(?:[^{}]|(?R))*\}#s', $feedback, $feedbackjsonstrings);
-        if (empty($feedbackjsonstrings)) {
-            throw new moodle_exception('Could not parse feedback of AI tool');
+        // LLMs sometimes do not return the plain JSON, but it is wrapped inside HTML tags, or some
+        // blabla like "Here is the JSON you asked for: ...". So we need to extract the JSON part.
+        if (empty($feedback)) {
+            throw new moodle_exception('No feedback returned from the LLM');
         }
-        $contentobject = json_decode($feedback);
-        if (json_last_error() === JSON_ERROR_NONE) {
+        $contentobject = $this->extract_single_json_object($feedback);
+        if (!is_null($contentobject)) {
             $contentobject->feedback = trim($contentobject->feedback);
             $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"', $contentobject->feedback);
-            $disclaimer = get_config('qtype_aitext', 'disclaimer');
-            $contentobject->feedback .= ' ' . $this->llm_translate($disclaimer);
         } else {
-            $contentobject = (object) [
-                                        "feedback" => $feedback,
-                                        "marks" => null,
-                                        ];
+            $contentobject = new \stdClass();
+            $contentobject->feedback = $feedback;
+            $contentobject->marks = null;
         }
+        $disclaimer = get_config('qtype_aitext', 'disclaimer');
+        $contentobject->feedback = format_text($contentobject->feedback, FORMAT_MARKDOWN);
+        $contentobject->feedback .= ' ' . $this->llm_translate($disclaimer);
+
         return $contentobject;
+    }
+
+    /**
+     * Extracts the JSON properly from a string, also respecting { symbols inside the JSON.}
+     *
+     * @param string $text the JSON string possibly with extra text around it.
+     * @return stdClass|null the JSON object or null if none found.
+     */
+    private function extract_single_json_object(string $text): ?stdClass {
+        $start = strpos($text, '{');
+        if ($start === false) {
+            return null;
+        }
+        $depth = 0;
+        $json = '';
+        for ($i = $start, $len = strlen($text); $i < $len; $i++) {
+            if ($text[$i] === '{') {
+                $depth++;
+            }
+            if ($depth > 0) {
+                $json .= $text[$i];
+            }
+            if ($text[$i] === '}') {
+                $depth--;
+                if ($depth === 0) {
+                    break;
+                }
+            }
+        }
+        if ($json) {
+            $decoded = json_decode($json);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $decoded;
+            }
+        }
+        return null;
     }
 
     /**
