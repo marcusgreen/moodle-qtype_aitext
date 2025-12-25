@@ -133,7 +133,7 @@ class qtype_aitext extends question_type {
         $options->maxwordlimit = isset($formdata->maxwordenabled) ? $formdata->maxwordlimit : null;
 
         $options->maxbytes = $formdata->maxbytes ?? 0;
-        if (!is_array($formdata->graderinfo)) {
+        if (!is_array($formdata->graderinfo) || !isset($formdata->graderinfo['text'])) {
             $formdata->graderinfo = [
                 'text' => (string) $formdata->graderinfo,
                 'format' => FORMAT_HTML,
@@ -340,7 +340,7 @@ class qtype_aitext extends question_type {
             $qo->$field = $format->getpath($data, ['#', $field, 0, '#'], '');
         }
         // Note: add in other text fields.
-        $textfields = ['responsetemplate'];
+        $textfields = ['responsetemplate', 'graderinfo'];
         foreach ($textfields as $field) {
             $fmt = $format->get_format($format->getpath($data, ['#', $field . 'format', 0, '#'], 0));
             $qo->$field = $format->import_text_with_files($data, ['#', $field, 0], '', $fmt);
