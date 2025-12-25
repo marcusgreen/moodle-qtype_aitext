@@ -1,6 +1,17 @@
 ### Release 1.01 of the Moodle AIText question type Dec 2025
-Switch sampleresponseeval element to html rather than text area. This means
-any HTML will be rendered rather than showing tags.
+
+When editing a question the Sample response evaluation will now render any HTML
+rather than showing raw tags.
+
+The "Information for Graders" field towards the end of the question editing form was silently discarding anything added to it. It now saves that information and will appear when manually grading a question.
+
+Thanks to Norbert Forster for reporting that issue in
+https://github.com/marcusgreen/moodle-qtype_aitext/issues/51
+and thanks to to Thomas Schoenlein for the code to fix this.
+
+Thanks to Philipp Memmel for multiple commits to improve parsing and sanitising of LLM responses and for constant support and feedback with the development of the plugin.
+
+Thanks to Michael Hughes for a fix to the handling of the Tiny MCE Editor.
 
 Thanks to Mathieu Pelletier for a fix which addresses three reported issues
 https://github.com/marcusgreen/moodle-qtype_aitext/pull/47
