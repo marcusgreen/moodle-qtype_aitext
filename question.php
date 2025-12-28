@@ -56,6 +56,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     public $maxwordlimit;
 
     /**
+     * Whether to preserve HTML in student responses
+     * @var bool
+     */
+    public $preservehtml;
+
+    /**
      * LLM Model, will vary between AI systems, e.g. gpt4 or llama3
      * @var stream_set_blocking
      */
@@ -287,36 +293,40 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     }
 
     /**
-     * Used by prompttester in the editing form
+     * Builds the complete AI prompt by combining the user response with the configured AI prompt template.
      *
-     * @param string $response
-     * @param string $aiprompt
-     * @param number $defaultmark
-     * @param string $markscheme
-     * @return string;
+     * Processes  AI prompt by replacing [[questiontext]] with question text, handling expert mode
+     * with [[expert]] and [[response]] placeholders, stripping HTML from response unless preservehtml is enabled,
+     * adding language translation instructions, appending markscheme information for grading, and adding JSON formatting.
+     *
+     * Also used by prompttester in the editing form and during response grading.
+     *
+     * @param string $response The user's response text to be evaluated
+     * @param string $aiprompt The AI prompt template containing placeholders like [[questiontext]], [[response]], etc.
+     * @param float|int $defaultmark The maximum possible score for this question
+     * @param string $markscheme The grading rubric or criteria to pass to the LLM
+     * @return string The complete AI prompt ready to be sent to the LLM
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
         // Check if [questiontext] is in the aiprompt and replace it with the question text.
         if (strpos($aiprompt, '[[questiontext]]') !== false) {
-            $aiprompt = str_replace('[[questiontext]]', strip_tags($this->questiontext), $aiprompt);
+            $questiontext = $this->preservehtml ? $this->questiontext : strip_tags($this->questiontext);
+            $aiprompt = str_replace('[[questiontext]]', $questiontext, $aiprompt);
         }
         if (strpos($aiprompt, '[[expert]]') !== false && (get_config('qtype_aitext', 'expertmode') == 1)) {
             // Remove [[expert]] as it is just a flag.
             $prompt = str_replace('[[expert]]', '', $aiprompt);
             $prompt = preg_replace("/\[\[response\]\]/", $response, $prompt);
-
             if (strpos($aiprompt, '[[userlang]]') !== false) {
                 $prompt .= ' ' . current_language();
             }
             return $prompt;
         }
-
-        $responsetext = strip_tags($response);
+        $responsetext = $this->preservehtml ? $response : strip_tags($response);
             $responsetext = '[[' . $responsetext . ']]';
             $prompt = get_config('qtype_aitext', 'prompt');
             $prompt = preg_replace("/\[responsetext\]/", $responsetext, $prompt);
             $prompt .= ' ' . trim($aiprompt);
-
         if ($markscheme > '') {
             // Tell the LLM how to mark the submission.
             $prompt .= " The total score is: $defaultmark .";
@@ -326,7 +336,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $prompt .= ' Set marks to null in the json object.' . PHP_EOL;
         }
         $prompt .= ' ' . trim(get_config('qtype_aitext', 'jsonprompt'));
-
         // Only process language if the disable tag [[language=""]] is not present.
         if (strpos($aiprompt, '[[language=""]]') === false) {
             // Check for a specific language specification in aiprompt.
@@ -334,7 +343,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             if (preg_match('/\[\[language=([a-zA-Z]{2})\]\]/', $aiprompt, $matches)) {
                 $langcode = $matches[1];
             }
-
             if ($langcode !== null) {
                 // If a specific language code (e.g., "fr") is found, add the translation instruction.
                 $prompt .= ' translate the feedback to the language ' . $langcode;
@@ -343,10 +351,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 $prompt .= ' translate the feedback to the language ' . current_language();
             }
         }
-
         return $prompt;
     }
-
 
     /**
      * Build the full ai spellchecking prompt.

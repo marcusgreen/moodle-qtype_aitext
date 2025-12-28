@@ -22,6 +22,7 @@
         <FIELD NAME="sampleanswer" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="A sample answer for testing the prompt and AI response"/>
         <FIELD NAME="model" TYPE="char" LENGTH="60" NOTNULL="false" SEQUENCE="false" COMMENT="The model in the LLM, e.g. gpt-4 or llama3"/>
         <FIELD NAME="spellcheck" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="preservehtml" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Whether to preserve HTML in student responses"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

@@ -124,6 +124,7 @@ class qtype_aitext extends question_type {
         }
 
         $options->spellcheck = !empty($formdata->spellcheck);
+        $options->preservehtml = !empty($formdata->preservehtml);
         $options->aiprompt = $formdata->aiprompt;
         $options->markscheme = $formdata->markscheme;
         $options->model = trim($formdata->model);
@@ -179,6 +180,9 @@ class qtype_aitext extends question_type {
         $question->responsetemplateformat = $questiondata->options->responsetemplateformat;
         $question->aiprompt = $questiondata->options->aiprompt;
         $question->markscheme = $questiondata->options->markscheme;
+        // Handle older questions that don't have the preservehtml property.
+        $question->preservehtml = property_exists($questiondata->options, 'preservehtml')
+             ? $questiondata->options->preservehtml : 0;
         parent::get_question_options($question);
         $question->sampleresponses = $this->get_sampleresponses($question);
 

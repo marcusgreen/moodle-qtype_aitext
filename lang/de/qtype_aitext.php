@@ -72,6 +72,7 @@ $string['pluginname_link'] = 'Frage/Typ/AI Text';
 $string['pluginnameadding'] = 'Hinzufügen einer KI-Text-Frage';
 $string['pluginnameediting'] = 'Bearbeiten einer AI-Text-Frage';
 $string['pluginnamesummary'] = 'Ermöglicht die Beantwortung eines Datei-Uploads und/oder eines Online-Textes. Die Antwort des Schülers wird vom konfigurierten AI/Large-Sprachmodell verarbeitet, das ein Feedback und optional eine Note zurückgibt.';
+$string['preservehtml'] = 'HTML beibehalten';
 $string['privacy::responsefieldlines'] = 'Anzahl der Zeilen, die die Größe des Eingabefeldes (Textarea) angeben.';
 $string['privacy:preference:attachments'] = 'Anzahl der erlaubten Anhänge.';
 $string['privacy:preference:attachmentsrequired'] = 'Anzahl der erforderlichen Anhänge.';

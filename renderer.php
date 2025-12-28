@@ -523,7 +523,16 @@ class qtype_aitext_format_plain_renderer extends qtype_aitext_format_renderer_ba
             return '';
         }
 
-        return format_text($step->get_qt_var($name), $step->get_qt_var($name . 'format'), ['para' => false]);
+        $question = $qa->get_question();
+        $response = $step->get_qt_var($name);
+
+        // If preservehtml is enabled, return the raw response without formatting.
+        // Use property_exists to handle older questions that don't have this property.
+        if (property_exists($question, 'preservehtml') && !empty($question->preservehtml)) {
+            return $response;
+        }
+
+        return format_text($response, $step->get_qt_var($name . 'format'), ['para' => false]);
     }
 }
 

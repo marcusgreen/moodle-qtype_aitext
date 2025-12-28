@@ -128,13 +128,19 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
             return '';
         }
 
+        $question = $qa->get_question();
+        $response = $step->get_qt_var($name);
+        $format = $step->get_qt_var($name . 'format');
+
+        // If preservehtml is enabled, return the raw response without formatting.
+        // Use property_exists to handle older questions that don't have this property.
+        if (property_exists($question, 'preservehtml') && !empty($question->preservehtml)) {
+            return $response;
+        }
+
         $formatoptions = new stdClass();
         $formatoptions->para = false;
-        return format_text(
-            $step->get_qt_var($name),
-            $step->get_qt_var($name . 'format'),
-            $formatoptions
-        );
+        return format_text($response, $format, $formatoptions);
     }
 
     /**

@@ -97,7 +97,21 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         }
 
         // Aitext savepoint reached.
-        upgrade_plugin_savepoint(true, 2025072200, 'qtype', 'aitext');
+        upgrade_plugin_savepoint(true, 2025072201, 'qtype', 'aitext');
+    }
+
+    if ($oldversion < 2025122501) {
+        // Define field preservehtml to be added to qtype_aitext.
+        $table = new xmldb_table('qtype_aitext');
+        $field = new xmldb_field('preservehtml', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'spellcheck');
+
+        // Conditionally launch add field preservehtml.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2025122501, 'qtype', 'aitext');
     }
 
     return true;

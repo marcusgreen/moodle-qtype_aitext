@@ -52,8 +52,13 @@ class qtype_aitext_edit_form extends question_edit_form {
             $this->editoroptions
         );
 
-        // Spelling correction.
-        $mform->addElement('checkbox', 'spellcheck', get_string('automatic_spellcheck', 'qtype_aitext'));
+        // Create checkbox elements and add them to a group.
+        $checkboxgroup = [];
+        $checkboxgroup[] = $mform->createElement('checkbox', 'spellcheck', '', get_string('automatic_spellcheck', 'qtype_aitext'));
+        $checkboxgroup[] = $mform->createElement('checkbox', 'preservehtml', '', get_string('preservehtml', 'qtype_aitext'));
+
+        // Add the checkbox group to the form.
+        $mform->addGroup($checkboxgroup, 'checkboxgroup', get_string('responseoptions', 'qtype_aitext'), [' '], false);
 
         // Ai prompt.
         $mform->addElement(
@@ -251,6 +256,8 @@ class qtype_aitext_edit_form extends question_edit_form {
         $question->maxwordlimit = $question->options->maxwordlimit;
         $question->aiprompt = $question->options->aiprompt;
         $question->spellcheck = $question->options->spellcheck;
+        // Handle older questions that don't have the preservehtml property.
+        $question->preservehtml = property_exists($question->options, 'preservehtml') ? $question->options->preservehtml : 0;
         // Make the count start from 0 like the repeat array elements.
         $question->sampleresponses = [];
         foreach ($question->options->sampleresponses as $sampleresponse) {

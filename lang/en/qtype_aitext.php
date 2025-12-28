@@ -86,6 +86,7 @@ $string['pluginname_userfaced'] = 'Question type "AI text" with AI supported fee
 $string['pluginnameadding'] = 'Adding an AI Text question';
 $string['pluginnameediting'] = 'Editing an AI Text question';
 $string['pluginnamesummary'] = 'Allows a response of a file upload and/or online text. The student response is processed by the configured AI/Large language model which returns feedback and optionally a grade..';
+$string['preservehtml'] = 'Preserve HTML';
 $string['privacy::responsefieldlines'] = 'Number of lines indicating the size of the input box (textarea).';
 $string['privacy:metadata'] = 'AI Text question type plugin allows question authors to set default options as user preferences.';
 $string['privacy:preference:attachments'] = 'Number of allowed attachments.';
