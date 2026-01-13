@@ -119,6 +119,9 @@ class qtype_aitext_renderer extends qtype_renderer {
                 ['feedback']]
             );
         }
+
+        // Initialize submission feedback handling for student responses.
+        $this->page->requires->js_call_amd('qtype_aitext/submission', 'init', []);
         $result .= html_writer::tag(
             'div',
             $question->format_questiontext($qa),
