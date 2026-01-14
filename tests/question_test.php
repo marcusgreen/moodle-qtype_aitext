@@ -31,9 +31,11 @@ global $CFG;
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 require_once($CFG->dirroot . '/question/type/aitext/tests/helper.php');
 require_once($CFG->dirroot . '/question/type/aitext/questiontype.php');
+require_once($CFG->dirroot . '/question/type/aitext/question.php');
 
 use qtype_aitext_test_helper;
 use qtype_aitext;
+use qtype_aitext_question;
 use Random\RandomException;
 
 /**
@@ -75,6 +77,28 @@ final class question_test extends \advanced_testcase {
             set_config('enabled', true, 'aiprovider_openai');
             $this->islive = true;
         }
+    }
+
+
+    /**
+     * Test that extract_single_json_object correctly extracts JSON from a string.
+     *
+     * @return void
+     */
+    public function test_extract_single_json_object(){
+        // 1. Create a proper question instance
+        $question = qtype_aitext_test_helper::make_aitext_question([]);
+
+        // 2. Create a ReflectionMethod object
+        $method = new \ReflectionMethod(qtype_aitext_question::class, 'extract_single_json_object');
+
+        $text = '{"feedback":"This \(frac{1}{2} ","marks":0}';
+        xdebug_break();
+        $result = $method->invoke($question, $text);
+        $this->assertInstanceOf(\stdClass::class, $result);
+
+        $this->assertEquals('This \\frac{1}{2} ', $result->feedback);
+        $this->assertEquals(0, $result->marks);
     }
 
     /**
