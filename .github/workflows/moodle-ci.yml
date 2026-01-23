@@ -37,8 +37,8 @@ jobs:
             moodle-branch: 'MOODLE_501_STABLE'
             database: 'mariadb'
           - php: '8.4'
-             moodle-branch: 'main'
-             database: 'pgsql'
+            moodle-branch: 'main'
+            database: 'pgsql'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
