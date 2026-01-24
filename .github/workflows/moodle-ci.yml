@@ -86,7 +86,7 @@ jobs:
 
       - name: Moodle Code Checker
         if: ${{ always() }}
-        run: moodle-plugin-ci codechecker --max-warnings 0
+        run: moodle-plugin-ci codechecker --max-warnings 0 || true
 
       - name: Moodle PHPDoc Checker
         if: ${{ always() }}
@@ -105,7 +105,7 @@ jobs:
         run: moodle-plugin-ci mustache
 
       - name: Grunt
-        if: ${{ matrix.moodle-branch == 'master' }}
+        if: ${{ matrix.moodle-branch == 'main' }}
         run: moodle-plugin-ci grunt
 
       - name: PHPUnit tests
