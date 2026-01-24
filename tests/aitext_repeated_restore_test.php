@@ -21,6 +21,7 @@ use backup_controller;
 use restore_controller;
 use quiz_question_helper_test_trait;
 use backup;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -33,6 +34,7 @@ require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/mod/quiz/tests/quiz_question_helper_test_trait.php');
 require_once($CFG->dirroot . '/question/type/aitext/tests/helper.php');
 
+
 /**
  * Test repeated restore functionality specifically for aitext question type.
  *
@@ -40,9 +42,9 @@ require_once($CFG->dirroot . '/question/type/aitext/tests/helper.php');
  * @category   test
  * @copyright  2025 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers \restore_questions_parser_processor
- * @covers \restore_create_categories_and_questions
  */
+#[CoversClass(\restore_questions_parser_processor::class)]
+#[CoversClass(\restore_create_categories_and_questions::class)]
 final class aitext_repeated_restore_test extends advanced_testcase {
     use quiz_question_helper_test_trait;
 
