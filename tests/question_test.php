@@ -346,6 +346,34 @@ final class question_test extends \advanced_testcase {
                 'expectedfeedback' => '',
                 'expectedmarks' => 0,
             ],
+            'json_with_backslashes' => [
+                // This JSON is real answer from an LLM.
+                // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
+                'json' => '```json { "feedback": "Die Antwort des Schülers zeigt ein grundlegendes Verständnis für das ' .
+                    'Röntgenspektrum und die Entstehung des Bremsspektrums sowie des charakteristischen Spektrums. Es wird ' .
+                    'korrekt beschrieben, dass das Bremsspektrum durch das Bremsen der Elektronen entsteht und von der ' .
+                    'Beschleunigungsspannung abhängt. Auch die materialabhängige Entstehung des charakteristischen Spektrums ' .
+                    'wird erwähnt und teilweise richtig interpretiert. Allerdings fehlen wesentliche physikalische Inhalte: 1. ' .
+                    'Es wird nicht erklärt, dass die Bremsstrahlung ein kontinuierliches Spektrum darstellt. ' .
+                    '2. Der Unterschied zwischen \(K_\alpha\)- und \(K_\beta\)-Linien des Röntgenspektrums wird nicht ' .
+                    'angesprochen. 3. Der Zusammenhang zwischen der Kernladungszahl und den Frequenzen \(K_\alpha\)-Linien ' .
+                    '(Moseleys Gesetz) ist ungenau erläutert und könnte präziser beschrieben werden. Insgesamt ist die ' .
+                    'Antwort gut, aber es sind noch einige physikalische Details notwendig, um die volle Punktzahl zu ' .
+                    'erreichen. Gegeben: 7/10 Punkte.", "marks": 7 } ```',
+                'exceptionexpected' => false,
+                'expectedfeedback' => 'Die Antwort des Schülers zeigt ein grundlegendes Verständnis für das ' .
+                    'Röntgenspektrum und die Entstehung des Bremsspektrums sowie des charakteristischen Spektrums. Es wird ' .
+                    'korrekt beschrieben, dass das Bremsspektrum durch das Bremsen der Elektronen entsteht und von der ' .
+                    'Beschleunigungsspannung abhängt. Auch die materialabhängige Entstehung des charakteristischen Spektrums ' .
+                    'wird erwähnt und teilweise richtig interpretiert. Allerdings fehlen wesentliche physikalische Inhalte: 1. ' .
+                    'Es wird nicht erklärt, dass die Bremsstrahlung ein kontinuierliches Spektrum darstellt. ' .
+                    '2. Der Unterschied zwischen \(K_\alpha\)- und \(K_\beta\)-Linien des Röntgenspektrums wird nicht ' .
+                    'angesprochen. 3. Der Zusammenhang zwischen der Kernladungszahl und den Frequenzen \(K_\alpha\)-Linien ' .
+                    '(Moseleys Gesetz) ist ungenau erläutert und könnte präziser beschrieben werden. Insgesamt ist die ' .
+                    'Antwort gut, aber es sind noch einige physikalische Details notwendig, um die volle Punktzahl zu ' .
+                    'erreichen. Gegeben: 7/10 Punkte.',
+                'expectedmarks' => 7,
+            ],
         ];
     }
 

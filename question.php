@@ -383,7 +383,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $contentobject->marks = null;
         }
         $disclaimer = get_config('qtype_aitext', 'disclaimer');
-        $contentobject->feedback = format_text($contentobject->feedback, FORMAT_MARKDOWN);
+        $contentobject->feedback = format_text($contentobject->feedback, FORMAT_MARKDOWN, ['para' => false]);
         $contentobject->feedback .= ' ' . $this->llm_translate($disclaimer);
 
         return $contentobject;
@@ -417,6 +417,23 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             }
         }
         if ($json) {
+            // Sometimes, the external LLM will return bad JSON (with not properly escaped backslashes, for example in a LaTeX
+            // formula). The returned JSON then contains something like "... \( K_\alpha \) ...", which is invalid JSON.
+            // However, we cannot just blindly escape all backslashes, because that would also mess up valid JSON sequences like
+            // "\n" or "\t" and we cannot know if these are intended well escaped backslashes or the LLM just messed up and forgot
+            // to escape.
+            // So we are trying to parse LaTeX-like sequences explicitely and only inside them add an extra backslash to each
+            // backslash.
+            $json = preg_replace_callback(
+                '/\\\\\(.*?\\\\\)|\\\\\[.*?\\\\\]|\$\$.*?\$\$|\$[^$]+\$/s',
+                function ($matches) {
+                    if (empty($matches[0])) {
+                        return $matches[0] ?? '';
+                    }
+                    return str_replace('\\', '\\\\', $matches[0]);
+                },
+                $json
+            );
             $decoded = json_decode($json);
             if (json_last_error() === JSON_ERROR_NONE) {
                 return $decoded;
