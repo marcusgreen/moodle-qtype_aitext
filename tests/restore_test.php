@@ -16,6 +16,8 @@
 
 namespace qtype_aitext;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -29,11 +31,10 @@ require_once($CFG->dirroot . '/question/type/aitext/tests/helper.php');
  * @copyright  2025 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(\qtype_aitext::class)]
 final class restore_test extends \restore_date_testcase {
     /**
      * Test missing qtype_aitext_options creation.
-     *
-     * @covers ::restore()
      *
      * Old backup files may contain aitext with no qtype_aitext_options record.
      * During restore, we add default options for any questions like that.

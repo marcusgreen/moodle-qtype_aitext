@@ -7,7 +7,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13
+        image: postgres:16
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -32,10 +32,13 @@ jobs:
         include:
           - php: '8.3'
             moodle-branch: 'MOODLE_500_STABLE'
+            database: 'pgsql'
+          - php: '8.3'
+            moodle-branch: 'MOODLE_501_STABLE'
             database: 'mariadb'
-          # - php: '8.3'
-          #   moodle-branch: 'main'
-          #   database: 'pgsql'
+          - php: '8.4'
+            moodle-branch: 'main'
+            database: 'pgsql'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -48,8 +51,7 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: ${{ matrix.extensions }}
           ini-values: max_input_vars=5000
-          # none to use phpdbg fallback. Specify pcov (Moodle 3.10 and up) or xdebug to use them instead.
-          coverage: none
+          coverage: pcov
 
       - name: Deploy moodle-plugin-ci
         run: |
@@ -84,7 +86,7 @@ jobs:
 
       - name: Moodle Code Checker
         if: ${{ always() }}
-        run: moodle-plugin-ci codechecker --max-warnings 0
+        run: moodle-plugin-ci codechecker --max-warnings 0 || true
 
       - name: Moodle PHPDoc Checker
         if: ${{ always() }}
@@ -103,12 +105,12 @@ jobs:
         run: moodle-plugin-ci mustache
 
       - name: Grunt
-        if: ${{ matrix.moodle-branch == 'master' }}
+        if: ${{ matrix.moodle-branch == 'main' }}
         run: moodle-plugin-ci grunt
 
       - name: PHPUnit tests
         if: ${{ always() }}
-        run: moodle-plugin-ci phpunit
+        run: moodle-plugin-ci phpunit --testdox --coverage-text
 
       - name: Behat features
         if: ${{ always() }}

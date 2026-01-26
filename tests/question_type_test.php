@@ -19,6 +19,7 @@ namespace qtype_aitext;
 use PHPUnit\Framework\ExpectationFailedException;
 use qtype_aitext;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -34,6 +35,7 @@ require_once($CFG->dirroot . '/question/type/aitext/questiontype.php');
  * @author     Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(qtype_aitext::class)]
 final class question_type_test extends \advanced_testcase {
     /**
      * Always aitext
@@ -67,8 +69,6 @@ final class question_type_test extends \advanced_testcase {
      * Expanded version of name
      * @todo confirm and perhaps put more detail into this comment
      *
-     * @covers ::name()
-     *
      * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
@@ -78,8 +78,6 @@ final class question_type_test extends \advanced_testcase {
     }
     /**
      * Does can_analyse_response work (it will always be false for this qtype)
-     *
-     * @covers ::can_analyse_responses()
      *
      * @return void
      */
@@ -92,8 +90,6 @@ final class question_type_test extends \advanced_testcase {
      * Which unlike a multi choice or similar would be zero or very close to.
      * Used by statistics calculation rather than the actual qtype.
      *
-     * @covers ::get_radom_guess_score()
-     *
      * @return void
      */
     public function test_get_random_guess_score(): void {
@@ -105,7 +101,6 @@ final class question_type_test extends \advanced_testcase {
      * Test get_possible_responses
      *
      * @return void
-     * @covers ::get_possible_responses()
      */
     public function test_get_possible_responses(): void {
         $q = $this->get_test_question_data();
