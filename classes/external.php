@@ -44,10 +44,10 @@ class qtype_aitext_external extends external_api {
     public static function fetch_ai_grade_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
-             'response'    => new external_value(PARAM_TEXT, 'The students response to question'),
+             'response'    => new external_value(PARAM_RAW, 'The students response to question'),
              'defaultmark' => new external_value(PARAM_INT, 'The total possible score'),
-             'prompt'      => new external_value(PARAM_TEXT, 'The AI Prompt'),
-             'marksscheme' => new external_value(PARAM_TEXT, 'The marks scheme'),
+             'prompt'      => new external_value(PARAM_RAW, 'The AI Prompt'),
+             'marksscheme' => new external_value(PARAM_RAW, 'The marks scheme'),
              'questiontext' => new external_value(PARAM_RAW, 'The question text'),
              'contextid'   => new external_value(PARAM_INT, 'The context id'),
             ]
@@ -106,6 +106,12 @@ class qtype_aitext_external extends external_api {
 
         // TODO Eventually move this to a own capability which by default is assigned to a teacher in a course.
         require_capability('mod/quiz:grade', $context);
+
+        // Converting the HTML special chars seems to be the only way to accept things like "this<that" and keeping the text
+        // "alive" without removing parts of it by passing it so sanitization functions.
+        $response = clean_param(htmlspecialchars($response), PARAM_CLEANHTML);
+        $prompt = clean_param(htmlspecialchars($prompt), PARAM_CLEANHTML);
+        $marksscheme = clean_param(htmlspecialchars($marksscheme), PARAM_CLEANHTML);
 
         // Build an aitext question instance so we can call the same code that the question type uses when it grades.
         $type = 'aitext';
