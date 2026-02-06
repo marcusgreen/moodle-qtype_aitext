@@ -67,12 +67,14 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addHelpButton('aiprompt', 'aiprompt', 'qtype_aitext');
         $mform->addRule('aiprompt', get_string('aipromptmissing', 'qtype_aitext'), 'required');
 
-        // Expert mode template button.
-        $mform->addElement(
-            'button',
-            'expertmodetemplatebtn',
-            get_string('useexpertmodetemplate', 'qtype_aitext')
-        );
+        // Expert mode template button (only shown when enable_expertmode setting is enabled).
+        if (get_config('qtype_aitext', 'enable_expertmode')) {
+            $mform->addElement(
+                'button',
+                'expertmodetemplatebtn',
+                get_string('useexpertmodetemplate', 'qtype_aitext')
+            );
+        }
 
         // Markscheme.
         $mform->addElement(
