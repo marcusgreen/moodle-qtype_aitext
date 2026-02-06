@@ -67,6 +67,13 @@ class qtype_aitext_edit_form extends question_edit_form {
         $mform->addHelpButton('aiprompt', 'aiprompt', 'qtype_aitext');
         $mform->addRule('aiprompt', get_string('aipromptmissing', 'qtype_aitext'), 'required');
 
+        // Expert mode template button.
+        $mform->addElement(
+            'button',
+            'expertmodetemplatebtn',
+            get_string('useexpertmodetemplate', 'qtype_aitext')
+        );
+
         // Markscheme.
         $mform->addElement(
             'textarea',
@@ -210,6 +217,13 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         // Load any JS that we need to make things happen, specifically the prompt tester.
         $PAGE->requires->js_call_amd('qtype_aitext/responserun', 'init', [$this->context->id]);
+
+        // Initialize expert mode template button.
+        $experttemplate = get_config('qtype_aitext', 'prompttemplate');
+        if (empty($experttemplate)) {
+            $experttemplate = get_string('defaultprompttemplate', 'qtype_aitext');
+        }
+        $PAGE->requires->js_call_amd('qtype_aitext/expertmode', 'init', [$experttemplate]);
     }
 
     /**

@@ -64,6 +64,27 @@ if ($ADMIN->fulltree) {
         80,
         6
     ));
+
+    // New structured prompt template.
+    $settings->add(new admin_setting_configtextarea(
+        'qtype_aitext/prompttemplate',
+        new lang_string('prompttemplate', 'qtype_aitext'),
+        new lang_string('prompttemplate_setting', 'qtype_aitext'),
+        new lang_string('defaultprompttemplate', 'qtype_aitext'),
+        PARAM_RAW,
+        80,
+        20
+    ));
+
+    $settings->add(new admin_setting_configtextarea(
+        'qtype_aitext/roleprompt',
+        new lang_string('roleprompt', 'qtype_aitext'),
+        new lang_string('roleprompt_setting', 'qtype_aitext'),
+        new lang_string('defaultroleprompt', 'qtype_aitext'),
+        PARAM_RAW,
+        80,
+        3
+    ));
     $settings->add(new admin_setting_configselect(
         'qtype_aitext/responseformat',
         new lang_string('responseformat', 'qtype_aitext'),
@@ -93,17 +114,12 @@ if ($ADMIN->fulltree) {
         0
     ));
 
+    // Deprecated: translatepostfix functionality is now integrated into the prompt template.
+    // This setting is kept for backwards compatibility with existing questions.
     $settings->add(new admin_setting_configcheckbox(
         'qtype_aitext/translatepostfix',
         new lang_string('translatepostfix', 'qtype_aitext'),
-        new lang_string('translatepostfix_text', 'qtype_aitext'),
+        new lang_string('translatepostfix_text', 'qtype_aitext') . ' ' . get_string('deprecated', 'qtype_aitext'),
         1
-    ));
-
-    $settings->add(new admin_setting_configcheckbox(
-        'qtype_aitext/expertmode',
-        get_string('expertmode', 'qtype_aitext'),
-        get_string('expertmode_setting', 'qtype_aitext'),
-        0
     ));
 }

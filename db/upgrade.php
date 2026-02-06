@@ -32,6 +32,9 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
+    // Include upgrade helper functions for data migrations.
+    require_once(__DIR__ . '/upgradelib.php');
+
     if ($oldversion < 2024050300) {
         $table = new xmldb_table('qtype_aitext');
         // Used for prompt testing in the edit form.
@@ -98,6 +101,18 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
 
         // Aitext savepoint reached.
         upgrade_plugin_savepoint(true, 2025072200, 'qtype', 'aitext');
+    }
+
+    if ($oldversion < 2026020601) {
+        // Migrate legacy expert mode prompts from [[placeholder]] to {{placeholder}} syntax.
+        $migratedcount = qtype_aitext_upgrade_migrate_legacy_prompts();
+
+        if ($migratedcount > 0) {
+            mtrace("Migrated {$migratedcount} legacy expert mode prompts to new {{placeholder}} syntax.");
+        }
+
+        // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2026020601, 'qtype', 'aitext');
     }
 
     return true;
