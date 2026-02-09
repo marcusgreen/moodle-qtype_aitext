@@ -187,10 +187,11 @@ final class question_test extends \advanced_testcase {
         $markscheme = 'One mark for correct grammar';
         $defaultmark = 5;
 
-        // Configure the template system.
+        // Configure the template system. Note: {{jsonprompt}} is no longer in the template,
+        // it is always appended automatically at the end of the prompt.
         $template = "=== ROLE ===\n{{role}}\n\n=== QUESTION ===\n{{questiontext}}\n\n" .
             "=== GRADING ===\n{{aiprompt}}\n\n=== SCORE ===\nMax: {{defaultmark}}\n{{markscheme}}\n\n" .
-            "=== RESPONSE ===\n{{response}}\n\n=== FORMAT ===\n{{jsonprompt}}\n\n=== LANGUAGE ===\n{{language}}";
+            "=== RESPONSE ===\n{{response}}\n\n=== LANGUAGE ===\n{{language}}";
         set_config('prompttemplate', $template, 'qtype_aitext');
         set_config('roleprompt', 'You are a helpful teacher.', 'qtype_aitext');
         set_config('jsonprompt', 'Return JSON: {"feedback":"...","marks":N}', 'qtype_aitext');
@@ -210,8 +211,9 @@ final class question_test extends \advanced_testcase {
         $this->assertStringContainsString('en', $result);
 
         // Scenario 2: Expert mode via {{response}} placeholder.
+        // Note: {{jsonprompt}} is NOT in the expert prompt, but should still be appended.
         $expertaiprompt = "Du bist ein Deutschlehrer.\n\nFrage: {{questiontext}}\n\n" .
-            "Antwort: {{response}}\n\nMax Punkte: {{defaultmark}}\n\n{{jsonprompt}}";
+            "Antwort: {{response}}\n\nMax Punkte: {{defaultmark}}";
         $result = $question->build_full_ai_prompt($studentresponse, $expertaiprompt, $defaultmark, $markscheme);
 
         $this->assertStringContainsString('Du bist ein Deutschlehrer.', $result);
@@ -219,6 +221,7 @@ final class question_test extends \advanced_testcase {
         $this->assertStringContainsString('The rain in Spain', $result);
         $this->assertStringContainsString('Max Punkte: 5', $result);
         $this->assertStringContainsString('Return JSON', $result);
+        $this->assertStringContainsString('=== OUTPUT FORMAT ===', $result);
         $this->assertStringNotContainsString('You are a helpful teacher.', $result);
 
         // Scenario 3a: Specific language via [[language=fr]].

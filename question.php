@@ -336,25 +336,33 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 '{{defaultmark}}' => $defaultmark,
                 '{{markscheme}}' => $markschemetext,
                 '{{response}}' => strip_tags($response),
-                '{{jsonprompt}}' => trim($jsonprompt),
+                '{{jsonprompt}}' => '',
                 '{{language}}' => $language,
                 '{{role}}' => trim($roleprompt),
             ];
-            return str_replace(array_keys($expertreplacement), array_values($expertreplacement), $cleanedaiprompt);
+            $prompt = str_replace(array_keys($expertreplacement), array_values($expertreplacement), $cleanedaiprompt);
+        } else {
+            $replacements = [
+                '{{role}}' => trim($roleprompt),
+                '{{questiontext}}' => strip_tags($this->questiontext ?? ''),
+                '{{aiprompt}}' => trim($cleanedaiprompt),
+                '{{defaultmark}}' => $defaultmark,
+                '{{markscheme}}' => $markschemetext,
+                '{{response}}' => strip_tags($response),
+                '{{jsonprompt}}' => '',
+                '{{language}}' => $language,
+            ];
+            $prompt = str_replace(array_keys($replacements), array_values($replacements), $template);
         }
 
-        $replacements = [
-            '{{role}}' => trim($roleprompt),
-            '{{questiontext}}' => strip_tags($this->questiontext ?? ''),
-            '{{aiprompt}}' => trim($cleanedaiprompt),
-            '{{defaultmark}}' => $defaultmark,
-            '{{markscheme}}' => $markschemetext,
-            '{{response}}' => strip_tags($response),
-            '{{jsonprompt}}' => trim($jsonprompt),
-            '{{language}}' => $language,
-        ];
+        // Always append the JSON output format instruction at the end of the prompt.
+        // This ensures the LLM returns structured JSON regardless of mode (standard or expert).
+        $jsonprompttext = trim($jsonprompt);
+        if (!empty($jsonprompttext)) {
+            $prompt .= "\n\n=== OUTPUT FORMAT ===\n" . $jsonprompttext;
+        }
 
-        return str_replace(array_keys($replacements), array_values($replacements), $template);
+        return $prompt;
     }
 
     /**
