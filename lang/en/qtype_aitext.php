@@ -28,7 +28,7 @@ $string['addsample'] = 'Add a sample response';
 $string['aiprompt'] = 'AI prompt';
 $string['aiprompt_help'] = 'A prompt for the AI Grader. This is the guideline that AI uses to give feedback on the student response.
 
-Expert mode: If you include the placeholder {{response}} in your prompt, it will be used as the complete prompt template, bypassing the admin template. Available placeholders: {{response}}, {{questiontext}}, {{defaultmark}}, {{markscheme}}, {{language}}, {{role}}.';
+Expert mode: If you include the placeholder {{response}} in your prompt, it will be used as the complete prompt template, bypassing the admin template. Available placeholders: {{response}}, {{questiontext}}, {{markscheme}}, {{language}}, {{role}}.';
 $string['aipromptmissing'] = 'The AI prompt is missing. Please enter a prompt on the basis of which the feedback is generated.';
 $string['answerfiles'] = 'Answer files';
 $string['answertext'] = 'Answer text';
@@ -52,14 +52,13 @@ $string['defaultprompttemplate'] = '=== ROLE ===
 {{aiprompt}}
 
 === SCORING ===
-Maximum score: {{defaultmark}}
 {{markscheme}}
 
 === STUDENT RESPONSE TO GRADE ===
 {{response}}
 
 === LANGUAGE ===
-Respond in {{language}}.';    
+Respond in {{language}}.';
 $string['defaultroleprompt'] = 'You are an experienced teacher who grades student responses fairly and constructively. Provide helpful feedback that helps the student learn.';
 $string['deletesample'] = 'Delete sample';
 $string['deprecated'] = '(Deprecated - use prompt template instead)';
@@ -76,8 +75,9 @@ $string['err_minwordlimitnegative'] = 'Minimum word limit cannot be a negative n
 $string['err_parammissing'] = 'Invalid parameters. Make sure you have a sample answer and prompt';
 $string['err_retrievingfeedback'] = 'Error retrieving feedback vom KI-Tool: {$a}';
 $string['err_retrievingfeedback_checkconfig'] = 'Unable to retrieve feedback. AI System Configuration might be wrong, contact your Administrator.';
+$string['err_nofeedback'] = 'No feedback was returned from the AI. The response could not be graded automatically.';
 $string['err_retrievingtranslation'] = 'Error retrieving translation: {$a}';
-$string['expertmodeconfirm'] = 'This will replace the current prompt with the expert mode template.<br><br><strong>What is expert mode?</strong><br>In expert mode, you have full control over the entire AI prompt. The admin template is ignored and your prompt is sent directly to the AI.<br><br><strong>Available placeholders:</strong><ul><li><code>{{response}}</code> - The student\'s answer (required to activate expert mode)</li><li><code>{{questiontext}}</code> - The question text</li><li><code>{{markscheme}}</code> - The grading criteria</li><li><code>{{defaultmark}}</code> - Maximum achievable points</li><li><code>{{language}}</code> - The user\'s language for the response</li><li><code>{{role}}</code> - The role description</li></ul><strong>Note:</strong> The <code>{{role}}</code> placeholder inserts the admin-defined role prompt. You can either use this placeholder or write your own role description directly in your prompt.<br><br>Continue?';
+$string['expertmodeconfirm'] = 'This will replace the current prompt with the expert mode template.<br><br><strong>What is expert mode?</strong><br>In expert mode, you have full control over the entire AI prompt. The admin template is ignored and your prompt is sent directly to the AI.<br><br><strong>Available placeholders:</strong><ul><li><code>{{response}}</code> - The student\'s answer (required to activate expert mode)</li><li><code>{{questiontext}}</code> - The question text</li><li><code>{{markscheme}}</code> - The grading criteria</li><li><code>{{language}}</code> - The user\'s language for the response</li><li><code>{{role}}</code> - The role description</li></ul><strong>Note:</strong> The <code>{{role}}</code> placeholder inserts the admin-defined role prompt. You can either use this placeholder or write your own role description directly in your prompt.<br><br>Continue?';
 $string['formateditor'] = 'HTML editor';
 $string['formateditorfilepicker'] = 'HTML editor with file picker';
 $string['formatmonospaced'] = 'Plain text, monospaced font';
@@ -119,7 +119,7 @@ $string['privacy:preference:disclaimer']  = 'Text to indicate the feedback and/o
 $string['privacy:preference:maxbytes'] = 'Maximum file size.';
 $string['privacy:preference:responseformat'] = 'What is the response format (HTML editor, plain text, etc.)?';
 $string['prompttemplate'] = 'Prompt template';
-$string['prompttemplate_setting'] = 'The structured template for building the AI prompt. Use placeholders: {{role}}, {{questiontext}}, {{aiprompt}}, {{defaultmark}}, {{markscheme}}, {{response}}, {{language}}. The JSON output format instruction is always appended automatically. Leave a placeholder empty section to omit it.';
+$string['prompttemplate_setting'] = 'The structured template for building the AI prompt. Use placeholders: {{role}}, {{questiontext}}, {{aiprompt}}, {{markscheme}}, {{response}}, {{language}}. The output format and maximum score are always appended automatically. Leave a placeholder empty section to omit it.';
 $string['purposeplacedescription_feedback'] = 'Generation of feedback suggestions when submitting a quiz attempt or when regrading';
 $string['purposeplacedescription_translate'] = 'Translation of the disclaimer and AI generated feedback to the user\'s target language.';
 $string['response'] = 'Response';

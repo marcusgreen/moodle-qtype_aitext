@@ -28,7 +28,7 @@ $string['acceptedfiletypes'] = 'Akzeptierte Dateitypen';
 $string['aiprompt'] = 'AI-Eingabeaufforderung';
 $string['aiprompt_help'] = 'Eine Eingabeaufforderung für den AI Grader. Dies ist der Leitfaden, den AI verwendet, um eine Rückmeldung über die Schülerantwort zu geben.
 
-**Experten-Modus:** Wenn Sie {{response}} in Ihrem Prompt verwenden, wird dieser als vollständige Prompt-Vorlage verwendet und ersetzt die Admin-Vorlage. Verfügbare Platzhalter: {{response}}, {{questiontext}}, {{defaultmark}}, {{markscheme}}, {{language}}, {{role}}.';
+**Experten-Modus:** Wenn Sie {{response}} in Ihrem Prompt verwenden, wird dieser als vollständige Prompt-Vorlage verwendet und ersetzt die Admin-Vorlage. Verfügbare Platzhalter: {{response}}, {{questiontext}}, {{markscheme}}, {{language}}, {{role}}.';
 $string['aipromptmissing'] = 'Der Ai-Prompt fehlt. Bitte geben Sie einen Prompt ein, auf dessen Grundlage das Feedback generiert wird.';
 $string['answerfiles'] = 'Antwortdateien';
 $string['answertext'] = 'Antworttext';
@@ -49,14 +49,13 @@ $string['defaultprompttemplate'] = '=== ROLLE ===
 {{aiprompt}}
 
 === PUNKTEVERGABE ===
-Maximale Punktzahl: {{defaultmark}}
 {{markscheme}}
 
 === ZU BEWERTENDE SCHÜLERANTWORT ===
 {{response}}
 
 === SPRACHE ===
-Antworte auf {{language}}.';    
+Antworte auf {{language}}.';
 $string['defaultroleprompt'] = 'Du bist ein erfahrener Lehrer, der Schülerantworten fair und konstruktiv bewertet. Gib hilfreiches Feedback, das dem Schüler beim Lernen hilft.';
 $string['deprecated'] = '(Veraltet - verwenden Sie stattdessen die Prompt-Vorlage)';
 $string['disclaimer'] = 'Haftungsausschluss';
@@ -71,8 +70,9 @@ $string['err_minwordlimit'] = 'Minimum word limit is enabled but is not set';
 $string['err_minwordlimitnegative'] = 'Minimales Wortlimit kann keine negative Zahl sein';
 $string['err_parammissing'] = 'Ungültige Parameter. Stellen Sie sicher, dass Sie eine Beispiel-Antwort und einen Prompt eingegeben haben.';
 $string['err_retrievingfeedback'] = 'Fehler beim Abrufen des Feedbacks vom KI-Tool: {$a}';
+$string['err_nofeedback'] = 'Von der KI wurde kein Feedback zurückgegeben. Die Antwort konnte nicht automatisch bewertet werden.';
 $string['err_retrievingtranslation'] = 'Fehler beim Abrufen der Übersetzung: {$a}';
-$string['expertmodeconfirm'] = 'Dies ersetzt den aktuellen Prompt durch die Expertenmodus-Vorlage.<br><br><strong>Was ist der Expertenmodus?</strong><br>Im Expertenmodus haben Sie die volle Kontrolle über den gesamten KI-Prompt. Die Admin-Vorlage wird ignoriert und Ihr Prompt wird direkt an die KI gesendet.<br><br><strong>Verfügbare Platzhalter:</strong><ul><li><code>{{response}}</code> - Die Schülerantwort (erforderlich zur Aktivierung des Expertenmodus)</li><li><code>{{questiontext}}</code> - Der Fragetext</li><li><code>{{markscheme}}</code> - Das Bewertungsschema</li><li><code>{{defaultmark}}</code> - Maximal erreichbare Punktzahl</li><li><code>{{language}}</code> - Die Sprache für die Antwort</li><li><code>{{role}}</code> - Die Rollenbeschreibung</li></ul><strong>Hinweis:</strong> Der Platzhalter <code>{{role}}</code> fügt den vom Admin definierten Rollen-Prompt ein. Sie können entweder diesen Platzhalter verwenden oder Ihre eigene Rollenbeschreibung direkt in Ihren Prompt schreiben.<br><br>Fortfahren?';
+$string['expertmodeconfirm'] = 'Dies ersetzt den aktuellen Prompt durch die Expertenmodus-Vorlage.<br><br><strong>Was ist der Expertenmodus?</strong><br>Im Expertenmodus haben Sie die volle Kontrolle über den gesamten KI-Prompt. Die Admin-Vorlage wird ignoriert und Ihr Prompt wird direkt an die KI gesendet.<br><br><strong>Verfügbare Platzhalter:</strong><ul><li><code>{{response}}</code> - Die Schülerantwort (erforderlich zur Aktivierung des Expertenmodus)</li><li><code>{{questiontext}}</code> - Der Fragetext</li><li><code>{{markscheme}}</code> - Das Bewertungsschema</li><li><code>{{language}}</code> - Die Sprache für die Antwort</li><li><code>{{role}}</code> - Die Rollenbeschreibung</li></ul><strong>Hinweis:</strong> Der Platzhalter <code>{{role}}</code> fügt den vom Admin definierten Rollen-Prompt ein. Sie können entweder diesen Platzhalter verwenden oder Ihre eigene Rollenbeschreibung direkt in Ihren Prompt schreiben.<br><br>Fortfahren?';
 $string['formateditor'] = 'HTML-Editor';
 $string['formateditorfilepicker'] = 'HTML-Editor mit Dateipicker';
 $string['formatmonospaced'] = 'Einfacher Text, Schriftart monospaced';
@@ -103,7 +103,7 @@ $string['privacy:preference:attachments'] = 'Anzahl der erlaubten Anhänge.';
 $string['privacy:preference:attachmentsrequired'] = 'Anzahl der erforderlichen Anhänge.';
 $string['privacy:preference:defaultmark'] = 'Die Standardmarkierung, die für eine bestimmte Frage gesetzt wurde.';
 $string['prompttemplate'] = 'Prompt-Vorlage';
-$string['prompttemplate_setting'] = 'Die strukturierte Vorlage für den KI-Prompt. Verwenden Sie Platzhalter: {{role}}, {{questiontext}}, {{aiprompt}}, {{defaultmark}}, {{markscheme}}, {{response}}, {{language}}. Die JSON-Ausgabeformat-Anweisung wird automatisch angehängt. Lassen Sie einen Abschnitt leer, um ihn wegzulassen.';
+$string['prompttemplate_setting'] = 'Die strukturierte Vorlage für den KI-Prompt. Verwenden Sie Platzhalter: {{role}}, {{questiontext}}, {{aiprompt}}, {{markscheme}}, {{response}}, {{language}}. Ausgabeformat und maximale Punktzahl werden automatisch angehängt. Lassen Sie einen Abschnitt leer, um ihn wegzulassen.';
 $string['prompttester'] = 'Prompt-Tester';
 $string['responsefieldlines'] = 'Größe des Eingabefeldes';
 $string['responseformat'] = 'Antwortformat';

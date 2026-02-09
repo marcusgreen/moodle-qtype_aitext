@@ -187,10 +187,10 @@ final class question_test extends \advanced_testcase {
         $markscheme = 'One mark for correct grammar';
         $defaultmark = 5;
 
-        // Configure the template system. Note: {{jsonprompt}} is no longer in the template,
-        // it is always appended automatically at the end of the prompt.
+        // Configure the template system. Note: {{jsonprompt}} and {{defaultmark}} are no longer in the template,
+        // they are always appended automatically at the end of the prompt.
         $template = "=== ROLE ===\n{{role}}\n\n=== QUESTION ===\n{{questiontext}}\n\n" .
-            "=== GRADING ===\n{{aiprompt}}\n\n=== SCORE ===\nMax: {{defaultmark}}\n{{markscheme}}\n\n" .
+            "=== GRADING ===\n{{aiprompt}}\n\n=== SCORE ===\n{{markscheme}}\n\n" .
             "=== RESPONSE ===\n{{response}}\n\n=== LANGUAGE ===\n{{language}}";
         set_config('prompttemplate', $template, 'qtype_aitext');
         set_config('roleprompt', 'You are a helpful teacher.', 'qtype_aitext');
@@ -204,22 +204,22 @@ final class question_test extends \advanced_testcase {
         $this->assertStringContainsString('You are a helpful teacher.', $result);
         $this->assertStringContainsString('Write a poem about nature', $result);
         $this->assertStringContainsString('Check if the poem has good imagery.', $result);
-        $this->assertStringContainsString('Max: 5', $result);
         $this->assertStringContainsString('One mark for correct grammar', $result);
         $this->assertStringContainsString('The rain in Spain', $result);
         $this->assertStringContainsString('Return JSON', $result);
+        $this->assertStringContainsString('Maximum score: 5', $result);
         $this->assertStringContainsString('en', $result);
 
         // Scenario 2: Expert mode via {{response}} placeholder.
-        // Note: {{jsonprompt}} is NOT in the expert prompt, but should still be appended.
+        // Note: {{jsonprompt}} and {{defaultmark}} are NOT in the expert prompt, but should still be appended.
         $expertaiprompt = "Du bist ein Deutschlehrer.\n\nFrage: {{questiontext}}\n\n" .
-            "Antwort: {{response}}\n\nMax Punkte: {{defaultmark}}";
+            "Antwort: {{response}}";
         $result = $question->build_full_ai_prompt($studentresponse, $expertaiprompt, $defaultmark, $markscheme);
 
         $this->assertStringContainsString('Du bist ein Deutschlehrer.', $result);
         $this->assertStringContainsString('Write a poem about nature', $result);
         $this->assertStringContainsString('The rain in Spain', $result);
-        $this->assertStringContainsString('Max Punkte: 5', $result);
+        $this->assertStringContainsString('Maximum score: 5', $result);
         $this->assertStringContainsString('Return JSON', $result);
         $this->assertStringContainsString('=== OUTPUT FORMAT ===', $result);
         $this->assertStringNotContainsString('You are a helpful teacher.', $result);
@@ -278,7 +278,7 @@ final class question_test extends \advanced_testcase {
         string $json,
         bool $exceptionexpected,
         string $expectedfeedback,
-        float $expectedmarks
+        ?float $expectedmarks
     ): void {
         $this->resetAfterTest();
         set_config('disclaimer', '(example disclaimer)', 'qtype_aitext');
@@ -298,13 +298,20 @@ final class question_test extends \advanced_testcase {
             }
         }
         $this->assertIsObject($processedfeedback);
-        // The process_feedback function is implemented in a way that in case of a parsing failure,
-        // it as a fallback returns the original JSON string as feedback and 0 marks.
-        $this->assertEquals(
-            format_text($expectedfeedback, FORMAT_MARKDOWN) . ' (example disclaimer)',
-            $processedfeedback->feedback
-        );
-        $this->assertEquals($processedfeedback->marks, $expectedmarks);
+        // Empty feedback returns the err_nofeedback system message without disclaimer.
+        if (empty($json)) {
+            $this->assertEquals(
+                get_string('err_nofeedback', 'qtype_aitext'),
+                $processedfeedback->feedback
+            );
+        } else {
+            // Normal case: feedback is formatted and disclaimer is appended.
+            $this->assertEquals(
+                format_text($expectedfeedback, FORMAT_MARKDOWN) . ' (example disclaimer)',
+                $processedfeedback->feedback
+            );
+        }
+        $this->assertEquals($expectedmarks, $processedfeedback->marks);
     }
 
     /**
@@ -365,9 +372,9 @@ final class question_test extends \advanced_testcase {
             ],
             'empty_json' => [
                 'json' => '',
-                'exceptionexpected' => true,
+                'exceptionexpected' => false,
                 'expectedfeedback' => '',
-                'expectedmarks' => 0,
+                'expectedmarks' => null,
             ],
             // @codingStandardsIgnoreStart moodle.Strings.ForbiddenStrings.Found
             'json_with_backslashes' => [

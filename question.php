@@ -333,10 +333,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             // In expert mode, the aiprompt itself serves as the complete template.
             $expertreplacement = [
                 '{{questiontext}}' => strip_tags($this->questiontext ?? ''),
-                '{{defaultmark}}' => $defaultmark,
                 '{{markscheme}}' => $markschemetext,
                 '{{response}}' => strip_tags($response),
-                '{{jsonprompt}}' => '',
                 '{{language}}' => $language,
                 '{{role}}' => trim($roleprompt),
             ];
@@ -346,21 +344,20 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 '{{role}}' => trim($roleprompt),
                 '{{questiontext}}' => strip_tags($this->questiontext ?? ''),
                 '{{aiprompt}}' => trim($cleanedaiprompt),
-                '{{defaultmark}}' => $defaultmark,
                 '{{markscheme}}' => $markschemetext,
                 '{{response}}' => strip_tags($response),
-                '{{jsonprompt}}' => '',
                 '{{language}}' => $language,
             ];
             $prompt = str_replace(array_keys($replacements), array_values($replacements), $template);
         }
 
-        // Always append the JSON output format instruction at the end of the prompt.
-        // This ensures the LLM returns structured JSON regardless of mode (standard or expert).
+        // Always append the output format section at the end of the prompt.
+        // This ensures the LLM returns structured JSON and knows the max score, regardless of mode.
         $jsonprompttext = trim($jsonprompt);
         if (!empty($jsonprompttext)) {
             $prompt .= "\n\n=== OUTPUT FORMAT ===\n" . $jsonprompttext;
         }
+        $prompt .= "\nMaximum score: " . $defaultmark;
 
         return $prompt;
     }
@@ -430,7 +427,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         // LLMs sometimes do not return the plain JSON, but it is wrapped inside HTML tags, or some
         // blabla like "Here is the JSON you asked for: ...". So we need to extract the JSON part.
         if (empty($feedback)) {
-            throw new moodle_exception('No feedback returned from the LLM');
+            $contentobject = new \stdClass();
+            $contentobject->feedback = get_string('err_nofeedback', 'qtype_aitext');
+            $contentobject->marks = null;
+            return $contentobject;
         }
         $contentobject = $this->extract_single_json_object($feedback);
         if (!is_null($contentobject)) {
