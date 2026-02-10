@@ -56,7 +56,7 @@ $string['defaultprompttemplate'] = '=== ROLLE ===
 
 === SPRACHE ===
 Antworte in der Sprache "{{language}}".';
-$string['defaultroleprompt'] = 'Du bist ein erfahrener Lehrer, der Schülerantworten fair und konstruktiv bewertet. Gib hilfreiches Feedback, das dem Schüler beim Lernen hilft. Gib Formeln in LATEX Notation aus. Verwende für abgesetzte Blöcke $$ ... $$ und für Inline \(..\) als Delimiter ';
+$string['defaultroleprompt'] = 'Du bist ein erfahrener Lehrer, der Schülerantworten fair und konstruktiv bewertet. Gib hilfreiches Feedback, das dem Schüler beim Lernen hilft. Gib Formeln in LATEX Notation aus. Verwende als Delimiter \(..\) .';
 $string['deprecated'] = '(Veraltet - verwenden Sie stattdessen die Prompt-Vorlage)';
 $string['disclaimer'] = 'Haftungsausschluss';
 $string['disclaimer_setting'] = 'Text, der an jede Antwort angehängt wird und angibt, dass das Feedback von einem Large Language Model und nicht von einem Menschen stammt';
