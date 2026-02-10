@@ -225,7 +225,11 @@ class qtype_aitext_edit_form extends question_edit_form {
         if (empty($experttemplate)) {
             $experttemplate = get_string('defaultprompttemplate', 'qtype_aitext');
         }
-        $PAGE->requires->js_call_amd('qtype_aitext/expertmode', 'init', [$experttemplate]);
+        $roleprompt = get_config('qtype_aitext', 'roleprompt');
+        if (empty($roleprompt)) {
+            $roleprompt = get_string('defaultroleprompt', 'qtype_aitext');
+        }
+        $PAGE->requires->js_call_amd('qtype_aitext/expertmode', 'init', [$experttemplate, $roleprompt]);
     }
 
     /**

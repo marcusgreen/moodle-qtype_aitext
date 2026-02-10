@@ -29,8 +29,9 @@ import Notification from 'core/notification';
  * Initialize the expert mode template button.
  *
  * @param {string} template The expert mode template to insert.
+ * @param {string} roleprompt The current role prompt from the central template.
  */
-export const init = (template) => {
+export const init = (template, roleprompt) => {
     const button = document.getElementById('id_expertmodetemplatebtn');
     const aipromptTextarea = document.getElementById('id_aiprompt');
 
@@ -46,7 +47,7 @@ export const init = (template) => {
 
         if (currentValue) {
             // Ask for confirmation before replacing existing content.
-            const confirmMessage = await get_string('expertmodeconfirm', 'qtype_aitext');
+            const confirmMessage = await get_string('expertmodeconfirm', 'qtype_aitext', roleprompt);
 
             Notification.confirm(
                 await get_string('useexpertmodetemplate', 'qtype_aitext'),
