@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'qtype_aitext', language 'en'
+ * Strings for component 'qtype_aitext', language 'de'
  *
  * @package    qtype_aitext
  * @subpackage aitext
@@ -26,7 +26,9 @@
 $string['acceptedfiletypes'] = 'Akzeptierte Dateitypen';
 
 $string['aiprompt'] = 'AI-Eingabeaufforderung';
-$string['aiprompt_help'] = 'Eine Eingabeaufforderung für den Ai Grader. Dies ist der Leitfaden, den AI verwendet, um eine Rückmeldung über die Schülerantwort zu geben.';
+$string['aiprompt_help'] = 'Eine Eingabeaufforderung für den AI Grader. Dies ist der Leitfaden, den AI verwendet, um eine Rückmeldung über die Schülerantwort zu geben.
+
+**Experten-Modus:** Wenn Sie {{response}} in Ihrem Prompt verwenden, wird dieser als vollständige Prompt-Vorlage verwendet und ersetzt die globale Vorlage. Verfügbare Platzhalter: {{response}}, {{questiontext}}, {{markscheme}}, {{language}}, {{role}}.';
 $string['aipromptmissing'] = 'Der Ai-Prompt fehlt. Bitte geben Sie einen Prompt ein, auf dessen Grundlage das Feedback generiert wird.';
 $string['answerfiles'] = 'Antwortdateien';
 $string['answertext'] = 'Antworttext';
@@ -37,8 +39,29 @@ $string['defaultmarksscheme'] = 'Markierungsschema';
 $string['defaultmarksscheme_setting'] = 'Dies wird das Standard-Bewertungsschema für neue Fragen sein. Fragenautoren sollten dieses Schema an die jeweilige Frage anpassen.';
 $string['defaultprompt'] = 'AI-Aufforderung';
 $string['defaultprompt_setting'] = 'Dies ist die Standard-KI-Eingabeaufforderung für neue Fragen. Er sagt dem AI-Bewerter, wie er die Antwort des Schülers analysieren soll. Es ist der Leitfaden, den AI verwendet, um eine Rückmeldung über die Schülerantwort zu geben. Fragenautoren sollten dies an die jeweilige Frage anpassen.';
+$string['defaultprompttemplate'] = '=== ROLLE ===
+{{role}}
+
+=== AUFGABENSTELLUNG ===
+{{questiontext}}
+
+=== BEWERTUNGSKRITERIEN ===
+{{aiprompt}}
+
+=== PUNKTEVERGABE ===
+{{markscheme}}
+
+=== ZU BEWERTENDE SCHÜLERANTWORT ===
+{{response}}
+
+=== SPRACHE ===
+Antworte in der Sprache "{{language}}".';
+$string['defaultroleprompt'] = 'Du bist ein erfahrener Lehrer, der Schülerantworten fair und konstruktiv bewertet. Gib hilfreiches Feedback, das dem Schüler beim Lernen hilft. Gib Formeln in LATEX Notation aus. Verwende als Delimiter \(..\) .';
+$string['deprecated'] = '(Veraltet - verwenden Sie stattdessen die Prompt-Vorlage)';
 $string['disclaimer'] = 'Haftungsausschluss';
 $string['disclaimer_setting'] = 'Text, der an jede Antwort angehängt wird und angibt, dass das Feedback von einem Large Language Model und nicht von einem Menschen stammt';
+$string['enable_expertmode'] = 'Expertenmodus aktivieren';
+$string['enable_expertmode_setting'] = 'Wenn aktiviert, wird der Button "Expertenmodus-Vorlage verwenden" im Frage-Bearbeitungsformular angezeigt.';
 $string['err_airesponsefailed'] = 'Fehler: {$a}';
 $string['err_maxminmismatch'] = 'Die maximale Wortgrenze muss größer sein als die minimale Wortgrenze';
 $string['err_maxwordlimit'] = 'Maximales Wortlimit ist aktiviert, aber nicht gesetzt';
@@ -47,7 +70,9 @@ $string['err_minwordlimit'] = 'Minimum word limit is enabled but is not set';
 $string['err_minwordlimitnegative'] = 'Minimales Wortlimit kann keine negative Zahl sein';
 $string['err_parammissing'] = 'Ungültige Parameter. Stellen Sie sicher, dass Sie eine Beispiel-Antwort und einen Prompt eingegeben haben.';
 $string['err_retrievingfeedback'] = 'Fehler beim Abrufen des Feedbacks vom KI-Tool: {$a}';
+$string['err_nofeedback'] = 'Von der KI wurde kein Feedback zurückgegeben. Die Antwort konnte nicht automatisch bewertet werden.';
 $string['err_retrievingtranslation'] = 'Fehler beim Abrufen der Übersetzung: {$a}';
+$string['expertmodeconfirm'] = 'Dies ersetzt den aktuellen Prompt durch die Expertenmodus-Vorlage.<br><br><strong>Was ist der Expertenmodus?</strong><br>Im Expertenmodus haben Sie die volle Kontrolle über den gesamten KI-Prompt. Die globale Vorlage wird ignoriert und Ihr Prompt wird direkt an die KI gesendet.<br><br><strong>Verfügbare Platzhalter:</strong><ul><li><code>{{response}}</code> - Die Schülerantwort (erforderlich zur Aktivierung des Expertenmodus)</li><li><code>{{questiontext}}</code> - Der Fragetext</li><li><code>{{markscheme}}</code> - Das Bewertungsschema</li><li><code>{{language}}</code> - Die Sprache für die Antwort</li><li><code>{{role}}</code> - Die Rollenbeschreibung aus der globalen Vorlage (aktuell: <em>"{$a}"</em>)</li></ul><strong>Hinweis:</strong> Der Platzhalter <code>{{role}}</code> fügt den in der globalen Vorlage definierten Rollen-Prompt ein. Sie können entweder diesen Platzhalter verwenden oder Ihre eigene Rollenbeschreibung direkt in Ihren Prompt schreiben.<br><br>Fortfahren?';
 $string['formateditor'] = 'HTML-Editor';
 $string['formateditorfilepicker'] = 'HTML-Editor mit Dateipicker';
 $string['formatmonospaced'] = 'Einfacher Text, Schriftart monospaced';
@@ -66,6 +91,7 @@ $string['maxwordlimit_help'] = 'Wenn die Antwort die Eingabe von Text durch die 
 $string['minwordlimitboundary'] = 'Diese Frage erfordert eine Antwort von mindestens {$a->limit} Wörtern, und Sie versuchen, {$a->count} Wörter zu übermitteln. Bitte erweitern Sie Ihre Antwort und versuchen Sie es erneut.';
 $string['model'] = 'Model';
 $string['nlines'] = '{$a} Zeilen';
+$string['nomarkscheme'] = 'Kein Bewertungsschema angegeben. Setze Punkte auf null.';
 $string['pluginname'] = 'AI Text';
 $string['pluginname_help'] = 'Als Antwort auf eine Frage gibt der Befragte Text ein. Es kann eine Antwortvorlage bereitgestellt werden. Die Antworten werden von einem KI-System (z. B. ChatGPT) vorbewertet und können dann manuell bewertet werden.';
 $string['pluginname_link'] = 'Frage/Typ/AI Text';
@@ -76,7 +102,8 @@ $string['privacy::responsefieldlines'] = 'Anzahl der Zeilen, die die Größe des
 $string['privacy:preference:attachments'] = 'Anzahl der erlaubten Anhänge.';
 $string['privacy:preference:attachmentsrequired'] = 'Anzahl der erforderlichen Anhänge.';
 $string['privacy:preference:defaultmark'] = 'Die Standardmarkierung, die für eine bestimmte Frage gesetzt wurde.';
-$string['prompt_setting'] = 'Wrapper text for the prompt set to the AI System, [responsetext] is whatever the student entered as an answer. Der KI-Prompt-Wert aus der Frage wird an diesen Text angehängt';
+$string['prompttemplate'] = 'Prompt-Vorlage';
+$string['prompttemplate_setting'] = 'Die strukturierte Vorlage für den KI-Prompt. Verwenden Sie Platzhalter: {{role}}, {{questiontext}}, {{aiprompt}}, {{markscheme}}, {{response}}, {{language}}. Ausgabeformat und maximale Punktzahl werden automatisch angehängt. Lassen Sie einen Abschnitt leer, um ihn wegzulassen.';
 $string['prompttester'] = 'Prompt-Tester';
 $string['responsefieldlines'] = 'Größe des Eingabefeldes';
 $string['responseformat'] = 'Antwortformat';
@@ -87,6 +114,8 @@ $string['responseoptions'] = 'Antwortmöglichkeiten';
 $string['responsetemplate'] = 'Antwortvorlage';
 $string['responsetemplate_help'] = 'Jeder Text, der hier eingegeben wird, wird im Antwort-Eingabefeld angezeigt, wenn ein neuer Versuch für die Frage gestartet wird.';
 $string['responsetemplateheader'] = 'Antwortvorlage';
+$string['roleprompt'] = 'Rollen-Prompt';
+$string['roleprompt_setting'] = 'Die Rollenbeschreibung für die KI. Dies teilt der KI mit, welche Rolle sie bei der Bewertung einnehmen soll.';
 $string['sampleanswer'] = 'Beispielantwort';
 $string['sampleanswer_help'] = 'Die Beispielantwort kann verwendet werden, um zu testen, wie der KI-Bewerter auf eine bestimmte Antwort reagieren wird.';
 $string['sampleanswerempty'] = 'Vergewissern Sie sich, dass Sie eine KI-Eingabeaufforderung und eine Beispielantwort haben, bevor Sie den Test durchführen.';
@@ -100,6 +129,7 @@ $string['spellcheckedit'] = 'Rechtschreibprüfung bearbeiten';
 $string['spellcheckeditor'] = 'Rechtschreibprüfung der KI bearbeiten';
 $string['thedefaultmarksscheme'] = 'Ziehe für jeden Grammatik- oder Rechtschreibfehler einen Punkt von der Gesamtpunktzahl ab.';
 $string['thedefaultprompt'] = 'Erklären Sie, ob etwas mit der Grammatik und der Rechtschreibung im Text nicht stimmt.';
+$string['useexpertmodetemplate'] = 'Expertenmodus-Vorlage verwenden';
 $string['wordcount'] = 'Wortanzahl: {$a}';
 $string['wordcounttoofew'] = 'Wortanzahl: {$a->count}, weniger als die erforderlichen {$a->limit} Wörter.';
 $string['wordcounttoomuch'] = 'Wortanzahl: {$a->count}, mehr als das Limit von {$a->limit} Wörtern.';

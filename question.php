@@ -246,23 +246,13 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
         }
-        if (is_array($response)) {
-            $hasexpert = strpos($this->aiprompt, '[[expert]]') !== false;
-            $hasresponse = strpos($this->aiprompt, '[[response]]') !== false;
-               // If one is present but not both, return early with the message.
-            if ($hasexpert xor $hasresponse) {
-                $feedback = 'If the prompt contains[[expert]] or [[response]] it must contain both';
-                $fullaiprompt = $this->aiprompt;
-            } else {
-                $fullaiprompt = $this->build_full_ai_prompt(
-                    $response['answer'],
-                    $this->aiprompt,
-                    $this->defaultmark,
-                    $this->markscheme
-                );
-                $feedback = $this->perform_request($fullaiprompt, 'feedback');
-            }
-        }
+        $fullaiprompt = $this->build_full_ai_prompt(
+            $response['answer'],
+            $this->aiprompt,
+            $this->defaultmark,
+            $this->markscheme
+        );
+        $feedback = $this->perform_request($fullaiprompt, 'feedback');
         $contentobject = $this->process_feedback($feedback);
 
         // If there are no marks, write the feedback and set to needs grading .
@@ -287,64 +277,130 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     }
 
     /**
-     * Used by prompttester in the editing form
+     * Build the complete AI prompt for grading a student response.
      *
-     * @param string $response
-     * @param string $aiprompt
-     * @param number $defaultmark
-     * @param string $markscheme
-     * @return string;
+     * Uses the structured template system. Also used by the prompt tester in the editing form.
+     *
+     * @param string $response The student's response text.
+     * @param string $aiprompt The grading instructions from the question.
+     * @param float $defaultmark The maximum achievable score.
+     * @param string $markscheme The marking criteria.
+     * @return string The complete prompt ready to send to the AI.
      */
     public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
-        // Check if [questiontext] is in the aiprompt and replace it with the question text.
-        if (strpos($aiprompt, '[[questiontext]]') !== false) {
-            $aiprompt = str_replace('[[questiontext]]', strip_tags($this->questiontext), $aiprompt);
+        return $this->build_template_prompt($response, $aiprompt, $defaultmark, $markscheme);
+    }
+
+    /**
+     * Build prompt using the structured template system.
+     *
+     * Supports two modes:
+     * - Standard mode: Uses the admin-configured template with {{placeholders}}.
+     * - Expert mode: If aiprompt contains {{response}}, it becomes the complete template.
+     *
+     * @param string $response The student's response text.
+     * @param string $aiprompt The grading instructions from the question.
+     * @param float $defaultmark The maximum achievable score.
+     * @param string $markscheme The marking criteria.
+     * @return string The complete prompt with all placeholders replaced.
+     */
+    private function build_template_prompt(string $response, string $aiprompt, float $defaultmark, string $markscheme): string {
+        $template = get_config('qtype_aitext', 'prompttemplate');
+        if (empty($template)) {
+            $template = get_string('defaultprompttemplate', 'qtype_aitext');
         }
-        if (strpos($aiprompt, '[[expert]]') !== false && (get_config('qtype_aitext', 'expertmode') == 1)) {
-            // Remove [[expert]] as it is just a flag.
-            $prompt = str_replace('[[expert]]', '', $aiprompt);
-            $prompt = preg_replace("/\[\[response\]\]/", $response, $prompt);
 
-            if (strpos($aiprompt, '[[userlang]]') !== false) {
-                $prompt .= ' ' . current_language();
-            }
-            return $prompt;
+        $roleprompt = get_config('qtype_aitext', 'roleprompt');
+        if (empty($roleprompt)) {
+            $roleprompt = get_string('defaultroleprompt', 'qtype_aitext');
         }
 
-        $responsetext = strip_tags($response);
-            $responsetext = '[[' . $responsetext . ']]';
-            $prompt = get_config('qtype_aitext', 'prompt');
-            $prompt = preg_replace("/\[responsetext\]/", $responsetext, $prompt);
-            $prompt .= ' ' . trim($aiprompt);
+        $jsonprompt = get_config('qtype_aitext', 'jsonprompt') ?? '';
 
-        if ($markscheme > '') {
-            // Tell the LLM how to mark the submission.
-            $prompt .= " The total score is: $defaultmark .";
-            $prompt .= ' ' . $markscheme;
+        $language = $this->determine_output_language($aiprompt);
+
+        $markschemetext = trim($markscheme);
+        if (empty($markschemetext)) {
+            $markschemetext = get_string('nomarkscheme', 'qtype_aitext');
+        }
+
+        $cleanedaiprompt = $this->clean_legacy_tags($aiprompt);
+
+        // Expert mode: {{response}} in aiprompt makes it the complete template.
+        $isexpertmode = strpos($cleanedaiprompt, '{{response}}') !== false;
+
+        if ($isexpertmode) {
+            // In expert mode, the aiprompt itself serves as the complete template.
+            $expertreplacement = [
+                '{{questiontext}}' => strip_tags($this->questiontext ?? ''),
+                '{{markscheme}}' => $markschemetext,
+                '{{response}}' => strip_tags($response),
+                '{{language}}' => $language,
+                '{{role}}' => trim($roleprompt),
+            ];
+            $prompt = str_replace(array_keys($expertreplacement), array_values($expertreplacement), $cleanedaiprompt);
         } else {
-            // Todo should this be a plugin setting value?.
-            $prompt .= ' Set marks to null in the json object.' . PHP_EOL;
+            $replacements = [
+                '{{role}}' => trim($roleprompt),
+                '{{questiontext}}' => strip_tags($this->questiontext ?? ''),
+                '{{aiprompt}}' => trim($cleanedaiprompt),
+                '{{markscheme}}' => $markschemetext,
+                '{{response}}' => strip_tags($response),
+                '{{language}}' => $language,
+            ];
+            $prompt = str_replace(array_keys($replacements), array_values($replacements), $template);
         }
-        $prompt .= ' ' . trim(get_config('qtype_aitext', 'jsonprompt'));
 
-        // Only process language if the disable tag [[language=""]] is not present.
-        if (strpos($aiprompt, '[[language=""]]') === false) {
-            // Check for a specific language specification in aiprompt.
-            $langcode = null;
-            if (preg_match('/\[\[language=([a-zA-Z]{2})\]\]/', $aiprompt, $matches)) {
-                $langcode = $matches[1];
-            }
-
-            if ($langcode !== null) {
-                // If a specific language code (e.g., "fr") is found, add the translation instruction.
-                $prompt .= ' translate the feedback to the language ' . $langcode;
-            } else if (get_config('qtype_aitext', 'translatepostfix')) {
-                // Otherwise, if the setting is enabled, use the user's current language.
-                $prompt .= ' translate the feedback to the language ' . current_language();
-            }
+        // Always append the output format section at the end of the prompt.
+        // This ensures the LLM returns structured JSON and knows the max score, regardless of mode.
+        $jsonprompttext = trim($jsonprompt);
+        if (!empty($jsonprompttext)) {
+            $prompt .= "\n\n=== OUTPUT FORMAT ===\n" . $jsonprompttext;
         }
+        $prompt .= "\nMaximum score: " . $defaultmark;
 
         return $prompt;
+    }
+
+    /**
+     * Determine the output language for the AI response.
+     *
+     * Priority: [[language=XX]] > [[language=""]] (disabled) > translatepostfix setting.
+     *
+     * @param string $aiprompt The AI prompt that may contain language override tags.
+     * @return string A language code (e.g., 'en', 'de') or descriptive text.
+     */
+    private function determine_output_language(string $aiprompt): string {
+        if (strpos($aiprompt, '[[language=""]]') !== false) {
+            return 'the same language as the question';
+        }
+
+        if (preg_match('/\[\[language=([a-zA-Z]{2})\]\]/', $aiprompt, $matches)) {
+            return $matches[1];
+        }
+
+        if (get_config('qtype_aitext', 'translatepostfix')) {
+            return current_language();
+        }
+
+        return 'the same language as the question';
+    }
+
+    /**
+     * Remove legacy placeholder tags from the AI prompt.
+     *
+     * Removes: [[questiontext]], [[language=XX]], [[language=""]], [[userlang]].
+     * These are processed separately and should not appear in the final prompt.
+     *
+     * @param string $aiprompt The original AI prompt with potential legacy tags.
+     * @return string The cleaned prompt.
+     */
+    private function clean_legacy_tags(string $aiprompt): string {
+        $cleaned = str_replace('[[questiontext]]', '', $aiprompt);
+        $cleaned = preg_replace('/\[\[language="?[a-zA-Z]*"?\]\]/', '', $cleaned);
+        $cleaned = str_replace('[[userlang]]', '', $cleaned);
+
+        return trim($cleaned);
     }
 
 
@@ -371,7 +427,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         // LLMs sometimes do not return the plain JSON, but it is wrapped inside HTML tags, or some
         // blabla like "Here is the JSON you asked for: ...". So we need to extract the JSON part.
         if (empty($feedback)) {
-            throw new moodle_exception('No feedback returned from the LLM');
+            $contentobject = new \stdClass();
+            $contentobject->feedback = get_string('err_nofeedback', 'qtype_aitext');
+            $contentobject->marks = null;
+            return $contentobject;
         }
         $contentobject = $this->extract_single_json_object($feedback);
         if (!is_null($contentobject)) {

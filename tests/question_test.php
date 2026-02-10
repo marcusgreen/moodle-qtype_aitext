@@ -168,77 +168,100 @@ final class question_test extends \advanced_testcase {
     }
 
     /**
-     * Check the student response gets interpolated into the prompt ready to send
-     * off to the LLM
-     * @covers \qtype_aitext\question::build_full_ai_prompt
+     * Test the structured prompt template system with various scenarios.
+     *
+     * This test covers three distinct scenarios:
+     * 1. Standard mode - Uses admin template with {{placeholders}}.
+     * 2. Expert mode - When aiprompt contains {{response}}, it becomes the template.
+     * 3. Language handling - Tests [[language=XX]], [[language=""]], and translatepostfix.
+     *
+     * @covers \qtype_aitext_question::build_full_ai_prompt
      */
     public function test_build_full_ai_prompt(): void {
         $this->resetAfterTest(true);
 
+        // Setup common test data.
         $question = qtype_aitext_test_helper::make_aitext_question([]);
-        $question->questiontext = 'Write a poem';
-        $aiprompt = "Does this answer the request to '[[questiontext]]' ";
-        $markscheme  = 'One mark if the response is gramatically correct';
-        $studentresponse = 'The rain in Spain';
-        $defaultmark = 1;
+        $question->questiontext = 'Write a poem about nature';
+        $studentresponse = 'The rain in Spain falls mainly on the plain';
+        $markscheme = 'One mark for correct grammar';
+        $defaultmark = 5;
 
-        // Default request to translate feedback to en.
+        // Configure the template system. Note: {{jsonprompt}} and {{defaultmark}} are no longer in the template,
+        // they are always appended automatically at the end of the prompt.
+        $template = "=== ROLE ===\n{{role}}\n\n=== QUESTION ===\n{{questiontext}}\n\n" .
+            "=== GRADING ===\n{{aiprompt}}\n\n=== SCORE ===\n{{markscheme}}\n\n" .
+            "=== RESPONSE ===\n{{response}}\n\n=== LANGUAGE ===\n{{language}}";
+        set_config('prompttemplate', $template, 'qtype_aitext');
+        set_config('roleprompt', 'You are a helpful teacher.', 'qtype_aitext');
+        set_config('jsonprompt', 'Return JSON: {"feedback":"...","marks":N}', 'qtype_aitext');
+
+        // Scenario 1: Standard mode with admin template.
         set_config('translatepostfix', true, 'qtype_aitext');
-        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
-        $this->assertStringContainsString('translate the feedback to the language en', $result);
+        $aiprompt = 'Check if the poem has good imagery.';
+        $result = $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
 
-        // Set config to not auto translate feedback to en.
+        $this->assertStringContainsString('You are a helpful teacher.', $result);
+        $this->assertStringContainsString('Write a poem about nature', $result);
+        $this->assertStringContainsString('Check if the poem has good imagery.', $result);
+        $this->assertStringContainsString('One mark for correct grammar', $result);
+        $this->assertStringContainsString('The rain in Spain', $result);
+        $this->assertStringContainsString('Return JSON', $result);
+        $this->assertStringContainsString('Maximum score: 5', $result);
+        $this->assertStringContainsString('en', $result);
+
+        // Scenario 2: Expert mode via {{response}} placeholder.
+        // Note: {{jsonprompt}} and {{defaultmark}} are NOT in the expert prompt, but should still be appended.
+        $expertaiprompt = "Du bist ein Deutschlehrer.\n\nFrage: {{questiontext}}\n\n" .
+            "Antwort: {{response}}";
+        $result = $question->build_full_ai_prompt($studentresponse, $expertaiprompt, $defaultmark, $markscheme);
+
+        $this->assertStringContainsString('Du bist ein Deutschlehrer.', $result);
+        $this->assertStringContainsString('Write a poem about nature', $result);
+        $this->assertStringContainsString('The rain in Spain', $result);
+        $this->assertStringContainsString('Maximum score: 5', $result);
+        $this->assertStringContainsString('Return JSON', $result);
+        $this->assertStringContainsString('=== OUTPUT FORMAT ===', $result);
+        $this->assertStringNotContainsString('You are a helpful teacher.', $result);
+
+        // Scenario 3a: Specific language via [[language=fr]].
+        $aiprompt = 'Rate the answer [[language=fr]]';
+        $result = $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+        $this->assertStringContainsString('fr', $result);
+        $this->assertStringNotContainsString('[[language=fr]]', $result);
+
+        // Scenario 3b: Disabled translation via [[language=""]].
+        $aiprompt = 'Rate the answer [[language=""]]';
+        set_config('translatepostfix', true, 'qtype_aitext');
+        $result = $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+        $this->assertStringContainsString('the same language as the question', $result);
+        $this->assertStringNotContainsString('[[language=""]]', $result);
+
+        // Scenario 3c: translatepostfix disabled.
         set_config('translatepostfix', false, 'qtype_aitext');
-        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
-        $this->assertStringNotContainsString('translate the feedback to the language en', $result);
-
-        // The questiontext should have been interpolated into the prompt.
-        $this->assertStringContainsString('Write a poem', $result);
-
-        // Request feedback translation on a question by question basis.
-        $aiprompt = "Is the text gramatically correct? [[language=jp]]";
-        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
-        $this->assertStringContainsString('translate the feedback to the language jp', $result);
-
-        // Disable insertion of the translation string.
-        $aiprompt = 'Is the text gramatically correct? [[language=""]]';
-        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
-        $this->assertStringNotContainsString('translate the feedback to the language', $result);
-
-        // Student response is within [ ] delimters. Angle brackets might be better.
-        $pattern = '/\[\[' . $studentresponse . '\]\]/';
-        $this->assertEquals(1, preg_match($pattern, $result));
-
-        // HTML tags should be stripped out, though that might change in the future.
-        $this->assertStringNotContainsString('<p>', $result);
-
-        // Marks scheme should be in result ready to send to LLm. Though it is optional.
-        $this->assertStringContainsString($markscheme, $result);
-
-        // Expert mode.
-        set_config('expertmode', 1, 'qtype_aitext');
-        $aiprompt = '[[expert]] Is the text gramatically correct?';
-        $result = (string) $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
-
-        // The string [[expert]] is only a flag so it should have been stripped out.
-        $this->assertStringNotContainsString('[[expert]]', $result);
+        $aiprompt = 'Simple grading instruction';
+        $result = $question->build_full_ai_prompt($studentresponse, $aiprompt, $defaultmark, $markscheme);
+        $this->assertStringContainsString('the same language as the question', $result);
     }
 
     /**
-     * Check when [[expert]] is included no "boilerplate" will be added
-     * @return void
+     * Test that an empty markscheme is handled correctly with fallback text.
      *
-     * @covers \qtype_aitext\question::grade_response($response)
-     *
+     * @covers \qtype_aitext_question::build_full_ai_prompt
      */
-    public function test_expert_mode(): void {
-        global $DB;
+    public function test_build_full_ai_prompt_empty_markscheme(): void {
         $this->resetAfterTest(true);
-        $question = qtype_aitext_test_helper::make_aitext_question(['aiprompt' => '[[expert]] Write asentence in the past tense']);
-        $response = ['answer' => 'Yesterday I went to the park', 'answerformat' => 2];
-        $question->grade_response($response);
-        $result = $DB->get_record('question_attempt_step_data', ['name' => '-aicontent']);
-        $this->assertStringContainsString('If the prompt contains[[expert]] or [[response]] it must contain both', $result->value);
+
+        $question = qtype_aitext_test_helper::make_aitext_question([]);
+        $question->questiontext = 'Test question';
+
+        set_config('prompttemplate', '{{markscheme}}', 'qtype_aitext');
+        set_config('translatepostfix', false, 'qtype_aitext');
+
+        $result = $question->build_full_ai_prompt('Student answer', 'Grade this', 10, '');
+
+        // Should contain the fallback text for empty markscheme.
+        $this->assertStringContainsString('null', $result);
     }
 
     /**
@@ -249,13 +272,13 @@ final class question_test extends \advanced_testcase {
      * @param string $json The JSON string generated by the LLM.
      * @param bool $exceptionexpected If there is an exception expected during parsing.
      * @param string $expectedfeedback The expected feedback extracted from the JSON.
-     * @param float $expectedmarks The expected marks extracted from the JSON.
+     * @param float|null $expectedmarks The expected marks extracted from the JSON.
      */
     public function test_process_feedback(
         string $json,
         bool $exceptionexpected,
         string $expectedfeedback,
-        float $expectedmarks
+        ?float $expectedmarks
     ): void {
         $this->resetAfterTest();
         set_config('disclaimer', '(example disclaimer)', 'qtype_aitext');
@@ -275,13 +298,20 @@ final class question_test extends \advanced_testcase {
             }
         }
         $this->assertIsObject($processedfeedback);
-        // The process_feedback function is implemented in a way that in case of a parsing failure,
-        // it as a fallback returns the original JSON string as feedback and 0 marks.
-        $this->assertEquals(
-            format_text($expectedfeedback, FORMAT_MARKDOWN) . ' (example disclaimer)',
-            $processedfeedback->feedback
-        );
-        $this->assertEquals($processedfeedback->marks, $expectedmarks);
+        // Empty feedback returns the err_nofeedback system message without disclaimer.
+        if (empty($json)) {
+            $this->assertEquals(
+                get_string('err_nofeedback', 'qtype_aitext'),
+                $processedfeedback->feedback
+            );
+        } else {
+            // Normal case: feedback is formatted and disclaimer is appended.
+            $this->assertEquals(
+                format_text($expectedfeedback, FORMAT_MARKDOWN) . ' (example disclaimer)',
+                $processedfeedback->feedback
+            );
+        }
+        $this->assertEquals($expectedmarks, $processedfeedback->marks);
     }
 
     /**
@@ -342,13 +372,13 @@ final class question_test extends \advanced_testcase {
             ],
             'empty_json' => [
                 'json' => '',
-                'exceptionexpected' => true,
+                'exceptionexpected' => false,
                 'expectedfeedback' => '',
-                'expectedmarks' => 0,
+                'expectedmarks' => null,
             ],
+            // @codingStandardsIgnoreStart moodle.Strings.ForbiddenStrings.Found
             'json_with_backslashes' => [
-                // This JSON is real answer from an LLM.
-                // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
+                // This JSON is real answer from an LLM with markdown code block delimiters.
                 'json' => '```json { "feedback": "Die Antwort des Schülers zeigt ein grundlegendes Verständnis für das ' .
                     'Röntgenspektrum und die Entstehung des Bremsspektrums sowie des charakteristischen Spektrums. Es wird ' .
                     'korrekt beschrieben, dass das Bremsspektrum durch das Bremsen der Elektronen entsteht und von der ' .
@@ -374,6 +404,7 @@ final class question_test extends \advanced_testcase {
                     'erreichen. Gegeben: 7/10 Punkte.',
                 'expectedmarks' => 7,
             ],
+            // @codingStandardsIgnoreEnd
         ];
     }
 
