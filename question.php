@@ -442,6 +442,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $contentobject->marks = null;
         }
         $disclaimer = get_config('qtype_aitext', 'disclaimer');
+        // The format_text will interprete a backslash as escaping character. To preserve one we need to double them first.
+        // This is especially important so that the mathjax filter still has a chance to have its delimiters \( ... \).
+        $contentobject->feedback = str_replace('\\', '\\\\', $contentobject->feedback);
         $contentobject->feedback = format_text($contentobject->feedback, FORMAT_MARKDOWN, ['para' => false]);
         $contentobject->feedback .= ' ' . $this->llm_translate($disclaimer);
 
