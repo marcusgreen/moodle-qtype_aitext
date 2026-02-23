@@ -437,7 +437,25 @@ final class question_test extends \advanced_testcase {
                     'wäre korrekt). Punkte: 1/1.',
                 'expectedmathjaxapplied' => true,
                 'expectedmarks' => 1,
-            ]
+            ],
+            [
+                'json' => '{"feedback":"Richtig! Deine Eingabe \\(3 \cdot 7\\) ist gültig (auch \\(7 \cdot 3\\) ' .
+                    'wäre korrekt). Punkte: 1/1.","marks":1}',
+                'exceptionexpected' => false,
+                'expectedfeedback' => 'Richtig! Deine Eingabe \\\\(3 \\\\cdot 7\\\\) ist gültig (auch \\\\(7 \\\\cdot 3\\\\) ' .
+                    'wäre korrekt). Punkte: 1/1.',
+                'expectedmathjaxapplied' => true,
+                'expectedmarks' => 1,
+            ],
+            [
+                'json' => '{"feedback":"Richtig! Deine Eingabe \\\\(3 \cdot 7\\\\) ist gültig (auch \\\\(7 \cdot 3\\\\) ' .
+                    'wäre korrekt). Punkte: 1/1.","marks":1}',
+                'exceptionexpected' => false,
+                'expectedfeedback' => 'Richtig! Deine Eingabe \\\\(3 \\\\cdot 7\\\\) ist gültig (auch \\\\(7 \\\\cdot 3\\\\) ' .
+                    'wäre korrekt). Punkte: 1/1.',
+                'expectedmathjaxapplied' => true,
+                'expectedmarks' => 1,
+            ],
             // @codingStandardsIgnoreEnd
         ];
     }
