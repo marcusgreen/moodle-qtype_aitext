@@ -444,6 +444,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $disclaimer = get_config('qtype_aitext', 'disclaimer');
         // The format_text will interprete a backslash as escaping character. To preserve one we need to double them first.
         // This is especially important so that the mathjax filter still has a chance to have its delimiters \( ... \).
+        // Limit the number of backslashes to not double them if they are already doubled.
+        $contentobject->feedback = str_replace('\\\\', '\\', $contentobject->feedback);
         $contentobject->feedback = str_replace('\\', '\\\\', $contentobject->feedback);
         $contentobject->feedback = format_text($contentobject->feedback, FORMAT_MARKDOWN, ['para' => false]);
         $contentobject->feedback .= ' ' . $this->llm_translate($disclaimer);
@@ -486,8 +488,14 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             // to escape.
             // So we are trying to parse LaTeX-like sequences explicitely and only inside them add an extra backslash to each
             // backslash.
+            // Try to decode the JSON as-is first. If the LLM returned valid JSON, use it directly.
+            // This avoids corrupting already properly escaped backslashes (e.g. \\( \\frac{x}{3} \\)).
+            $decoded = json_decode($json);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $decoded;
+            }
             $json = preg_replace_callback(
-                '/\\\\\(.*?\\\\\)|\\\\\[.*?\\\\\]|\$\$.*?\$\$|\$[^$]+\$/s',
+                '/\\\\{1,2}\(.*?\\\\{1,2}\)|\\\\{1,2}\[.*?\\\\{1,2}\]|\$\$.*?\$\$|\$[^$]+\$/s',
                 function ($matches) {
                     if (empty($matches[0])) {
                         return $matches[0] ?? '';
