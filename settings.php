@@ -86,7 +86,7 @@ if ($ADMIN->fulltree) {
         'qtype_aitext/responseformat',
         new lang_string('responseformat', 'qtype_aitext'),
         new lang_string('responseformat_setting', 'qtype_aitext'),
-        0,
+        'plain',
         ['plain' => 'plain', 'editor' => 'editor', 'monospaced' => 'monospaced']
     ));
     // Define the choices for the radio buttons.
