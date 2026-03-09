@@ -134,6 +134,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     /** @var array  */
     public $sampleanswers;
 
+    /** @var int|null Cached context id of the current attempt usage. */
+    protected $attemptcontextid = null;
+
     /**
      * Required by the interface question_automatically_gradable_with_countback.
      *
@@ -153,6 +156,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function apply_attempt_state(question_attempt_step $step) {
         $this->step = $step;
+        $this->attemptcontextid = null;
     }
     /**
      * Call the llm using either the 4.5 core api or the backend provided by
@@ -165,10 +169,11 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (defined('BEHAT_SITE_RUNNING') || (defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
             return "AI Feedback";
         }
+        $contextid = $this->get_contextid_for_ai_request();
         $backend = get_config('qtype_aitext', 'backend');
         if ($backend == 'local_ai_manager') {
             $manager = new local_ai_manager\manager($purpose);
-            $llmresponse = (object) $manager->perform_request($prompt, 'qtype_aitext', $this->contextid);
+            $llmresponse = (object) $manager->perform_request($prompt, 'qtype_aitext', $contextid);
             if ($llmresponse->get_code() !== 200) {
                 throw new moodle_exception(
                     'err_retrievingfeedback',
@@ -182,7 +187,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         } else if ($backend == 'core_ai_subsystem') {
             global $USER;
             $action = new \core_ai\aiactions\generate_text(
-                contextid: $this->contextid,
+                contextid: $contextid,
                 userid: $USER->id,
                 prompttext: $prompt
             );
@@ -829,5 +834,55 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         } else {
             return get_string('wordcount', 'qtype_aitext', $count);
         }
+    }
+
+    /**
+     * Resolve the context id which should be used for AI requests.
+     *
+     * This context is important because it will be used to perform permission checks. So we need the context in which
+     * the user *actually* requests AI functionalities.
+     *
+     * Prefers the current question usage context (attempt/quiz context). If not available or the determined one is a user
+     * context, the question bank context of the question will be used.
+     *
+     * @return int the id of the context to use for AI requests
+     */
+    public function get_contextid_for_ai_request(): int {
+        global $DB;
+
+        if (!is_null($this->attemptcontextid)) {
+            return $this->attemptcontextid;
+        }
+
+        $stepid = 0;
+        if (!empty($this->step) && method_exists($this->step, 'get_id')) {
+            $stepid = (int) $this->step->get_id();
+        }
+
+        if ($stepid > 0) {
+            // We are ignoring user contexts here, because the permissions for AI requests cannot be evaluated for user contexts.
+            // User contexts typically mean that a question preview is being done. In this case we use the question's context, so
+            // basically the context of the question bank it belongs to.
+            $sql = "SELECT qu.contextid
+                      FROM {question_attempt_steps} qas
+                      JOIN {question_attempts} qa ON qa.id = qas.questionattemptid
+                      JOIN {question_usages} qu ON qu.id = qa.questionusageid
+                      JOIN {context} c ON c.id = qu.contextid
+                     WHERE qas.id = :stepid AND c.contextlevel <> :contextlevel";
+            $attemptcontextid = $DB->get_field_sql($sql, ['stepid' => $stepid, 'contextlevel' => CONTEXT_USER]);
+            if (!empty($attemptcontextid)) {
+                $this->attemptcontextid = (int) $attemptcontextid;
+                return $this->attemptcontextid;
+            }
+        }
+
+        if (!empty($this->contextid)) {
+            $this->attemptcontextid = $this->contextid;
+            return $this->attemptcontextid;
+        }
+
+        // We usually should not get here, but if we do, we are falling back to the system context.
+        $this->attemptcontextid = context_system::instance()->id;
+        return $this->attemptcontextid;
     }
 }
