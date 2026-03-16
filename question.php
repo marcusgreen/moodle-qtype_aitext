@@ -181,6 +181,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             return $llmresponse->get_content();
         } else if ($backend == 'core_ai_subsystem') {
             global $USER;
+            $this->get_model();
+
             $action = new \core_ai\aiactions\generate_text(
                 contextid: $this->contextid,
                 userid: $USER->id,
@@ -213,6 +215,26 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
         throw new moodle_exception('err_invalidbackend', 'qtype_aitext');
     }
+    public function get_model(): ?string {
+        try {
+            $manager = \core\di::get(\core_ai\manager::class);
+            $actions = [\core_ai\aiactions\generate_text::class];
+            $providers = $manager->get_providers_for_actions($actions, true);
+
+            if (empty($providers) || !isset(reset($providers)[0])) {
+                return null;
+            }
+
+            $provider = reset($providers)[0];
+            $configkey = 'core_ai\\aiactions\\generate_text';
+
+            return $provider->actionconfig[$configkey]['settings']['model'] ?? null;
+        } catch (\Exception $e) {
+            debugging('Error getting AI model: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return null;
+        }
+    }
+
 
     /**
      * Get the spellchecking response.

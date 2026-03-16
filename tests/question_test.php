@@ -96,6 +96,34 @@ final class question_test extends \advanced_testcase {
         }
     }
 
+    public function test_get_models(): void {
+        global $DB, $CFG;
+        // Get the AI manager instance using dependency injection.
+        $manager = \core\di::get(\core_ai\manager::class);
+
+        // Define the actions you want to check for.
+        $actions = [
+             \core_ai\aiactions\generate_text::class,
+        ];
+
+        // Get providers that support the specified actions (only enabled ones).
+        // The second parameter 'true' ensures only enabled providers are returned.
+        $providers = $DB->get_records('ai_providers');
+        xdebug_break();
+
+        $providers = $manager->get_providers_for_actions($actions, false);
+        $instances  = $manager->get_provider_instances();
+        // Loop through providers for each action.
+        foreach ($providers as $actionclass => $actionproviders) {
+
+            // foreach ($actionProviders as $provider) {
+            //     echo "  - Provider ID: {$provider->id}\n";
+            //     echo "    Name: {$provider->name}\n";
+            //     echo "    Class: " . get_class($provider) . "\n";
+            //     echo "    Configured: " . ($provider->is_provider_configured() ? 'Yes' : 'No') . "\n";
+            // }
+        }
+    }
     /**
      * Ensure grader info is persisted when saving question options.
      *
