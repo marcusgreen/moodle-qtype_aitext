@@ -166,8 +166,41 @@ class qtype_aitext_renderer extends qtype_renderer {
      */
     public function feedback(question_attempt $qa, question_display_options $options) {
         // Get data written in the question.php grade_response method.
-        // This probably should be retrieved by an API call.
         $comment = $qa->get_current_manual_comment();
+
+        // Check if async grading is still in progress.
+        $aigraded = $qa->get_last_qt_var('-aigraded');
+
+        if ($aigraded === '0') {
+            // AI grading is still pending. Show a progress bar.
+            $output = '';
+            $progressidnumber = $qa->get_last_qt_var('-aiprogressidnumber');
+            if (!empty($progressidnumber)) {
+                $progressbar = \core\output\stored_progress_bar::get_by_idnumber($progressidnumber);
+                if ($progressbar) {
+                    $output .= html_writer::div(
+                        $progressbar->get_content(),
+                        'qtype_aitext-async-progress'
+                    );
+                }
+            }
+            // Fallback message if the progress bar is not available.
+            if (empty($output)) {
+                $output = html_writer::div(
+                    get_string('async_grading_placeholder', 'qtype_aitext'),
+                    'qtype_aitext-async-pending alert alert-info'
+                );
+            }
+            return $output;
+        }
+
+        if ($aigraded === 'error') {
+            // AI grading failed. Show an error message.
+            return html_writer::div(
+                get_string('async_grading_failed', 'qtype_aitext'),
+                'qtype_aitext-async-error alert alert-warning'
+            );
+        }
 
         if ($this->page->pagetype === 'question-bank-previewquestion-preview') {
             // Ensure $comment is an array and has content.
@@ -180,12 +213,10 @@ class qtype_aitext_renderer extends qtype_renderer {
                 $showprompt .= get_string('showprompt', 'qtype_aitext') . '</button>';
                 $showprompt .= '<div id="fullprompt" class="hidden">' . $prompt . '</div>';
 
-                // Store the modified feedback in a variable.
                 $feedback = $comment[0] . $showprompt;
                 return $feedback;
             }
 
-            // Return the comment if it exists, otherwise empty string.
             return (is_array($comment) && isset($comment[0])) ? $comment[0] : '';
         }
 

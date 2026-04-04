@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 
+use qtype_aitext\task\grade_response;
 
 /**
  * Represents an aitext question.
@@ -220,37 +221,76 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     }
 
     /**
-     * Get the spellchecking response.
+     * Grade response by queueing an adhoc task for asynchronous
+     * AI evaluation. Returns a placeholder grade immediately.
+     * In preview mode, grading is done synchronously.
      *
      * @param array $response
-     * @return string
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws moodle_exception
-     */
-    private function get_spellchecking(array $response): string {
-        $fullaiprompt = $this->build_full_ai_spellchecking_prompt($response['answer']);
-        $response = $this->perform_request($fullaiprompt, 'feedback');
-        return $response;
-    }
-
-    /**
-     * Grade response by making a call to external
-     * large language model such as ChatGPT
-     *
-     * @param array $response
-     * @return void
+     * @return array
      */
     public function grade_response(array $response): array {
-
-        if ($this->spellcheck) {
-            $spellcheckresponse = $this->get_spellchecking($response);
-            $this->insert_attempt_step_data('-spellcheckresponse', $spellcheckresponse);
-        }
         if (!$this->is_complete_response($response)) {
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
         }
+
+        // In preview mode, grade synchronously so the teacher gets instant feedback.
+        if ($this->is_preview_context()) {
+            return $this->grade_response_sync($response);
+        }
+
+        // Queue the async grading task.
+        $task = new grade_response();
+        $task->set_custom_data([
+            'attemptstepid' => $this->step->get_id(),
+            'response' => $response['answer'],
+            'questionid' => $this->id,
+            'defaultmark' => $this->defaultmark,
+            'aiprompt' => $this->aiprompt,
+            'markscheme' => $this->markscheme,
+            'spellcheck' => $this->spellcheck,
+            'contextid' => $this->get_contextid_for_ai_request(),
+        ]);
+        $task->set_userid($this->step->get_user_id());
+
+        // Initialise the stored progress bar before queueing so it can be polled.
+        $task->initialise_stored_progress();
+        $task->set_initial_progress();
+
+        \core\task\manager::queue_adhoc_task($task);
+
+        // Store the progress bar idnumber so the renderer can display it.
+        $progressidnumber = \core\output\stored_progress_bar::convert_to_idnumber(
+            grade_response::class,
+            $task->get_id()
+        );
+        $this->insert_attempt_step_data('-aiprogressidnumber', $progressidnumber);
+
+        // Store a placeholder while the async task is running.
+        $this->insert_attempt_step_data('-aigraded', '0');
+        $this->insert_attempt_step_data(
+            '-comment',
+            get_string('async_grading_placeholder', 'qtype_aitext')
+        );
+        $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
+
+        // Return "needs grading" — the actual grade will be written by the adhoc task.
+        return [0.0, question_state::$needsgrading];
+    }
+
+    /**
+     * Grade response synchronously (used in preview mode).
+     *
+     * @param array $response
+     * @return array
+     */
+    private function grade_response_sync(array $response): array {
+        if ($this->spellcheck) {
+            $fullaispellcheckprompt = $this->build_full_ai_spellchecking_prompt($response['answer']);
+            $spellcheckresponse = $this->perform_request($fullaispellcheckprompt, 'feedback');
+            $this->insert_attempt_step_data('-spellcheckresponse', $spellcheckresponse);
+        }
+
         $fullaiprompt = $this->build_full_ai_prompt(
             $response['answer'],
             $this->aiprompt,
@@ -260,7 +300,6 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $feedback = $this->perform_request($fullaiprompt, 'feedback');
         $contentobject = $this->process_feedback($feedback);
 
-        // If there are no marks, write the feedback and set to needs grading .
         if (is_null($contentobject->marks)) {
             $grade = [0.0, question_state::$needsgrading];
         } else {
@@ -271,14 +310,26 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
 
-         // The -aicontent data is used in question preview. Only needs to happen in preview.
         $this->insert_attempt_step_data('-aiprompt', $fullaiprompt);
         $this->insert_attempt_step_data('-aicontent', $contentobject->feedback);
-
         $this->insert_attempt_step_data('-comment', $contentobject->feedback);
         $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
 
         return $grade;
+    }
+
+    /**
+     * Check if the current context is a question preview.
+     *
+     * @return bool
+     */
+    private function is_preview_context(): bool {
+        global $PAGE;
+        try {
+            return strpos($PAGE->pagetype, 'question-bank-previewquestion') !== false;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
@@ -535,7 +586,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $cache = cache::make('qtype_aitext', 'stringdata');
         if (($translation = $cache->get(current_language() . '_' . $text)) === false) {
             $prompt = 'translate "' . $text . '" into ' . current_language() .
-                    'Only return the exact text, do not wrap it in other text.';
+                'Only return the exact text, do not wrap it in other text.';
             $translation = $this->perform_request($prompt, 'translate');
             $translation = trim($translation, '"');
             $cache->set(current_language() . '_' . $text, $translation);
@@ -672,7 +723,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             return true;
         } else if (
             array_key_exists('attachments', $response)
-                && $response['attachments'] instanceof question_response_files
+            && $response['attachments'] instanceof question_response_files
         ) {
             return true;
         } else {
@@ -772,7 +823,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      *
      * @param string $responsestring
      * @return string|null
-     .*/
+    .*/
     private function check_input_word_count($responsestring) {
 
         if (!$this->minwordlimit && !$this->maxwordlimit) {
