@@ -22,6 +22,7 @@
  * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
 $string['acceptedfiletypes'] = 'Accepted file types';
 $string['addsample'] = 'Add a sample response';
@@ -74,7 +75,7 @@ $string['err_minwordlimit'] = 'Minimum word limit is enabled but is not set';
 $string['err_minwordlimitnegative'] = 'Minimum word limit cannot be a negative number';
 $string['err_nofeedback'] = 'No feedback was returned from the AI. The response could not be graded automatically.';
 $string['err_parammissing'] = 'Invalid parameters. Make sure you have a sample answer and prompt';
-$string['err_retrievingfeedback'] = 'Error retrieving feedback vom KI-Tool: {$a}';
+$string['err_retrievingfeedback'] = 'Error retrieving feedback from the AI system: {$a}';
 $string['err_retrievingfeedback_checkconfig'] = 'Unable to retrieve feedback. AI System Configuration might be wrong, contact your Administrator.';
 $string['err_retrievingtranslation'] = 'Error retrieving translation: {$a}';
 $string['expertmodeconfirm'] = 'This will replace the current prompt with the expert mode template.<br><br><strong>What is expert mode?</strong><br>In expert mode, you have full control over the entire AI prompt. The central template is ignored and your prompt is sent directly to the AI.<br><br><strong>Available placeholders:</strong><ul><li><code>{{response}}</code> - The student\'s answer (required to activate expert mode)</li><li><code>{{questiontext}}</code> - The question text</li><li><code>{{markscheme}}</code> - The grading criteria</li><li><code>{{language}}</code> - The user\'s language for the response</li><li><code>{{role}}</code> - The role description from the central template (currently: <em>"{$a}"</em>)</li></ul><strong>Note:</strong> The <code>{{role}}</code> placeholder inserts the role prompt defined in the central template. You can either use this placeholder or write your own role description directly in your prompt.<br><br>Continue?';
@@ -86,7 +87,7 @@ $string['formatplain'] = 'Plain text';
 $string['get_llmmfeedback'] = 'Get LLM feedback';
 $string['graderinfo'] = 'Information for graders';
 $string['graderinfoheader'] = 'Grader information';
-$string['jsonprompt'] = 'JSon prompt';
+$string['jsonprompt'] = 'JSON prompt';
 $string['jsonprompt_setting'] = 'Instructions sent to convert the returned value into json';
 $string['localaimanager'] = 'Local AI manager';
 $string['markprompt_required'] = 'Mark prompt required';
@@ -109,7 +110,7 @@ $string['pluginname_link'] = 'question/type/AI Text';
 $string['pluginname_userfaced'] = 'Question type "AI text" with AI supported feedback generation';
 $string['pluginnameadding'] = 'Adding an AI Text question';
 $string['pluginnameediting'] = 'Editing an AI Text question';
-$string['pluginnamesummary'] = 'Allows a response of a file upload and/or online text. The student response is processed by the configured AI/Large language model which returns feedback and optionally a grade..';
+$string['pluginnamesummary'] = 'Allows a response of a file upload and/or online text. The student response is processed by the configured AI/Large language model which returns feedback and optionally a grade.';
 $string['privacy::responsefieldlines'] = 'Number of lines indicating the size of the input box (textarea).';
 $string['privacy:metadata'] = 'AI Text question type plugin allows question authors to set default options as user preferences.';
 $string['privacy:preference:attachments'] = 'Number of allowed attachments.';
@@ -141,7 +142,7 @@ $string['roleprompt'] = 'Role prompt';
 $string['roleprompt_setting'] = 'The system role description for the AI. This tells the AI what role it should take when grading.';
 $string['sampleresponse'] = 'Sample response';
 $string['sampleresponse_help'] = 'The sample response can be used to test how the AI grader will respond to a given response.';
-$string['sampleresponseempty'] = 'Make sure that you have an AI prompt and sample respons before testing.';
+$string['sampleresponseempty'] = 'Make sure that you have an AI prompt and sample response before testing.';
 $string['sampleresponseeval'] = 'Sample response evaluation';
 $string['sampleresponseevaluate'] = 'Evaluate sample response';
 $string['showprompt'] = 'Show prompt';
