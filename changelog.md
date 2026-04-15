@@ -1,4 +1,18 @@
-### Release 1.01 of the Moodle AIText question type Dec 2025
+### Moodle AIText question type
+
+## Release 2.01 Apr 2026
+
+Huge thanks to Philipp Memmel and the team at ByCS who have contributed a transformative amount of code and testing to the plugin.
+
+New prompt template system with configurable structured templates using placeholders ({{role}}, {{questiontext}}, {{aiprompt}}, {{markscheme}}, {{response}}, {{language}}). The central template is defined in settings and applied consistently across all AI calls.
+
+Improved MathJax / LaTeX rendering: mathematical expressions in AI feedback are now correctly displayed when the response contains LaTeX notation.
+
+Improved robustness of AI completion against unusual or adversarial student inputs that could previously disrupt prompt formatting.
+
+Fixed the prompt tester in the question editing form so that the loading spinner is removed when an error occurs, preventing the UI from appearing stuck.
+
+### Release 1.01 Dec 2025
 
 When editing a question the Sample response evaluation will now render any HTML
 rather than showing raw tags.
@@ -45,12 +59,12 @@ Does this answer the question "[[questiontext]]
 Thanks to Adam Jenkins for this idea (and many others).  If a language string is included, e.g. [[language=js]] it will be converted to the string "translate the feedback to the language jp". If the prompt contains [[language=""]] no language translation string will be included. See
 https://github.com/marcusgreen/moodle-qtype_aitext/issues/20
 
-### Release 0.04 of the Moodle AIText question type Aug 2025
+### Release 0.04 Aug 2025
 
 Merge of callbacks code for upcoming mebis local_ai_connect features.
 Fix upgrade.db which was missing the spellcheck fields and breaking the plugin.
 
-### Release 0.03 of the Moodle AIText question type May 2025
+### Release 0.03 May 2025
 
 Fixed compatibility with Moodle 5.0, thanks to Philipp Memmel of Mebis-lp for the hint about Dependency Injection.
 
@@ -60,7 +74,7 @@ to be tested against the prompt. Make the spinner prettier for the web service c
 Fix backup/restore and xml import/export
 
 
-### Release 0.02 of the Moodle AIText question type Dec 2024
+### Release 0.02 Dec 2024
 
 Merged in code from https://github.com/mebis-lp/moodle-qtype_aitext
 Who have have extensive experience with live use of the question type.
@@ -93,7 +107,7 @@ Thanks to Farah Ahmad of Aga Khan University for reporting an issue with plagiar
 
 Thanks to Matt Metzgar for reporting an issue with the tranlation postfix.
 
-### Release 0.01 of the Moodle AIText question type May 2024
+### Release 0.01 May 2024
 
 Version 2024050300
 
