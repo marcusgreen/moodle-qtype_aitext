@@ -22,6 +22,7 @@
  * @copyright  2024 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
 $string['acceptedfiletypes'] = 'Accepted file types';
 $string['addsample'] = 'Add a sample response';
