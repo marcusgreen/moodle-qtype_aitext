@@ -229,13 +229,14 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return array
      */
     public function grade_response(array $response): array {
+
         if (!$this->is_complete_response($response)) {
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
         }
 
-        // In preview mode, grade synchronously so the teacher gets instant feedback.
-        if ($this->is_preview_context()) {
+        // In preview mode, or when async grading is disabled, grade synchronously.
+        if ($this->is_preview_context() || !get_config('qtype_aitext', 'asyncgrading')) {
             return $this->grade_response_sync($response);
         }
 
@@ -253,11 +254,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         ]);
         $task->set_userid($this->step->get_user_id());
 
-        // Initialise the stored progress bar before queueing so it can be polled.
+        // Queue first so the task gets a DB ID, then initialise the progress bar using that ID.
+        \core\task\manager::queue_adhoc_task($task);
         $task->initialise_stored_progress();
         $task->set_initial_progress();
-
-        \core\task\manager::queue_adhoc_task($task);
 
         // Store the progress bar idnumber so the renderer can display it.
         $progressidnumber = \core\output\stored_progress_bar::convert_to_idnumber(
@@ -265,14 +265,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $task->get_id()
         );
         $this->insert_attempt_step_data('-aiprogressidnumber', $progressidnumber);
-
-        // Store a placeholder while the async task is running.
         $this->insert_attempt_step_data('-aigraded', '0');
-        $this->insert_attempt_step_data(
-            '-comment',
-            get_string('async_grading_placeholder', 'qtype_aitext')
-        );
-        $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
 
         // Return "needs grading" — the actual grade will be written by the adhoc task.
         return [0.0, question_state::$needsgrading];

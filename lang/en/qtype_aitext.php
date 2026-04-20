@@ -32,6 +32,8 @@ Expert mode: If you include the placeholder {{response}} in your prompt, it will
 $string['aipromptmissing'] = 'The AI prompt is missing. Please enter a prompt on the basis of which the feedback is generated.';
 $string['answerfiles'] = 'Answer files';
 $string['answertext'] = 'Answer text';
+$string['asyncgrading'] = 'Asynchronous grading';
+$string['asyncgrading_setting'] = 'When enabled, AI grading is queued as a background task and a progress bar is shown. When disabled, grading happens immediately on submission.';
 $string['async_grading_complete'] = 'AI grading is complete.';
 $string['async_grading_failed'] = 'AI grading failed. A teacher will need to grade this response manually.';
 $string['async_grading_placeholder'] = '<em>AI feedback is being generated. Please check back shortly.</em>';

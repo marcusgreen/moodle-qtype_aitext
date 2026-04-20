@@ -105,6 +105,13 @@ if ($ADMIN->fulltree) {
     ));
 
     $settings->add(new admin_setting_configcheckbox(
+        'qtype_aitext/asyncgrading',
+        new lang_string('asyncgrading', 'qtype_aitext'),
+        new lang_string('asyncgrading_setting', 'qtype_aitext'),
+        1
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
         'qtype_aitext/markprompt_required',
         new lang_string('markprompt_required', 'qtype_aitext'),
         new lang_string('markprompt_required_setting', 'qtype_aitext'),
