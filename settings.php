@@ -108,7 +108,7 @@ if ($ADMIN->fulltree) {
         'qtype_aitext/asyncgrading',
         new lang_string('asyncgrading', 'qtype_aitext'),
         new lang_string('asyncgrading_setting', 'qtype_aitext'),
-        1
+        0
     ));
 
     $settings->add(new admin_setting_configcheckbox(

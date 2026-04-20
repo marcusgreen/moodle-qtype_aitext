@@ -182,6 +182,7 @@ class qtype_aitext_renderer extends qtype_renderer {
                         $progressbar->get_content(),
                         'qtype_aitext-async-progress'
                     );
+                    $this->page->requires->js_call_amd('qtype_aitext/asyncprogress', 'init');
                 }
             }
             // Fallback message if the progress bar is not available.

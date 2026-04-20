@@ -254,8 +254,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         ]);
         $task->set_userid($this->step->get_user_id());
 
-        // Queue first so the task gets a DB ID, then initialise the progress bar using that ID.
-        \core\task\manager::queue_adhoc_task($task);
+        // Queue first so the task gets a DB ID, then set it back on the task so the
+        // progress bar idnumber includes it, then initialise the progress bar.
+        $taskid = \core\task\manager::queue_adhoc_task($task);
+        $task->set_id($taskid);
         $task->initialise_stored_progress();
         $task->set_initial_progress();
 
