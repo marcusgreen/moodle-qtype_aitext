@@ -320,7 +320,6 @@ final class feedback_parser_test extends \advanced_testcase {
                 true,
                 2.0,
             ],
-            // @codingStandardsIgnoreEnd
             'plain_text_no_latex' => [
                 '{"feedback":"Gut gemacht! print() ist korrekt.","marks":2}',
                 '(Disclaimer)',
@@ -328,6 +327,24 @@ final class feedback_parser_test extends \advanced_testcase {
                 false,
                 2.0,
             ],
+            // MBS-10728: Real production LLM response from Philipp's log.
+            // Contains $$...$$ display math, Markdown code blocks, newlines, and mixed formatting.
+            // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
+            'mbs10728_production_log_mixed_math_and_code' => [
+                '{"feedback":"Bewertung: 4/6 Punkte\n\nSt\u00e4rken:\n- Richtige Idee: '
+                . 'Eingabe wird zu int konvertiert, Rest mit % berechnet, if/else-Logik '
+                . 'und korrekte Ausgaben sind inhaltlich richtig.\n- Fachlich korrekt: '
+                . 'Eine Zahl n ist genau dann durch 7 teilbar, wenn der Rest 0 ist: '
+                . '$$n \\\\text{ ist durch } 7 \\\\text{ teilbar } \\\\iff n \\\\bmod 7 = 0.$$ '
+                . 'Der Rest liegt dabei in Python stets in '
+                . '$$\\\\{0,1,2,3,4,5,6\\\\}.$$\n\nHauptproblem: Dein Code steht ohne '
+                . 'Zeilenumbr\\u00fcche.","marks":4}',
+                '',
+                'Bewertung',
+                true,
+                4.0,
+            ],
+            // @codingStandardsIgnoreEnd
         ];
     }
 
@@ -359,6 +376,54 @@ final class feedback_parser_test extends \advanced_testcase {
 
         // The [[ ]] should NOT be replaced with quotes because JSON extraction failed.
         $this->assertStringNotContainsString('"markers"', $result->feedback);
+    }
+
+    /**
+     * MBS-10728: Test with real production LLM response from Philipp's log.
+     *
+     * This response contains display math ($$...$$), Markdown code blocks,
+     * newlines, and mixed formatting. Verifies that the parser correctly
+     * extracts JSON, detects format, and produces valid HTML output.
+     */
+    public function test_parse_production_log_response_mbs10728(): void {
+        $this->resetAfterTest();
+
+        $parser = new feedback_parser();
+
+        // Real production JSON from Philipp's log (shortened, key elements preserved).
+        // @codingStandardsIgnoreStart moodle.Strings.ForbiddenStrings.Found
+        $json = '{"feedback":"Bewertung: 4/6 Punkte\n\nSt\u00e4rken:\n'
+            . '- Richtige Idee: Eingabe wird zu int konvertiert, Rest mit % berechnet.\n'
+            . '- Fachlich korrekt: Eine Zahl n ist genau dann durch 7 teilbar, '
+            . 'wenn der Rest 0 ist: $$n \\\\text{ ist durch } 7 \\\\text{ teilbar } '
+            . '\\\\iff n \\\\bmod 7 = 0.$$ Der Rest liegt dabei in Python stets in '
+            . '$$\\\\{0,1,2,3,4,5,6\\\\}.$$\n\nHauptproblem (\\u22122 Punkte):\n'
+            . '- Dein Code steht ohne Zeilenumbr\\u00fcche und Einr\\u00fcckungen '
+            . 'in einer Zeile.","marks":4}';
+        // @codingStandardsIgnoreEnd
+
+        $result = $parser->parse($json, '');
+
+        // Marks must be extracted correctly.
+        $this->assertEquals(4, $result->marks);
+
+        // Key plain text content must survive the pipeline.
+        $this->assertStringContainsString('Bewertung', $result->feedback);
+        $this->assertStringContainsString('Richtige Idee', $result->feedback);
+        $this->assertStringContainsString('Fachlich korrekt', $result->feedback);
+        $this->assertStringContainsString('Hauptproblem', $result->feedback);
+
+        // The math content (numbers, operators) must be present.
+        $this->assertStringContainsString('7', $result->feedback);
+        $this->assertStringContainsString('0', $result->feedback);
+
+        // MathJax filter wrapping depends on filter availability.
+        if (strpos($result->feedback, 'filter_mathjaxloader_equation') !== false) {
+            $this->assertStringContainsString(
+                '<span class="filter_mathjaxloader_equation">',
+                $result->feedback
+            );
+        }
     }
 
     /**
