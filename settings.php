@@ -44,6 +44,13 @@ if ($ADMIN->fulltree) {
         '(Response provided by an AI System)'
     ));
     $settings->add(new admin_setting_configcheckbox(
+        'qtype_aitext/allowhtml',
+        new lang_string('allowhtml', 'qtype_aitext'),
+        new lang_string('allowhtml_setting', 'qtype_aitext'),
+        0
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
         'qtype_aitext/enable_expertmode',
         new lang_string('enable_expertmode', 'qtype_aitext'),
         new lang_string('enable_expertmode_setting', 'qtype_aitext'),

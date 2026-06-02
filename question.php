@@ -331,6 +331,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         $cleanedaiprompt = $this->clean_legacy_tags($aiprompt);
 
+        // When allowhtml is enabled, HTML is not stripped from the student response.
+        $allowhtml = get_config('qtype_aitext', 'allowhtml');
+        $responsetext = $allowhtml ? ($response ?? '') : strip_tags($response ?? '');
+
         // Expert mode: {{response}} in aiprompt makes it the complete template.
         $isexpertmode = strpos($cleanedaiprompt, '{{response}}') !== false;
 
@@ -339,7 +343,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $expertreplacement = [
                 '{{questiontext}}' => strip_tags($this->questiontext ?? ''),
                 '{{markscheme}}' => $markschemetext,
-                '{{response}}' => strip_tags($response),
+                '{{response}}' => $responsetext,
                 '{{language}}' => $language,
                 '{{role}}' => trim($roleprompt),
             ];
@@ -350,7 +354,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 '{{questiontext}}' => strip_tags($this->questiontext ?? ''),
                 '{{aiprompt}}' => trim($cleanedaiprompt),
                 '{{markscheme}}' => $markschemetext,
-                '{{response}}' => strip_tags($response),
+                '{{response}}' => $responsetext,
                 '{{language}}' => $language,
             ];
             $prompt = str_replace(array_keys($replacements), array_values($replacements), $template);

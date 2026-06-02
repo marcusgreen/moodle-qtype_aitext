@@ -31,6 +31,8 @@ $string['aiprompt_help'] = 'A prompt for the AI Grader. This is the guideline th
 
 Expert mode: If you include the placeholder {{response}} in your prompt, it will be used as the complete prompt template, bypassing the central template. Available placeholders: {{response}}, {{questiontext}}, {{markscheme}}, {{language}}, {{role}}.';
 $string['aipromptmissing'] = 'The AI prompt is missing. Please enter a prompt on the basis of which the feedback is generated.';
+$string['allowhtml'] = 'Allow HTML in responses';
+$string['allowhtml_setting'] = 'When enabled, HTML will not be stripped from the student response before it is sent to the AI.';
 $string['answerfiles'] = 'Answer files';
 $string['answertext'] = 'Answer text';
 $string['attachmentsoptional'] = 'Attachments are optional';

@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_aitext';
-$plugin->version = 2026041501;
+$plugin->version = 2026060200;
 $plugin->requires = 2024100700;  // Moodle 4.5.
 $plugin->release = '2.02';
 $plugin->supported = [405, 502];
