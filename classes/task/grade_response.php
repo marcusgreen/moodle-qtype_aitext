@@ -16,7 +16,12 @@
 
 namespace qtype_aitext\task;
 
+use core\output\stored_progress_bar;
 use core\task\adhoc_task;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->libdir . '/questionlib.php');
 
 /**
  * Adhoc task for asynchronous AI grading of aitext question responses.
@@ -157,6 +162,26 @@ class grade_response extends adhoc_task {
      */
     public function set_initial_progress(): void {
         $this->progress->update_full(0, get_string('async_grading_waiting', 'qtype_aitext'));
+    }
+
+    /**
+     * Initializes and starts a stored progress bar for tracking progress.
+     *
+     * @return void
+     */
+    public function initialise_stored_progress(): void {
+        // In Moodle 5.0+, adhoc_task provides this method natively; delegate to it.
+        if (method_exists(adhoc_task::class, 'initialise_stored_progress')) {
+            parent::initialise_stored_progress();
+            return;
+        }
+
+        // Required for 4.5 compatibility.
+        $this->progress = new stored_progress_bar(
+            stored_progress_bar::convert_to_idnumber(get_class($this) . '_' . $this->get_id())
+        );
+        $this->progress->create();
+        $this->progress->start();
     }
 
     #[\Override]

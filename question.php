@@ -244,7 +244,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $task = new grade_response();
         $task->set_custom_data([
             'attemptstepid' => $this->step->get_id(),
-            'response' => $response['answer'],
+            'response' => (string)$response['answer'],
             'questionid' => $this->id,
             'defaultmark' => $this->defaultmark,
             'aiprompt' => $this->aiprompt,
