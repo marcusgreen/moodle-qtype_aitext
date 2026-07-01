@@ -132,7 +132,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     public bool $spellcheck;
 
 
-    /** @var array  */
+    /** @var array */
     public $sampleanswers;
 
     /** @var int|null Cached context id of the current attempt usage. */
@@ -143,22 +143,23 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      *
      * @param array $responses
      * @param array $totaltries
-     * @return number
+     * @return true
      */
-    public function compute_final_grade($responses, $totaltries) {
-
+    public function compute_final_grade($responses, $totaltries): bool {
         return true;
     }
+
     /**
      * Re-initialise the state during a quiz (or question use)
      *
      * @param question_attempt_step $step
      * @return void
      */
-    public function apply_attempt_state(question_attempt_step $step) {
+    public function apply_attempt_state(question_attempt_step $step): void {
         $this->step = $step;
         $this->attemptcontextid = null;
     }
+
     /**
      * Call the llm using either the 4.5 core api or the backend provided by
      * local_ai_manager (mebis) or tool_aimanager
@@ -174,7 +175,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $backend = get_config('qtype_aitext', 'backend');
         if ($backend == 'local_ai_manager') {
             $manager = new local_ai_manager\manager($purpose);
-            $llmresponse = (object) $manager->perform_request($prompt, 'qtype_aitext', $contextid);
+            $llmresponse = (object)$manager->perform_request($prompt, 'qtype_aitext', $contextid);
             if ($llmresponse->get_code() !== 200) {
                 throw new moodle_exception(
                     'err_retrievingfeedback',
@@ -185,7 +186,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 );
             }
             return $llmresponse->get_content();
-        } else if ($backend == 'core_ai_subsystem') {
+        } elseif ($backend == 'core_ai_subsystem') {
             global $USER;
             $action = new \core_ai\aiactions\generate_text(
                 contextid: $contextid,
@@ -208,7 +209,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 }
             }
             return $responsedata['generatedcontent'];
-        } else if ($backend == 'tool_aimanager') {
+        } elseif ($backend == 'tool_aimanager') {
             if (class_exists('\tool_aiconnect\ai\ai')) {
                 $ai = new tool_aiconnect\ai\ai();
                 $llmresponse = $ai->prompt_completion($prompt);
@@ -229,6 +230,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * @return array
      */
     public function grade_response(array $response): array {
+        global $DB;
 
         if (!$this->is_complete_response($response)) {
             $grade = [0 => 0, question_state::$needsgrading];
@@ -240,12 +242,16 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             return $this->grade_response_sync($response);
         }
 
+        $stepid = $this->step->get_id();
+        $questionattemptid = $DB->get_field('question_attempt_steps', 'questionattemptid', ['id' => $stepid]);
+
         // Queue the async grading task.
         $task = new grade_response();
         $task->set_custom_data([
-            'attemptstepid' => $this->step->get_id(),
+            'attemptstepid' => $stepid,
             'response' => (string)$response['answer'],
             'questionid' => $this->id,
+            'questionattemptid' => $questionattemptid,
             'defaultmark' => $this->defaultmark,
             'aiprompt' => $this->aiprompt,
             'markscheme' => $this->markscheme,
@@ -300,7 +306,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         } else {
             $fraction = 0.0;
             if (is_numeric($contentobject->marks) && $this->defaultmark > 0) {
-                $fraction = (float) $contentobject->marks / $this->defaultmark;
+                $fraction = (float)$contentobject->marks / $this->defaultmark;
             }
             $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
@@ -609,12 +615,13 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     /**
      * Possibly redundant, a legacy from filesubmission
      *
-     * @param moodle_page $page     the page we are outputting to.
+     * @param moodle_page $page the page we are outputting to.
      * @return renderer_base the response-format-specific renderer.
      */
     public function get_format_renderer(moodle_page $page) {
-        return  $page->get_renderer('qtype_aitext', 'format_' . $this->responseformat);
+        return $page->get_renderer('qtype_aitext', 'format_' . $this->responseformat);
     }
+
     /**
      * Get expected data types
      * @return array
@@ -716,7 +723,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         // Determine if the given response has online text and attachments.
         if (array_key_exists('answer', $response) && ($response['answer'] !== '')) {
             return true;
-        } else if (
+        } elseif (
             array_key_exists('attachments', $response)
             && $response['attachments'] instanceof question_response_files
         ) {
@@ -739,12 +746,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function is_same_response(array $prevresponse, array $newresponse) {
         if (array_key_exists('answer', $prevresponse) && $prevresponse['answer'] !== $this->responsetemplate) {
-            $value1 = (string) $prevresponse['answer'];
+            $value1 = (string)$prevresponse['answer'];
         } else {
             $value1 = '';
         }
         if (array_key_exists('answer', $newresponse) && $newresponse['answer'] !== $this->responsetemplate) {
-            $value2 = (string) $newresponse['answer'];
+            $value2 = (string)$newresponse['answer'];
         } else {
             $value2 = '';
         }
@@ -771,10 +778,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if ($component == 'question' && $filearea == 'response_attachments') {
             // Response attachments visible if the question has them.
             return $this->attachments != 0;
-        } else if ($component == 'question' && $filearea == 'response_answer') {
+        } elseif ($component == 'question' && $filearea == 'response_answer') {
             // Response attachments visible if the question has them.
             return $this->responseformat === 'editorfilepicker';
-        } else if ($component == 'qtype_aitext' && $filearea == 'graderinfo') {
+        } elseif ($component == 'qtype_aitext' && $filearea == 'graderinfo') {
             return $options->manualcomment && $args[0] == $this->id;
         } else {
             return parent::check_file_access(
@@ -818,9 +825,8 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      *
      * @param string $responsestring
      * @return string|null
-    .*/
+     */
     private function check_input_word_count($responsestring) {
-
         if (!$this->minwordlimit && !$this->maxwordlimit) {
             // This question does not care about the word count.
             return null;
@@ -834,7 +840,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 'qtype_aitext',
                 ['limit' => $this->maxwordlimit, 'count' => $count]
             );
-        } else if ($count < $this->minwordlimit) {
+        } elseif ($count < $this->minwordlimit) {
             return get_string(
                 'minwordlimitboundary',
                 'qtype_aitext',
@@ -871,7 +877,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 'qtype_aitext',
                 ['limit' => $this->maxwordlimit, 'count' => $count]
             );
-        } else if ($count < $this->minwordlimit) {
+        } elseif ($count < $this->minwordlimit) {
             return get_string(
                 'wordcounttoofew',
                 'qtype_aitext',
@@ -902,7 +908,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
 
         $stepid = 0;
         if (!empty($this->step) && method_exists($this->step, 'get_id')) {
-            $stepid = (int) $this->step->get_id();
+            $stepid = (int)$this->step->get_id();
         }
 
         if ($stepid > 0) {
@@ -917,7 +923,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                      WHERE qas.id = :stepid AND c.contextlevel <> :contextlevel";
             $attemptcontextid = $DB->get_field_sql($sql, ['stepid' => $stepid, 'contextlevel' => CONTEXT_USER]);
             if (!empty($attemptcontextid)) {
-                $this->attemptcontextid = (int) $attemptcontextid;
+                $this->attemptcontextid = (int)$attemptcontextid;
                 return $this->attemptcontextid;
             }
         }

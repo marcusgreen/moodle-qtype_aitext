@@ -42,6 +42,7 @@ class grade_response extends adhoc_task {
             $attemptstepid = $customdata->attemptstepid;
             $response = $customdata->response;
             $questionid = $customdata->questionid;
+            $questionattemptid = (int)$customdata->questionattemptid;
             $defaultmark = (float) $customdata->defaultmark;
             $aiprompt = $customdata->aiprompt;
             $markscheme = $customdata->markscheme;
@@ -81,15 +82,14 @@ class grade_response extends adhoc_task {
             $contentobject = $question->process_feedback($feedback);
 
             // Calculate the grade fraction.
+            $fraction = 0.0;
             if (is_null($contentobject->marks)) {
-                $fraction = 0.0;
-                $statename = 'needsgrading';
+                $state = \question_state::$needsgrading;
             } else {
-                $fraction = 0.0;
                 if (is_numeric($contentobject->marks) && $defaultmark > 0) {
                     $fraction = (float) $contentobject->marks / $defaultmark;
                 }
-                $statename = 'graded';
+                $state = \question_state::graded_state_for_fraction($fraction);
             }
 
             // Write the grading data to the attempt step.
@@ -98,13 +98,33 @@ class grade_response extends adhoc_task {
             $this->insert_attempt_step_data($attemptstepid, '-comment', $contentobject->feedback);
             $this->insert_attempt_step_data($attemptstepid, '-commentformat', FORMAT_HTML);
             $this->insert_attempt_step_data($attemptstepid, '-aifraction', (string) $fraction);
-            $this->insert_attempt_step_data($attemptstepid, '-aistate', $statename);
+            $this->insert_attempt_step_data($attemptstepid, '-aistate', $state);
             $this->insert_attempt_step_data($attemptstepid, '-aigraded', '1');
 
             $this->progress->update_full(
                 100,
                 get_string('async_grading_complete', 'qtype_aitext')
             );
+
+            // Update fraction and state on the latest step (the one the engine reads for scoring).
+            $lateststep = $DB->get_record_sql(
+                'SELECT id FROM {question_attempt_steps} WHERE questionattemptid = ? ORDER BY sequencenumber DESC',
+                [$questionattemptid],
+                IGNORE_MULTIPLE
+            );
+
+            if ($lateststep) {
+                $DB->update_record('question_attempt_steps', (object)[
+                    'id' => $lateststep->id,
+                    'fraction' => $fraction,
+                    'state' => $state->__toString(),
+                ]);
+                mtrace("Updated step {$lateststep->id} with fraction {$fraction}, state {$state}.");
+            } else {
+                mtrace("Warning — no step found for question attempt with ID {$questionattemptid}!");
+            }
+
+            $this->recalculate_quiz_grades($questionattemptid);
 
             mtrace("[qtype_aitext] Async grading complete for step {$attemptstepid}");
         } catch (\Exception $exception) {
@@ -155,6 +175,44 @@ class grade_response extends adhoc_task {
                 'value' => $value,
             ]);
         }
+    }
+
+    /**
+     * Recalculate quiz attempt sumgrades and the user's final quiz grade after
+     * an asynchronous AI grading step completes.
+     *
+     * This is intentionally quiz-specific: other activity types that use the
+     * question engine would need their own recalculation hook here.
+     * @throws \dml_exception
+     */
+    private function recalculate_quiz_grades(int $questionattemptid): void {
+        global $CFG, $DB;
+
+        $questionusageid = $DB->get_field('question_attempts', 'questionusageid', ['id' => $questionattemptid]);
+        if (!$questionusageid) {
+            return;
+        }
+
+        $quizattempt = $DB->get_record('quiz_attempts', ['uniqueid' => $questionusageid]);
+        if (!$quizattempt || $quizattempt->state !== \mod_quiz\quiz_attempt::FINISHED) {
+            return;
+        }
+
+        // Recalculate sumgrades for this specific attempt using the same subquery
+        // the quiz module uses, which excludes attempts still in the needsgrading state.
+        $dm = new \question_engine_data_mapper();
+        $DB->execute(
+            "UPDATE {quiz_attempts}
+                SET timemodified = :timenow,
+                    sumgrades    = ({$dm->sum_usage_marks_subquery('uniqueid')})
+              WHERE id = :id",
+            ['timenow' => time(), 'id' => $quizattempt->id]
+        );
+
+        // Recompute the user's final grade and push it to the gradebook.
+        require_once($CFG->dirroot . '/mod/quiz/lib.php');
+        $quizobj = \mod_quiz\quiz_settings::create((int)$quizattempt->quiz);
+        \mod_quiz\grade_calculator::create($quizobj)->recompute_final_grade((int)$quizattempt->userid);
     }
 
     /**
