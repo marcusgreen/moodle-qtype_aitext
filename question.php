@@ -532,10 +532,14 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             return $text;
         }
 
+        // Use the full language name (e.g. "Eesti" for et) rather than the ISO code, because LLMs do not
+        // reliably map two-letter codes to languages and will otherwise translate into an arbitrary language.
+        $languagename = get_string('thislanguage', 'langconfig');
+
         $cache = cache::make('qtype_aitext', 'stringdata');
         if (($translation = $cache->get(current_language() . '_' . $text)) === false) {
-            $prompt = 'translate "' . $text . '" into ' . current_language() .
-                    'Only return the exact text, do not wrap it in other text.';
+            $prompt = 'translate "' . $text . '" into ' . $languagename .
+                    '. Only return the exact text, do not wrap it in other text.';
             $translation = $this->perform_request($prompt, 'translate');
             $translation = trim($translation, '"');
             $cache->set(current_language() . '_' . $text, $translation);
