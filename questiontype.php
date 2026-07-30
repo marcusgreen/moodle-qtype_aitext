@@ -154,7 +154,7 @@ class qtype_aitext extends question_type {
 
         $DB->update_record('qtype_aitext', $options);
         $DB->delete_records('qtype_aitext_sampleresponses', ['question' => $formdata->id]);
-        foreach ($formdata->sampleresponses as $sr) {
+        foreach (($formdata->sampleresponses ?? []) as $sr) {
             if (trim((string) $sr) === '') {
                 continue;
             }

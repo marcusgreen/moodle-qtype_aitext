@@ -39,4 +39,12 @@ $functions = [
                 'type'        => 'read',
                 'ajax'        => true,
         ],
+        'qtype_aitext_generate_test_responses' => [
+                'classname'   => 'qtype_aitext_external',
+                'methodname'  => 'generate_test_responses',
+                'description' => 'Generate varied-quality sample responses and write them to test_responses.md',
+                'capabilities' => 'mod/quiz:grade',
+                'type'        => 'write',
+                'ajax'        => true,
+        ],
 ];

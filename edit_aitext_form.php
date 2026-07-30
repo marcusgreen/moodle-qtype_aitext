@@ -112,6 +112,40 @@ class qtype_aitext_edit_form extends question_edit_form {
         // Add repeated sample answer options along with the field for returned responses.
         $mform->addElement('header', 'responsetest', get_string('responsetester', 'qtype_aitext'));
         $mform->addHelpButton('responsetest', 'responsetesthelp', 'qtype_aitext');
+        $mform->setExpanded('responsetest');
+
+        // Developer aid: ask the AI to generate a spread of varied-quality test responses
+        // and drop them into the sample response fields below (off-topic first). The number
+        // box next to the button sets how many responses are created.
+        $gengroup = [
+            $mform->createElement(
+                'button',
+                'gentestresponsesbtn',
+                get_string('gentestresponses', 'qtype_aitext'),
+                ['id' => 'id_gentestresponsesbtn']
+            ),
+            $mform->createElement(
+                'text',
+                'numtestresponses',
+                '',
+                [
+                    'id'        => 'id_numtestresponses',
+                    'size'      => 2,
+                    'maxlength' => 2,
+                    'title'     => get_string('numtestresponses', 'qtype_aitext'),
+                ]
+            ),
+        ];
+        $mform->addGroup($gengroup, 'gentestresponsesgroup', get_string('gentestresponses', 'qtype_aitext'), ' ', false);
+        $mform->setType('numtestresponses', PARAM_INT);
+        $mform->setDefault('numtestresponses', 4);
+        $mform->addHelpButton('gentestresponsesgroup', 'gentestresponses', 'qtype_aitext');
+        $mform->addElement(
+            'static',
+            'gentestresponsesstatus',
+            '',
+            '<div id="id_gentestresponsesstatus" class="col-md-9"></div>'
+        );
 
         $answeroptions = ['maxlen' => 50, 'rows' => 6, 'size' => 30];
         $evaloptions = ['cols' => 50, 'rows' => 5, 'disabled' => 'disabled' ];
@@ -219,6 +253,9 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         // Load any JS that we need to make things happen, specifically the prompt tester.
         $PAGE->requires->js_call_amd('qtype_aitext/responserun', 'init', [$this->context->id]);
+
+        // Generate-test-responses button handler.
+        $PAGE->requires->js_call_amd('qtype_aitext/generatetests', 'init', [$this->context->id]);
 
         // Initialize expert mode template button.
         $experttemplate = get_config('qtype_aitext', 'prompttemplate');
