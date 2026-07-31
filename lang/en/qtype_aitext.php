@@ -37,6 +37,9 @@ $string['answerfiles'] = 'Answer files';
 $string['answertext'] = 'Answer text';
 $string['attachmentsoptional'] = 'Attachments are optional';
 $string['automatic_spellcheck'] = 'Automatic spellcheck';
+$string['automatic_spellcheck_help'] = 'When enabled, the AI reproduces the student answer with only the spelling corrected, and the differences are shown to the grader.
+
+Spellchecking targets prose. Code is passed through unchanged where it can be detected (in HTML answers), but in plain-text answers code cannot be told apart from prose. If you expect students to answer with code, consider turning this off.';
 $string['backends'] = 'AI back end systems';
 $string['backends_text'] = 'Core AI system was introduced with Moodle 4.5, Local AI System is from https://github.com/mebis-lp/moodle-local_ai_manager and Tool AI System is from https://github.com/marcusgreen/moodle-tool_aiconnect';
 $string['cachedef_stringdata'] = 'Cachedef stringdata';

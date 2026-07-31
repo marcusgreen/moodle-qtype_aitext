@@ -46,7 +46,6 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
 
     /**
      * Render the students response when the question is in read-only mode.
-     * @param string $name the variable name this input edits.
      * @param question_attempt $qa the question attempt being display.
      * @param question_attempt_step $step the current step.
      * @param int $lines approximate size of input box to display.
@@ -54,7 +53,6 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
      * @return string html to display the response.
      */
     abstract public function response_area_read_only(
-        $name,
         question_attempt $qa,
         question_attempt_step $step,
         $lines,
@@ -63,7 +61,6 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
 
     /**
      * Render the students response when the question is in input mode.
-     * @param string $name the variable name this input edits.
      * @param question_attempt $qa the question attempt being display.
      * @param question_attempt_step $step the current step.
      * @param int $lines approximate size of input box to display.
@@ -71,7 +68,6 @@ abstract class qtype_aitext_format_renderer_base extends plugin_renderer_base {
      * @return string html to display the response for editing.
      */
     abstract public function response_area_input(
-        $name,
         question_attempt $qa,
         question_attempt_step $step,
         $lines,

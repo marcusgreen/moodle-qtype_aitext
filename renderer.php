@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use qtype_aitext\response_formatter;
+
 require_once($CFG->dirroot . '/question/type/aitext/format_base_renderer.php');
 require_once($CFG->dirroot . '/question/type/aitext/format_editor_renderer.php');
 require_once($CFG->dirroot . '/question/type/aitext/format_plain_renderer.php');
@@ -68,7 +70,6 @@ class qtype_aitext_renderer extends qtype_renderer {
 
         if (empty($options->readonly)) {
             $answer = $responseoutput->response_area_input(
-                'answer',
                 $qa,
                 $step,
                 $question->responsefieldlines,
@@ -76,7 +77,6 @@ class qtype_aitext_renderer extends qtype_renderer {
             );
         } else {
             $answer = $responseoutput->response_area_read_only(
-                'answer',
                 $qa,
                 $step,
                 $question->responsefieldlines,
@@ -155,6 +155,12 @@ class qtype_aitext_renderer extends qtype_renderer {
 
     /**
      * Extract plain text from the response for use in the spellcheck diff.
+     *
+     * Uses the same format-aware conversion that built the text sent to the AI
+     * (see \qtype_aitext\response_formatter::to_spellcheck_text()): prose is reduced to plain text
+     * (character-changing formatting neutralised) while any code is kept verbatim and fenced. This
+     * keeps both sides of the spellcheck diff consistent, since both are reduced identically.
+     *
      * @param question_attempt $qa
      * @return string
      */
@@ -163,14 +169,19 @@ class qtype_aitext_renderer extends qtype_renderer {
         $answer = $answerstep->get_qt_var('answer');
         $answerformat = $answerstep->get_qt_var('answerformat') ?? FORMAT_HTML;
         return $answer ?
-            content_to_text(html_entity_decode($answer), $answerformat) : null;
+            response_formatter::to_spellcheck_text($answer, $answerformat) : null;
     }
 
     /**
      * Reduce the spellcheck text to plain text suitable for char-by-char diffs in JS.
      *
-     * Both the AI-generated value (_spellcheckresponse)and the teacher-edited value (spellcheckedit)
-     * are in FORMAT_PLAIN format. Any html contained is stripped down to plain text by content_to_text.
+     * Both values are treated as plain text (FORMAT_PLAIN), i.e. returned verbatim (only trimmed):
+     *  - The teacher-edited value (spellcheckedit) is produced by an editor that is forced to
+     *    FORMAT_PLAIN (with PARAM_TEXT); note that its format is not persisted, only the text is.
+     *  - The AI-generated value (_spellcheckresponse) is the raw LLM output. The model is given the
+     *    student answer that has *already* been normalised by response_formatter::to_spellcheck_text()
+     *    (prose reduced to plain text, code kept verbatim and fenced) and is asked to reproduce it
+     *    1:1 with spelling fixed, so its output is that same plain text.
      *
      * @param question_attempt $qa the question attempt.
      * @return string plain text spellcheck content.
@@ -178,10 +189,10 @@ class qtype_aitext_renderer extends qtype_renderer {
     protected function get_spellchecked_response(question_attempt $qa): string {
         $teacheredit = $qa->get_last_behaviour_var('spellcheckedit');
         if ($teacheredit !== null) {
-            return content_to_text($teacheredit, FORMAT_PLAIN);
+            return response_formatter::to_spellcheck_text($teacheredit, FORMAT_PLAIN);
         }
         $ai = $qa->get_last_behaviour_var('_spellcheckresponse') ?? '';
-        return content_to_text(html_entity_decode($ai), FORMAT_HTML);
+        return response_formatter::to_spellcheck_text($ai, FORMAT_PLAIN);
     }
 
     /**

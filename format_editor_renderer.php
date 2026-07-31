@@ -42,19 +42,18 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
     /**
      * Render the response area as read-only.
      *
-     * @param string $name the variable name this input edits.
      * @param question_attempt $qa the question attempt being displayed.
      * @param question_attempt_step $step the current step.
      * @param int $lines the number of lines for the input area.
      * @param object $context the context the attempt belongs to.
      * @return string HTML fragment.
      */
-    public function response_area_read_only($name, $qa, $step, $lines, $context) {
-        $labelbyid = $qa->get_qt_field_name($name) . '_label';
+    public function response_area_read_only($qa, $step, $lines, $context) {
+        $labelbyid = $qa->get_qt_field_name('answer') . '_label';
 
         $responselabel = $this->displayoptions->add_question_identifier_to_label(get_string('answertext', 'qtype_aitext'));
         $output = html_writer::tag('h4', $responselabel, ['id' => $labelbyid, 'class' => 'visually-hidden']);
-        $output .= html_writer::tag('div', $this->prepare_response($name, $qa, $step, $context), [
+        $output .= html_writer::tag('div', $this->prepare_response($step, $context), [
             'role' => 'textbox',
             'aria-readonly' => 'true',
             'aria-labelledby' => $labelbyid,
@@ -65,9 +64,16 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
     }
 
     /**
-     * Where the student types in their response
+     * Where the student types in their response.
      *
-     * @param string $name
+     * The editor, and the format the response is (re-)saved under, are deliberately pinned to
+     * FORMAT_HTML so the answer is stored as HTML regardless of the user's preferred editor. A
+     * response previously saved under a different format (e.g. carried in the database from before
+     * this pin was introduced) is rendered to HTML with format_text, so the forced HTML editor shows
+     * it correctly instead of its raw source; it is then re-saved as HTML. format_text runs with
+     * filters and cleaning off so only the format conversion is applied.
+     * Note FORMAT_MOODLE === '0', so the (int) comparison (not empty()/falsy checks) is used here.
+     *
      * @param question_attempt $qa
      * @param question_attempt_step $step
      * @param int $lines lines available to type in response
@@ -75,32 +81,33 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
      * @return string
      * @throws coding_exception
      */
-    public function response_area_input($name, $qa, $step, $lines, $context) {
+    public function response_area_input($qa, $step, $lines, $context) {
         global $CFG;
         require_once($CFG->dirroot . '/repository/lib.php');
 
-        $inputname = $qa->get_qt_field_name($name);
-        $responseformat = $step->get_qt_var($name . 'format');
+        $inputname = $qa->get_qt_field_name('answer');
         $id = $inputname . '_id';
 
+        // The editor and the re-saved format are pinned to FORMAT_HTML.
+        $responseformat = FORMAT_HTML;
         $editor = editors_get_preferred_editor($responseformat);
-        $strformats = format_text_menu();
-        $formats = $editor->get_supported_formats();
-        foreach ($formats as $fid) {
-            $formats[$fid] = $strformats[$fid];
-        }
 
-        [$draftitemid, $response] = $this->prepare_response_for_editing(
-            $name,
-            $step,
-            $context
-        );
+        $response = $step->get_qt_var('answer') ?? '';
+        $storedformat = $step->get_qt_var('answerformat');
+        // Render a legacy non-HTML answer to HTML so the forced HTML editor displays it correctly.
+        if ($storedformat !== null && $storedformat !== '' && (int) $storedformat !== FORMAT_HTML && $response !== '') {
+            $response = format_text($response, $storedformat, [
+                'context' => $context,
+                'para' => false,
+                'filter' => false,
+                'noclean' => true,
+            ]);
+        }
 
         $editor->set_text($response);
         $editor->use_editor(
             $id,
             $this->get_editor_options($context),
-            $this->get_filepicker_options($context, $draftitemid)
         );
 
         $responselabel = $this->displayoptions->add_question_identifier_to_label(get_string('answertext', 'qtype_aitext'));
@@ -117,18 +124,9 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
         ));
 
         $output .= html_writer::start_tag('div');
-        if (count($formats) == 1) {
-            reset($formats);
-            $output .= html_writer::empty_tag('input', ['type' => 'hidden',
-                    'name' => $inputname . 'format', 'value' => key($formats)]);
-        } else {
-            $output .= html_writer::label(get_string('format'), 'menu' . $inputname . 'format', false);
-            $output .= ' ';
-            $output .= html_writer::select($formats, $inputname . 'format', $responseformat, '');
-        }
+        $output .= html_writer::empty_tag('input', ['type' => 'hidden',
+                'name' => $inputname . 'format', 'value' => $responseformat]);
         $output .= html_writer::end_tag('div');
-
-        $output .= $this->filepicker_html($inputname, $draftitemid);
 
         $output .= html_writer::end_tag('div');
         return $output;
@@ -136,45 +134,30 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
 
     /**
      * Prepare the response for read-only display.
-     * @param string $name the variable name this input edits.
-     * @param question_attempt $qa the question
-     *  being display.
+     *
+     * Render the answer with filters enabled (in the question's
+     * own context) so content filters such as LaTeX/MathJax are applied. This is the
+     * opposite of the editing path, where the raw source must be preserved unfiltered.
+     *
      * @param question_attempt_step $step the current step.
      * @param object $context the context the attempt belongs to.
      * @return string the response prepared for display.
      */
     protected function prepare_response(
-        $name,
-        question_attempt $qa,
         question_attempt_step $step,
         $context
     ) {
-        if (!$step->has_qt_var($name)) {
+        if (!$step->has_qt_var('answer')) {
             return '';
         }
-
         $formatoptions = new stdClass();
         $formatoptions->para = false;
+        $formatoptions->context = $context;
         return format_text(
-            $step->get_qt_var($name),
-            $step->get_qt_var($name . 'format'),
+            $step->get_qt_var('answer'),
+            $step->get_qt_var('answerformat') ?? FORMAT_HTML,
             $formatoptions
         );
-    }
-
-    /**
-     * Prepare the response for editing.
-     * @param string $name the variable name this input edits.
-     * @param question_attempt_step $step the current step.
-     * @param object $context the context the attempt belongs to.
-     * @return array the response prepared for display.
-     */
-    protected function prepare_response_for_editing(
-        $name,
-        question_attempt_step $step,
-        $context
-    ) {
-        return [0, $step->get_qt_var($name)];
     }
 
     /**
@@ -186,31 +169,5 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
     protected function get_editor_options($context) {
         // Disable the text-editor autosave because quiz has it's own auto save function.
         return ['context' => $context, 'autosave' => false];
-    }
-
-    /**
-     * Redunant with the removal of the file submission option
-     *
-     * @todo remove calls to this then remove this
-     *
-     * @param object $context the context the attempt belongs to.
-     * @param int $draftitemid draft item id.
-     * @return array filepicker options for the editor.
-     */
-    protected function get_filepicker_options($context, $draftitemid) {
-        return ['return_types'  => FILE_INTERNAL | FILE_EXTERNAL];
-    }
-
-    /**
-     * Redundant with the removal of file submission
-     *
-     * @todo remove along with calls to it
-     *
-     * @param string $inputname input field name.
-     * @param int $draftitemid draft file area itemid.
-     * @return string HTML for the filepicker, if used.
-     */
-    protected function filepicker_html($inputname, $draftitemid) {
-        return '';
     }
 }
