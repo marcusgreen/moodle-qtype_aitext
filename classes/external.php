@@ -175,6 +175,7 @@ class qtype_aitext_external extends external_api {
      * @param string $marksscheme  The marking criteria.
      * @param int    $defaultmark  The total possible score.
      * @param int    $contextid    The context id.
+     * @param int    $numresponses How many responses to generate.
      * @return stdClass status flag, human readable message and the sample responses
      */
     public static function generate_test_responses(
