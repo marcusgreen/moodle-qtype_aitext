@@ -157,8 +157,8 @@ class qtype_aitext_renderer extends qtype_renderer {
     }
 
     /**
-     * Return the ai evaluation into the feedback area, instead
-     * of the normal fixed/hint feedback when in preview mode.
+     * Return the AI evaluation into the feedback area, instead
+     * of the normal fixed/hint feedback.
      *
      * @param question_attempt $qa
      * @param question_display_options $options
@@ -169,33 +169,34 @@ class qtype_aitext_renderer extends qtype_renderer {
         // This probably should be retrieved by an API call.
         $comment = $qa->get_current_manual_comment();
 
-        if ($this->page->pagetype === 'question-bank-previewquestion-preview') {
-            // Ensure $comment is an array and has content.
-            if (is_array($comment) && !empty($comment[0])) {
-                $this->page->requires->js_call_amd('qtype_aitext/showprompt', 'init', []);
-
-                $prompt = $qa->get_last_qt_var('-aiprompt');
-
-                // Clean the prompt so no script/JS can be injected, while keeping safe HTML.
-                $prompt = format_text($prompt, FORMAT_HTML, [
-                    'context' => $options->context ?? $this->page->context,
-                    'noclean' => false,
-                ]);
-
-                $showprompt  = '<br /><button id="showprompt" class="rounded">';
-                $showprompt .= get_string('showprompt', 'qtype_aitext') . '</button>';
-                $showprompt .= '<div id="fullprompt" class="hidden">' . $prompt . '</div>';
-
-                // Store the modified feedback in a variable.
-                $feedback = $comment[0] . $showprompt;
-                return $feedback;
-            }
-
-            // Return the comment if it exists, otherwise empty string.
-            return (is_array($comment) && isset($comment[0])) ? $comment[0] : '';
+        if (!is_array($comment) || empty($comment[0])) {
+            return '';
         }
 
-        return '';
+        $feedback = $comment[0];
+
+        // The "reveal full prompt" debug control is only offered on the question-bank
+        // preview page (it exposes the grading prompt, including the mark scheme, which
+        // students should not see during/after a real attempt).
+        if ($this->page->pagetype === 'question-bank-previewquestion-preview') {
+            $this->page->requires->js_call_amd('qtype_aitext/showprompt', 'init', []);
+
+            $prompt = $qa->get_last_qt_var('-aiprompt');
+
+            // Clean the prompt so no script/JS can be injected, while keeping safe HTML.
+            $prompt = format_text($prompt, FORMAT_HTML, [
+                'context' => $options->context ?? $this->page->context,
+                'noclean' => false,
+            ]);
+
+            $showprompt  = '<br /><button id="showprompt" class="rounded">';
+            $showprompt .= get_string('showprompt', 'qtype_aitext') . '</button>';
+            $showprompt .= '<div id="fullprompt" class="hidden">' . $prompt . '</div>';
+
+            $feedback .= $showprompt;
+        }
+
+        return $feedback;
     }
 
     /**
