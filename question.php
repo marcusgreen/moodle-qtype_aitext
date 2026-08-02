@@ -421,100 +421,21 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
     }
 
     /**
-     *
      * Convert string json returned from LLM call to an object,
-     * if it is not valid json apend as string to new object
+     * if it is not valid json append as string to new object.
      *
-     * @param string $feedback
-     * @return \stdClass
+     * Delegates to {@see \qtype_aitext\local\feedback_parser} which encapsulates the
+     * full pipeline: JSON extraction, LaTeX-aware JSON repair, LaTeX backslash protection,
+     * Markdown rendering, and disclaimer appending.
+     *
+     * @param string $feedback The raw LLM response string.
+     * @return \stdClass Object with 'feedback' (HTML string) and 'marks' (float|null).
      */
-    public function process_feedback(string $feedback) {
-        // LLMs sometimes do not return the plain JSON, but it is wrapped inside HTML tags, or some
-        // blabla like "Here is the JSON you asked for: ...". So we need to extract the JSON part.
-        if (empty($feedback)) {
-            $contentobject = new \stdClass();
-            $contentobject->feedback = get_string('err_nofeedback', 'qtype_aitext');
-            $contentobject->marks = null;
-            return $contentobject;
-        }
-        $contentobject = $this->extract_single_json_object($feedback);
-        if (!is_null($contentobject)) {
-            $contentobject->feedback = trim($contentobject->feedback);
-            $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"', $contentobject->feedback);
-        } else {
-            $contentobject = new \stdClass();
-            $contentobject->feedback = $feedback;
-            $contentobject->marks = null;
-        }
+    public function process_feedback(string $feedback): \stdClass {
         $disclaimer = get_config('qtype_aitext', 'disclaimer');
-        // The format_text will interprete a backslash as escaping character. To preserve one we need to double them first.
-        // This is especially important so that the mathjax filter still has a chance to have its delimiters \( ... \).
-        // Limit the number of backslashes to not double them if they are already doubled.
-        $contentobject->feedback = str_replace('\\\\', '\\', $contentobject->feedback);
-        $contentobject->feedback = str_replace('\\', '\\\\', $contentobject->feedback);
-        $contentobject->feedback = format_text($contentobject->feedback, FORMAT_MARKDOWN, ['para' => false]);
-        $contentobject->feedback .= ' ' . $this->llm_translate($disclaimer);
-
-        return $contentobject;
-    }
-
-    /**
-     * Extracts the JSON properly from a string, also respecting { symbols inside the JSON.}
-     *
-     * @param string $text the JSON string possibly with extra text around it.
-     * @return stdClass|null the JSON object or null if none found.
-     */
-    private function extract_single_json_object(string $text): ?stdClass {
-        $start = strpos($text, '{');
-        if ($start === false) {
-            return null;
-        }
-        $depth = 0;
-        $json = '';
-        for ($i = $start, $len = strlen($text); $i < $len; $i++) {
-            if ($text[$i] === '{') {
-                $depth++;
-            }
-            if ($depth > 0) {
-                $json .= $text[$i];
-            }
-            if ($text[$i] === '}') {
-                $depth--;
-                if ($depth === 0) {
-                    break;
-                }
-            }
-        }
-        if ($json) {
-            // Sometimes, the external LLM will return bad JSON (with not properly escaped backslashes, for example in a LaTeX
-            // formula). The returned JSON then contains something like "... \( K_\alpha \) ...", which is invalid JSON.
-            // However, we cannot just blindly escape all backslashes, because that would also mess up valid JSON sequences like
-            // "\n" or "\t" and we cannot know if these are intended well escaped backslashes or the LLM just messed up and forgot
-            // to escape.
-            // So we are trying to parse LaTeX-like sequences explicitely and only inside them add an extra backslash to each
-            // backslash.
-            // Try to decode the JSON as-is first. If the LLM returned valid JSON, use it directly.
-            // This avoids corrupting already properly escaped backslashes (e.g. \\( \\frac{x}{3} \\)).
-            $decoded = json_decode($json);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                return $decoded;
-            }
-            $json = preg_replace_callback(
-                '/\\\\{1,2}\(.*?\\\\{1,2}\)|\\\\{1,2}\[.*?\\\\{1,2}\]|\$\$.*?\$\$|\$[^$]+\$/s',
-                function ($matches) {
-                    if (empty($matches[0])) {
-                        return $matches[0] ?? '';
-                    }
-                    return str_replace('\\', '\\\\', $matches[0]);
-                },
-                $json
-            );
-            $decoded = json_decode($json);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                return $decoded;
-            }
-        }
-        return null;
+        $disclaimer = $this->llm_translate($disclaimer);
+        $parser = new \qtype_aitext\local\feedback_parser();
+        return $parser->parse($feedback, $disclaimer);
     }
 
     /**
