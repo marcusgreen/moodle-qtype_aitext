@@ -23,15 +23,16 @@ final class qtype_aitext_queue_test extends advanced_testcase {
      *
      * @param int $attemptid Attempt id.
      * @param string $response Student response.
+     * @param int|null $stepid Source attempt step id.
      * @return array
      */
-    private function job_data(int $attemptid, string $response = 'A response'): array {
+    private function job_data(int $attemptid, string $response = 'A response', ?int $stepid = null): array {
         return [
             'questionattemptid' => $attemptid,
             'usageid' => 100 + $attemptid,
             'slot' => 1,
             'questionid' => 200 + $attemptid,
-            'sourceattemptstepid' => 300 + $attemptid,
+            'sourceattemptstepid' => $stepid ?? 300 + $attemptid,
             'userid' => 400 + $attemptid,
             'prompt' => 'Grade: ' . $response,
             'response' => $response,
@@ -58,6 +59,22 @@ final class qtype_aitext_queue_test extends advanced_testcase {
     }
 
     /**
+     * Different responses in the same attempt create distinct grading jobs.
+     *
+     * @return void
+     */
+    public function test_different_responses_create_distinct_jobs(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $firstid = queue::enqueue($this->job_data(4, 'First response', 304));
+        $secondid = queue::enqueue($this->job_data(4, 'Second response', 305));
+
+        $this->assertNotSame($firstid, $secondid);
+        $this->assertEquals(2, $DB->count_records('qtype_aitext_queue'));
+    }
+
+    /**
      * Claiming and stale recovery return a job to the pending state.
      *
      * @return void
@@ -77,6 +94,39 @@ final class qtype_aitext_queue_test extends advanced_testcase {
         $recovered = $DB->get_record('qtype_aitext_queue', ['id' => $id]);
         $this->assertEquals(queue::STATUS_PENDING, $recovered->status);
         $this->assertLessThanOrEqual(time(), $recovered->nextrun);
+    }
+
+    /**
+     * Configured queue limits are normalized before they are used by cron.
+     *
+     * @return void
+     */
+    public function test_queue_configuration_limits(): void {
+        $this->resetAfterTest(true);
+        set_config('cron_batch_size', 0, 'qtype_aitext');
+        set_config('cron_max_attempts', 999, 'qtype_aitext');
+        set_config('cron_retry_delay', -1, 'qtype_aitext');
+
+        $this->assertEquals(1, queue::get_batch_size());
+        $this->assertEquals(queue::MAX_ATTEMPTS, queue::get_max_attempts());
+        $this->assertEquals(60, queue::get_retry_delay());
+    }
+
+    /**
+     * A completed job can retain a null mark when manual grading is required.
+     *
+     * @return void
+     */
+    public function test_complete_preserves_null_mark(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $id = queue::enqueue($this->job_data(5));
+
+        queue::complete($id, 'Feedback requiring manual review', null);
+        $record = $DB->get_record('qtype_aitext_queue', ['id' => $id]);
+
+        $this->assertEquals(queue::STATUS_COMPLETE, $record->status);
+        $this->assertNull($record->marks);
     }
 
     /**

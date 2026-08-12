@@ -141,12 +141,15 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * Required by the interface question_automatically_gradable_with_countback.
      *
      * @param array $responses
-     * @param array $totaltries
-     * @return number
+     * @param int $totaltries
+     * @return float|null Null when the external AI grade cannot be safely recomputed.
      */
     public function compute_final_grade($responses, $totaltries) {
-
-        return true;
+        // The final grade depends on an external AI call and cannot be
+        // recomputed safely from raw response arrays without making duplicate
+        // provider requests. Returning null keeps the attempt available for
+        // manual grading instead of accidentally awarding a full mark.
+        return null;
     }
     /**
      * Re-initialise the state during a quiz (or question use)
@@ -164,8 +167,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      *
      * @param string $prompt
      * @param string $purpose
+     * @param int|null $userid User to attribute the AI action to. Defaults to the current user.
+     * @return string
      */
-    public function perform_request(string $prompt, string $purpose = 'feedback'): string {
+    public function perform_request(string $prompt, string $purpose = 'feedback', ?int $userid = null): string {
         if (defined('BEHAT_SITE_RUNNING') || (defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
             return "AI Feedback";
         }
@@ -186,32 +191,30 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             return $llmresponse->get_content();
         } else if ($backend == 'core_ai_subsystem') {
             global $USER;
+            $requestuserid = $userid ?? $USER->id;
             $action = new \core_ai\aiactions\generate_text(
                 contextid: $contextid,
-                userid: $USER->id,
+                userid: $requestuserid,
                 prompttext: $prompt
             );
             $manager = \core\di::get(\core_ai\manager::class);
             $llmresponse = $manager->process_action($action);
             $responsedata = $llmresponse->get_response_data();
-            // Check the response data is actually a string.
-            if (
-                is_null($responsedata) || is_null($responsedata['generatedcontent'])
-                ||
-                !is_array($responsedata) || !array_key_exists('generatedcontent', $responsedata)
-            ) {
-                if (is_null($responsedata) || is_null($responsedata['generatedcontent'])) {
-                    throw new moodle_exception('err_retrievingfeedback_checkconfig', 'qtype_aitext');
-                } else {
-                    throw new moodle_exception('err_retrievingfeedback', 'qtype_aitext');
-                }
+            // Validate the provider response before reading nested values.
+            if (!is_array($responsedata) || !array_key_exists('generatedcontent', $responsedata)
+                    || !is_string($responsedata['generatedcontent']) || $responsedata['generatedcontent'] === '') {
+                throw new moodle_exception('err_retrievingfeedback_checkconfig', 'qtype_aitext');
             }
             return $responsedata['generatedcontent'];
         } else if ($backend == 'tool_aimanager') {
             if (class_exists('\tool_aiconnect\ai\ai')) {
                 $ai = new tool_aiconnect\ai\ai();
                 $llmresponse = $ai->prompt_completion($prompt);
-                return $llmresponse['response']['choices'][0]['message']['content'];
+                $content = $llmresponse['response']['choices'][0]['message']['content'] ?? null;
+                if (!is_string($content) || $content === '') {
+                    throw new moodle_exception('err_retrievingfeedback_checkconfig', 'qtype_aitext');
+                }
+                return $content;
             } else {
                 throw new moodle_exception('err_retrievingfeedback_checkconfig', 'qtype_aitext', '');
             }
@@ -272,14 +275,12 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $feedback = $this->perform_request($fullaiprompt, 'feedback');
         $contentobject = $this->process_feedback($feedback);
 
-        // If there are no marks, write the feedback and set to needs grading .
-        if (is_null($contentobject->marks)) {
+        // If there is no valid mark, write the feedback and set to needs grading.
+        $mark = $this->normalise_mark($contentobject->marks ?? null);
+        if ($mark === null) {
             $grade = [0.0, question_state::$needsgrading];
         } else {
-            $fraction = 0.0;
-            if (is_numeric($contentobject->marks) && $this->defaultmark > 0) {
-                $fraction = (float) $contentobject->marks / $this->defaultmark;
-            }
+            $fraction = $mark / $this->defaultmark;
             $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
         }
 
@@ -291,6 +292,19 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
 
         return $grade;
+    }
+
+    /**
+     * Normalize an AI mark to the question's valid range.
+     *
+     * @param mixed $mark Candidate mark from the provider.
+     * @return float|null Null when the provider did not return a finite numeric mark.
+     */
+    private function normalise_mark($mark): ?float {
+        if (!is_numeric($mark) || !is_finite((float) $mark) || $this->defaultmark <= 0) {
+            return null;
+        }
+        return max(0.0, min((float) $this->defaultmark, (float) $mark));
     }
 
     /**
@@ -336,7 +350,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             $this->defaultmark,
             $this->markscheme
         );
-        \qtype_aitext\local\queue::enqueue([
+        $jobid = \qtype_aitext\local\queue::enqueue([
             'questionattemptid' => $attempt->questionattemptid,
             'usageid' => $attempt->usageid,
             'slot' => $attempt->slot,
@@ -348,6 +362,9 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             'responsehash' => hash('sha256', (string) $response['answer']),
             'defaultmark' => $this->defaultmark,
         ]);
+        if ($jobid <= 0) {
+            return false;
+        }
         $this->insert_attempt_step_data('-aipending', '1');
         return true;
     }
@@ -497,9 +514,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * if it is not valid json apend as string to new object
      *
      * @param string $feedback
+     * @param int|null $userid User to attribute optional disclaimer translation to.
      * @return \stdClass
      */
-    public function process_feedback(string $feedback) {
+    public function process_feedback(string $feedback, ?int $userid = null): \stdClass {
         // LLMs sometimes do not return the plain JSON, but it is wrapped inside HTML tags, or some
         // blabla like "Here is the JSON you asked for: ...". So we need to extract the JSON part.
         if (empty($feedback)) {
@@ -509,10 +527,15 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             return $contentobject;
         }
         $contentobject = $this->extract_single_json_object($feedback);
-        if (!is_null($contentobject)) {
+        if ($contentobject instanceof \stdClass && isset($contentobject->feedback) && is_string($contentobject->feedback)) {
             $contentobject->feedback = trim($contentobject->feedback);
             $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"', $contentobject->feedback);
+            $contentobject->marks = isset($contentobject->marks) && is_numeric($contentobject->marks)
+                    && is_finite((float) $contentobject->marks)
+                ? (float) $contentobject->marks
+                : null;
         } else {
+            // Preserve unstructured output for manual review, but never infer a mark.
             $contentobject = new \stdClass();
             $contentobject->feedback = $feedback;
             $contentobject->marks = null;
@@ -524,7 +547,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $contentobject->feedback = str_replace('\\\\', '\\', $contentobject->feedback);
         $contentobject->feedback = str_replace('\\', '\\\\', $contentobject->feedback);
         $contentobject->feedback = format_text($contentobject->feedback, FORMAT_MARKDOWN, ['para' => false]);
-        $contentobject->feedback .= ' ' . $this->llm_translate($disclaimer);
+        $contentobject->feedback .= ' ' . $this->llm_translate($disclaimer, $userid);
 
         return $contentobject;
     }
@@ -542,14 +565,34 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         }
         $depth = 0;
         $json = '';
+        $instring = false;
+        $escaped = false;
         for ($i = $start, $len = strlen($text); $i < $len; $i++) {
-            if ($text[$i] === '{') {
+            $character = $text[$i];
+            if ($instring) {
+                $json .= $character;
+                if ($escaped) {
+                    $escaped = false;
+                } else if ($character === '\\') {
+                    $escaped = true;
+                } else if ($character === '"') {
+                    $instring = false;
+                }
+                continue;
+            }
+
+            if ($character === '"') {
+                $instring = true;
+                $json .= $character;
+                continue;
+            }
+            if ($character === '{') {
                 $depth++;
             }
             if ($depth > 0) {
-                $json .= $text[$i];
+                $json .= $character;
             }
-            if ($text[$i] === '}') {
+            if ($character === '}') {
                 $depth--;
                 if ($depth === 0) {
                     break;
@@ -567,7 +610,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             // Try to decode the JSON as-is first. If the LLM returned valid JSON, use it directly.
             // This avoids corrupting already properly escaped backslashes (e.g. \\( \\frac{x}{3} \\)).
             $decoded = json_decode($json);
-            if (json_last_error() === JSON_ERROR_NONE) {
+            if (json_last_error() === JSON_ERROR_NONE && $decoded instanceof \stdClass) {
                 return $decoded;
             }
             $json = preg_replace_callback(
@@ -581,7 +624,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
                 $json
             );
             $decoded = json_decode($json);
-            if (json_last_error() === JSON_ERROR_NONE) {
+            if (json_last_error() === JSON_ERROR_NONE && $decoded instanceof \stdClass) {
                 return $decoded;
             }
         }
@@ -593,9 +636,10 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      * store in a cache
      *
      * @param string $text
+     * @param int|null $userid User to attribute the translation action to.
      * @return string
      */
-    protected function llm_translate(string $text): string {
+    protected function llm_translate(string $text, ?int $userid = null): string {
         if (current_language() == 'en') {
             return $text;
         }
@@ -607,7 +651,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         if (($translation = $cache->get(current_language() . '_' . $text)) === false) {
             $prompt = 'translate "' . $text . '" into ' . current_language() .
                     'Only return the exact text, do not wrap it in other text.';
-            $translation = $this->perform_request($prompt, 'translate');
+            $translation = $this->perform_request($prompt, 'translate', $userid);
             $translation = trim($translation, '"');
             $cache->set(current_language() . '_' . $text, $translation);
         }
@@ -623,12 +667,17 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     protected function insert_attempt_step_data(string $name, string $value): void {
         global $DB;
-        $data = [
+        $conditions = [
             'attemptstepid' => $this->step->get_id(),
             'name' => $name,
-            'value' => $value,
         ];
-        $DB->insert_record('question_attempt_step_data', $data);
+        $existing = $DB->get_record('question_attempt_step_data', $conditions);
+        if ($existing) {
+            $existing->value = $value;
+            $DB->update_record('question_attempt_step_data', $existing);
+            return;
+        }
+        $DB->insert_record('question_attempt_step_data', (object) ($conditions + ['value' => $value]));
     }
 
     /**

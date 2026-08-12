@@ -164,6 +164,19 @@ final class question_test extends \advanced_testcase {
     }
 
     /**
+     * Interactive countback must not award a full mark without a new AI
+     * evaluation for the sequence of responses.
+     *
+     * @return void
+     */
+    public function test_compute_final_grade_requires_manual_review(): void {
+        $this->resetAfterTest(true);
+        $question = qtype_aitext_test_helper::make_aitext_question([]);
+
+        $this->assertNull($question->compute_final_grade([['answer' => 'A response']], 1));
+    }
+
+    /**
      * Test the structured prompt template system with various scenarios.
      *
      * This test covers three distinct scenarios:
@@ -339,7 +352,7 @@ final class question_test extends \advanced_testcase {
                 'exceptionexpected' => false,
                 'expectedfeedback' => '{"feedback": "Good job", "marks": 0',
                 'expectedmathjaxapplied' => false,
-                'expectedmarks' => 0,
+                'expectedmarks' => null,
             ],
             'valid_json_markdown_formatted' => [
                 // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
@@ -363,6 +376,13 @@ final class question_test extends \advanced_testcase {
                 'expectedmathjaxapplied' => false,
                 'expectedmarks' => 0.5,
             ],
+            'valid_json_with_unmatched_brace_in_feedback' => [
+                'json' => '{"feedback": "Use the } character carefully.", "marks": 1}',
+                'exceptionexpected' => false,
+                'expectedfeedback' => 'Use the } character carefully.',
+                'expectedmathjaxapplied' => false,
+                'expectedmarks' => 1,
+            ],
             'valid_json_with_code' => [
                 'json' => '{"feedback": "The code has a syntax error: the opening brace '
                     . '\'{\' after the function signature is missing.", "marks": 0.5}',
@@ -377,7 +397,21 @@ final class question_test extends \advanced_testcase {
                 'exceptionexpected' => false,
                 'expectedfeedback' => 'Not a json string',
                 'expectedmathjaxapplied' => false,
-                'expectedmarks' => 0,
+                'expectedmarks' => null,
+            ],
+            'json_missing_feedback' => [
+                'json' => '{"marks": 1}',
+                'exceptionexpected' => false,
+                'expectedfeedback' => '{"marks": 1}',
+                'expectedmathjaxapplied' => false,
+                'expectedmarks' => null,
+            ],
+            'json_array_wrapped_object' => [
+                'json' => '[{"feedback": "Good job", "marks": 1}]',
+                'exceptionexpected' => false,
+                'expectedfeedback' => 'Good job',
+                'expectedmathjaxapplied' => false,
+                'expectedmarks' => 1,
             ],
             'empty_json' => [
                 'json' => '',

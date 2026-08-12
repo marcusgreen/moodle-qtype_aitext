@@ -49,7 +49,7 @@ class process_ai_queue extends \core\task\scheduled_task {
 
         try {
             queue::recover_stale();
-            $batchsize = max(1, (int) (get_config('qtype_aitext', 'cron_batch_size') ?: 5));
+            $batchsize = queue::get_batch_size();
             for ($index = 0; $index < $batchsize; $index++) {
                 $job = queue::claim_next();
                 if (!$job) {
@@ -95,7 +95,12 @@ class process_ai_queue extends \core\task\scheduled_task {
 
         // Do not apply an old result after the student has submitted a newer
         // response. The response hash is generated before the job is queued.
-        $latestresponse = $qa->get_last_step_with_qt_var('answer')->get_qt_var('answer');
+        $lateststep = $qa->get_last_step_with_qt_var('answer');
+        if (!$lateststep) {
+            queue::cancel((int) $job->id, 'The source response step no longer exists.');
+            return;
+        }
+        $latestresponse = $lateststep->get_qt_var('answer');
         if (hash('sha256', (string) $latestresponse) !== $job->responsehash) {
             queue::cancel((int) $job->id, 'A newer response was submitted before this job ran.');
             return;
@@ -104,14 +109,14 @@ class process_ai_queue extends \core\task\scheduled_task {
         $spellcheckresponse = null;
         if ($question->spellcheck) {
             $spellcheckprompt = $question->build_full_ai_spellchecking_prompt((string) $job->response);
-            $spellcheckresponse = $question->perform_request($spellcheckprompt, 'feedback');
+            $spellcheckresponse = $question->perform_request($spellcheckprompt, 'feedback', (int) $job->userid);
         }
 
-        $rawfeedback = $question->perform_request($job->prompt, 'feedback');
-        $content = $question->process_feedback($rawfeedback);
-        $marks = is_numeric($content->marks) ? (float) $content->marks : null;
-        if ($marks !== null) {
-            $marks = max(0.0, min((float) $job->defaultmark, $marks));
+        $rawfeedback = $question->perform_request($job->prompt, 'feedback', (int) $job->userid);
+        $content = $question->process_feedback($rawfeedback, (int) $job->userid);
+        $marks = null;
+        if (is_numeric($content->marks) && is_finite((float) $content->marks)) {
+            $marks = max(0.0, min((float) $job->defaultmark, (float) $content->marks));
         }
 
         $transaction = $DB->start_delegated_transaction();
@@ -135,8 +140,7 @@ class process_ai_queue extends \core\task\scheduled_task {
                 $this->insert_step_data($newstep->get_id(), $stepdata);
             }
 
-            $queueMarks = $marks ?? 0.0;
-            queue::complete((int) $job->id, (string) $content->feedback, $queueMarks);
+            queue::complete((int) $job->id, (string) $content->feedback, $marks);
 
             // When the quiz attempt has already been submitted, question engine
             // data is updated first and then the quiz attempt/gradebook is
@@ -154,6 +158,8 @@ class process_ai_queue extends \core\task\scheduled_task {
 
             $transaction->allow_commit();
         } catch (\Throwable $exception) {
+            // Moodle's rollback API rethrows the original exception. The outer
+            // task loop catches it and moves the queue job into retry/failed.
             $transaction->rollback($exception);
         }
     }
@@ -168,11 +174,14 @@ class process_ai_queue extends \core\task\scheduled_task {
     private function insert_step_data(int $stepid, array $data): void {
         global $DB;
         foreach ($data as $name => $value) {
-            $DB->insert_record('question_attempt_step_data', (object) [
-                'attemptstepid' => $stepid,
-                'name' => $name,
-                'value' => $value,
-            ]);
+            $conditions = ['attemptstepid' => $stepid, 'name' => $name];
+            $existing = $DB->get_record('question_attempt_step_data', $conditions);
+            if ($existing) {
+                $existing->value = $value;
+                $DB->update_record('question_attempt_step_data', $existing);
+                continue;
+            }
+            $DB->insert_record('question_attempt_step_data', (object) ($conditions + ['value' => $value]));
         }
     }
 }

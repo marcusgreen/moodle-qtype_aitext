@@ -30,8 +30,23 @@ class queue {
     /** @var string Job failed permanently after retrying. */
     public const STATUS_FAILED = 'failed';
 
-    /** @var int Number of attempts after which a job is permanently failed. */
+    /** @var int Default number of attempts before a job is permanently failed. */
     public const DEFAULT_MAX_ATTEMPTS = 5;
+
+    /** @var int Upper bound for administrator-configured retry attempts. */
+    public const MAX_ATTEMPTS = 20;
+
+    /** @var int Default number of jobs processed in one scheduled-task run. */
+    public const DEFAULT_BATCH_SIZE = 5;
+
+    /** @var int Upper bound for administrator-configured batch size. */
+    public const MAX_BATCH_SIZE = 100;
+
+    /** @var int Default retry delay in seconds. */
+    public const DEFAULT_RETRY_DELAY = 300;
+
+    /** @var int Upper bound for a retry delay in seconds. */
+    public const MAX_RETRY_DELAY = 3600;
 
     /** @var int A processing job older than this is eligible for recovery. */
     public const STALE_AFTER = 1800;
@@ -65,20 +80,72 @@ class queue {
             'lasterror' => null,
         ];
 
-        // A question attempt step can only be graded once. This makes retries
-        // safe and prevents duplicate jobs if a request is replayed.
-        $existing = $DB->get_record('qtype_aitext_queue',
-            [
-                'questionattemptid' => $record->questionattemptid,
-                'responsehash' => $record->responsehash,
-            ],
-            'id,status'
-        );
-        if ($existing) {
-            return (int) $existing->id;
+        // A question attempt step can only be graded once. A short distributed
+        // lock keeps the lookup and insert atomic across web workers.
+        $lockfactory = \core\lock\lock_config::get_lock_factory('cron');
+        $lock = $lockfactory->get_lock('qtype_aitext_enqueue_' . $record->sourceattemptstepid, 10);
+        if (!$lock) {
+            return 0;
         }
 
-        return (int) $DB->insert_record('qtype_aitext_queue', $record);
+        try {
+            $existing = $DB->get_record('qtype_aitext_queue',
+                ['sourceattemptstepid' => $record->sourceattemptstepid],
+                'id,status'
+            );
+            if ($existing) {
+                return (int) $existing->id;
+            }
+            return (int) $DB->insert_record('qtype_aitext_queue', $record);
+        } finally {
+            $lock->release();
+        }
+    }
+
+    /**
+     * Read an integer setting while preserving explicit zero and negative values
+     * so public accessors can clamp them predictably.
+     *
+     * @param string $name Setting name without the component prefix.
+     * @param int $default Default when no setting has been saved.
+     * @return int
+     */
+    private static function get_configured_int(string $name, int $default): int {
+        $value = get_config('qtype_aitext', $name);
+        if ($value === false || $value === null || $value === '') {
+            return $default;
+        }
+        return (int) $value;
+    }
+
+    /**
+     * Get a safe batch-size value from plugin configuration.
+     *
+     * @return int
+     */
+    public static function get_batch_size(): int {
+        $configured = self::get_configured_int('cron_batch_size', self::DEFAULT_BATCH_SIZE);
+        return min(self::MAX_BATCH_SIZE, max(1, $configured));
+    }
+
+    /**
+     * Get a safe maximum-attempts value from plugin configuration.
+     *
+     * @return int
+     */
+    public static function get_max_attempts(): int {
+        $configured = self::get_configured_int('cron_max_attempts', self::DEFAULT_MAX_ATTEMPTS);
+        return min(self::MAX_ATTEMPTS, max(1, $configured));
+    }
+
+    /**
+     * Get a safe retry-delay value from plugin configuration.
+     *
+     * @return int
+     */
+    public static function get_retry_delay(): int {
+        $configured = self::get_configured_int('cron_retry_delay', self::DEFAULT_RETRY_DELAY);
+        return min(self::MAX_RETRY_DELAY, max(60, $configured));
     }
 
     /**
@@ -159,10 +226,10 @@ class queue {
      *
      * @param int $id Queue id.
      * @param string $feedback Rendered feedback.
-     * @param float $marks Awarded marks.
+     * @param float|null $marks Awarded marks, or null when manual grading is still required.
      * @return void
      */
-    public static function complete(int $id, string $feedback, float $marks): void {
+    public static function complete(int $id, string $feedback, ?float $marks): void {
         global $DB;
         $DB->update_record('qtype_aitext_queue', (object) [
             'id' => $id,
@@ -184,9 +251,9 @@ class queue {
     public static function fail(\stdClass $job, \Throwable $exception): void {
         global $DB;
         $now = time();
-        $maxattempts = max(1, (int) (get_config('qtype_aitext', 'cron_max_attempts') ?: self::DEFAULT_MAX_ATTEMPTS));
+        $maxattempts = self::get_max_attempts();
         $permanent = $job->attempts >= $maxattempts;
-        $delay = min(3600, max(60, (int) (get_config('qtype_aitext', 'cron_retry_delay') ?: 300) * $job->attempts));
+        $delay = min(self::MAX_RETRY_DELAY, self::get_retry_delay() * $job->attempts);
 
         $DB->update_record('qtype_aitext_queue', (object) [
             'id' => $job->id,

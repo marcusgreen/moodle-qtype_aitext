@@ -65,7 +65,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="attemptresponse" UNIQUE="false" FIELDS="questionattemptid,responsehash"/>
+        <INDEX NAME="sourceattemptstep" UNIQUE="true" FIELDS="sourceattemptstepid"/>
         <INDEX NAME="statusnextrun" UNIQUE="false" FIELDS="status,nextrun"/>
         <INDEX NAME="questionattempt" UNIQUE="false" FIELDS="questionattemptid"/>
       </INDEXES>

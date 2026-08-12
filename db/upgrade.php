@@ -147,5 +147,49 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026081200, 'qtype', 'aitext');
     }
 
+    if ($oldversion < 2026081201) {
+        $table = new xmldb_table('qtype_aitext_queue');
+        if ($dbman->table_exists($table)) {
+            // Retain the newest row for each source attempt step before applying
+            // the unique index. The queue did not enforce this invariant in 2.04.0.
+            $duplicates = $DB->get_records_sql(
+                "SELECT sourceattemptstepid, MAX(id) AS keepid
+                   FROM {qtype_aitext_queue}
+               GROUP BY sourceattemptstepid
+                 HAVING COUNT(*) > 1"
+            );
+            foreach ($duplicates as $duplicate) {
+                $DB->delete_records_select(
+                    'qtype_aitext_queue',
+                    'sourceattemptstepid = :sourceattemptstepid AND id <> :keepid',
+                    [
+                        'sourceattemptstepid' => $duplicate->sourceattemptstepid,
+                        'keepid' => $duplicate->keepid,
+                    ]
+                );
+            }
+
+            $oldindex = new xmldb_index(
+                'attemptresponse',
+                XMLDB_INDEX_NOTUNIQUE,
+                ['questionattemptid', 'responsehash']
+            );
+            if ($dbman->index_exists($table, $oldindex)) {
+                $dbman->drop_index($table, $oldindex);
+            }
+
+            $uniqueindex = new xmldb_index(
+                'sourceattemptstep',
+                XMLDB_INDEX_UNIQUE,
+                ['sourceattemptstepid']
+            );
+            if (!$dbman->index_exists($table, $uniqueindex)) {
+                $dbman->add_index($table, $uniqueindex);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026081201, 'qtype', 'aitext');
+    }
+
     return true;
 }

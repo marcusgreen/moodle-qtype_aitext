@@ -2,6 +2,13 @@
 
 ## Unreleased code
 
+## Release 2.04.1 Aug 2026
+
+Hardened asynchronous AI grading by preserving the submitting student's identity when Moodle Core AI processes a queued job, enforcing queue idempotency with a unique source-attempt-step index, handling duplicate legacy queue records during upgrade, bounding Cron batch and retry settings, preserving `null` marks for manual grading, and preventing duplicate question-attempt metadata rows.
+
+Improved resilience when LLM output is malformed or contains braces in feedback text, validated provider response shapes before reading nested fields, clamped synchronous and asynchronous marks to the question range, prevented unsafe full marks from interactive countback, and expanded regression coverage for queue configuration, null marks, multiple responses, and feedback parsing.
+
+
 ## Release 2.04 Aug 2026
 
 Added an opt-in asynchronous AI grading queue processed by Moodle cron. Added retry, stale-job recovery, response-version protection, queue result auditing, quiz attempt and gradebook refresh for delayed results, and privacy metadata/export/delete support for queued grading data.

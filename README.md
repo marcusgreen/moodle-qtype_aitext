@@ -120,11 +120,11 @@ The task is registered to run every minute, but actual execution depends on the 
 | Setting | Default | Description |
 |---|---:|---|
 | Enable Cron-based AI grading | Disabled | Switches grading from the synchronous request path to the queue. |
-| Cron AI grading batch size | `5` | Maximum number of jobs processed by one task run. |
-| Maximum AI grading retries | `5` | Maximum number of attempts before a job becomes permanently failed. |
-| AI grading retry delay | `300` seconds | Initial delay before retrying a failed job; the delay increases with each attempt up to one hour. |
+| Cron AI grading batch size | `5` | Maximum number of jobs processed by one task run. Runtime values are bounded to `1`–`100`. |
+| Maximum AI grading retries | `5` | Maximum number of attempts before a job becomes permanently failed. Runtime values are bounded to `1`–`20`. |
+| AI grading retry delay | `300` seconds | Initial delay before retrying a failed job. Runtime values are bounded to `60`–`3600` seconds; the delay increases with each attempt up to one hour. |
 
-A queued question remains in the `needsgrading` state until the worker creates a grading step. The question renderer displays a pending message while the result is being processed. If a newer response is submitted before an older job runs, response-version protection prevents the old result from overwriting the newer response.
+A queued question remains in the `needsgrading` state until the worker creates a grading step. If the provider returns feedback without a valid numerical mark, the feedback is retained but the question remains available for manual grading. The question renderer displays a pending message while the result is being processed. If a newer response is submitted before an older job runs, response-version protection prevents the old result from overwriting the newer response.
 
 The queue also recovers jobs that remain in the `processing` state after a worker timeout. Administrators can inspect the queue table and Moodle task logs when diagnosing provider failures. The queue stores the response and prompt needed to complete the request, so its retention and access must be considered part of the site's data-protection policy.
 
