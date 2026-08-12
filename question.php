@@ -243,13 +243,25 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
      */
     public function grade_response(array $response): array {
 
-        if ($this->spellcheck) {
-            $spellcheckresponse = $this->get_spellchecking($response);
-            $this->insert_attempt_step_data('-spellcheckresponse', $spellcheckresponse);
-        }
         if (!$this->is_complete_response($response)) {
             $grade = [0 => 0, question_state::$needsgrading];
             return $grade;
+        }
+
+        if ($this->is_cron_evaluation_enabled()) {
+            if ($this->enqueue_ai_grade($response)) {
+                // The question remains in needsgrading until the scheduled task
+                // adds a manual-grade step with the AI result.
+                return [0.0, question_state::$needsgrading];
+            }
+            // A missing persisted step is unexpected during a normal attempt.
+            // Fall back to synchronous grading rather than silently losing work.
+            debugging('Could not enqueue qtype_aitext grading; falling back to synchronous grading.', DEBUG_DEVELOPER);
+        }
+
+        if ($this->spellcheck) {
+            $spellcheckresponse = $this->get_spellchecking($response);
+            $this->insert_attempt_step_data('-spellcheckresponse', $spellcheckresponse);
         }
         $fullaiprompt = $this->build_full_ai_prompt(
             $response['answer'],
@@ -279,6 +291,65 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
 
         return $grade;
+    }
+
+    /**
+     * Whether the asynchronous Cron worker should handle this grading request.
+     *
+     * @return bool
+     */
+    private function is_cron_evaluation_enabled(): bool {
+        return (bool) get_config('qtype_aitext', 'cron_enabled')
+            && !defined('BEHAT_SITE_RUNNING')
+            && !(defined('PHPUNIT_TEST') && PHPUNIT_TEST);
+    }
+
+    /**
+     * Add the current response to the asynchronous grading queue.
+     *
+     * @param array $response The submitted response.
+     * @return bool True if the job was queued.
+     */
+    private function enqueue_ai_grade(array $response): bool {
+        global $DB;
+
+        if (empty($this->step) || !method_exists($this->step, 'get_id') || !$this->step->get_id()) {
+            return false;
+        }
+
+        $stepid = (int) $this->step->get_id();
+        $attempt = $DB->get_record_sql(
+            "SELECT qas.id AS stepid, qas.userid, qa.id AS questionattemptid,
+                    qa.questionusageid AS usageid, qa.slot
+               FROM {question_attempt_steps} qas
+               JOIN {question_attempts} qa ON qa.id = qas.questionattemptid
+              WHERE qas.id = :stepid",
+            ['stepid' => $stepid]
+        );
+        if (!$attempt) {
+            return false;
+        }
+
+        $prompt = $this->build_full_ai_prompt(
+            $response['answer'],
+            $this->aiprompt,
+            $this->defaultmark,
+            $this->markscheme
+        );
+        \qtype_aitext\local\queue::enqueue([
+            'questionattemptid' => $attempt->questionattemptid,
+            'usageid' => $attempt->usageid,
+            'slot' => $attempt->slot,
+            'questionid' => $this->id,
+            'sourceattemptstepid' => $stepid,
+            'userid' => $attempt->userid,
+            'prompt' => $prompt,
+            'response' => $response['answer'],
+            'responsehash' => hash('sha256', (string) $response['answer']),
+            'defaultmark' => $this->defaultmark,
+        ]);
+        $this->insert_attempt_step_data('-aipending', '1');
+        return true;
     }
 
     /**

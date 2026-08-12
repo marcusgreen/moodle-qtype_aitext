@@ -139,6 +139,13 @@ class qtype_aitext_renderer extends qtype_renderer {
             );
         }
         $result .= html_writer::tag('div', $files, ['class' => 'attachments']);
+        if ($qa->get_state() == question_state::$needsgrading && $qa->get_last_qt_var('-aipending') === '1') {
+            $result .= html_writer::div(
+                get_string('aigradingpending', 'qtype_aitext'),
+                'alert alert-info mt-3',
+                ['role' => 'status']
+            );
+        }
         $result .= html_writer::end_tag('div');
         if (get_config('qtype_aitext', 'backend') === 'local_ai_manager') {
             $result .= html_writer::tag(

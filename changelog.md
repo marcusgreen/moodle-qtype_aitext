@@ -2,6 +2,11 @@
 
 ## Unreleased code
 
+## Release 2.04 Aug 2026
+
+Added an opt-in asynchronous AI grading queue processed by Moodle cron. Added retry, stale-job recovery, response-version protection, queue result auditing, quiz attempt and gradebook refresh for delayed results, and privacy metadata/export/delete support for queued grading data.
+
+
 Thanks to Richard Aljaste for a fix to an issue with translating the disclaimer language https://github.com/marcusgreen/moodle-qtype_aitext/pull/73
 
 

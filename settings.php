@@ -50,6 +50,37 @@ if ($ADMIN->fulltree) {
         0
     ));
 
+    $settings->add(new admin_setting_configcheckbox(
+        'qtype_aitext/cron_enabled',
+        new lang_string('cron_enabled', 'qtype_aitext'),
+        new lang_string('cron_enabled_setting', 'qtype_aitext'),
+        0
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'qtype_aitext/cron_batch_size',
+        new lang_string('cron_batch_size', 'qtype_aitext'),
+        new lang_string('cron_batch_size_setting', 'qtype_aitext'),
+        5,
+        PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'qtype_aitext/cron_max_attempts',
+        new lang_string('cron_max_attempts', 'qtype_aitext'),
+        new lang_string('cron_max_attempts_setting', 'qtype_aitext'),
+        5,
+        PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'qtype_aitext/cron_retry_delay',
+        new lang_string('cron_retry_delay', 'qtype_aitext'),
+        new lang_string('cron_retry_delay_setting', 'qtype_aitext'),
+        300,
+        PARAM_INT
+    ));
+
     $settings->add(new admin_setting_configtextarea(
         'qtype_aitext/jsonprompt',
         new lang_string('jsonprompt', 'qtype_aitext'),

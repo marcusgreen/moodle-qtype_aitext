@@ -25,6 +25,11 @@
 namespace qtype_aitext\privacy;
 
 use core_privacy\local\metadata\collection;
+use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\contextlist;
+use core_privacy\local\request\transform;
+use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 
 /**
@@ -37,6 +42,8 @@ class provider implements
         // This component has data.
         // We need to return default options that have been set a user preferences.
     \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\request\plugin\provider,
     \core_privacy\local\request\user_preference_provider {
     /**
      * Returns meta data about this system.
@@ -49,7 +56,138 @@ class provider implements
         $collection->add_user_preference('qtype_aitext_responseformat', 'privacy:preference:responseformat');
         $collection->add_user_preference('qtype_aitext_responsefieldlines', 'privacy:preference:responsefieldlines');
         $collection->add_user_preference('qtype_aitext_maxbytes', 'privacy:preference:maxbytes');
+        $collection->add_database_table('qtype_aitext_queue', [
+            'userid' => 'privacy:metadata:queue:userid',
+            'response' => 'privacy:metadata:queue:response',
+            'prompt' => 'privacy:metadata:queue:prompt',
+            'feedback' => 'privacy:metadata:queue:feedback',
+            'marks' => 'privacy:metadata:queue:marks',
+            'timecreated' => 'privacy:metadata:queue:timecreated',
+        ], 'privacy:metadata:queue:tableexplanation');
         return $collection;
+    }
+
+    /**
+     * Return the contexts where the user has queued AI grading data.
+     *
+     * @param int $userid User id.
+     * @return contextlist
+     */
+    public static function get_contexts_for_userid(int $userid): contextlist {
+        $contextlist = new contextlist();
+        $contextlist->add_from_sql(
+            "SELECT qu.contextid
+               FROM {qtype_aitext_queue} q
+               JOIN {question_usages} qu ON qu.id = q.usageid
+              WHERE q.userid = :userid",
+            ['userid' => $userid]
+        );
+        return $contextlist;
+    }
+
+    /**
+     * Add users represented in a module context to the privacy user list.
+     *
+     * @param userlist $userlist User list for a context.
+     * @return void
+     */
+    public static function get_users_in_context(userlist $userlist): void {
+        $context = $userlist->get_context();
+        $userlist->add_from_sql(
+            'userid',
+            "SELECT q.userid
+               FROM {qtype_aitext_queue} q
+               JOIN {question_usages} qu ON qu.id = q.usageid
+              WHERE qu.contextid = :contextid",
+            ['contextid' => $context->id]
+        );
+    }
+
+    /**
+     * Export queue records for the requested user and contexts.
+     *
+     * @param approved_contextlist $contextlist Approved contexts.
+     * @return void
+     */
+    public static function export_user_data(approved_contextlist $contextlist): void {
+        global $DB;
+        $userid = $contextlist->get_user()->id;
+        foreach ($contextlist->get_contexts() as $context) {
+            $records = $DB->get_records_sql(
+                "SELECT q.*
+                   FROM {qtype_aitext_queue} q
+                   JOIN {question_usages} qu ON qu.id = q.usageid
+                  WHERE q.userid = :userid AND qu.contextid = :contextid
+               ORDER BY q.timecreated ASC",
+                ['userid' => $userid, 'contextid' => $context->id]
+            );
+            foreach ($records as $record) {
+                writer::with_context($context)->export_data(
+                    [get_string('privacy:metadata:queue', 'qtype_aitext'), (string) $record->id],
+                    (object) [
+                        'response' => $record->response,
+                        'prompt' => $record->prompt,
+                        'feedback' => $record->feedback,
+                        'marks' => $record->marks,
+                        'status' => $record->status,
+                        'timecreated' => transform::datetime($record->timecreated),
+                    ]
+                );
+            }
+        }
+    }
+
+    /**
+     * Delete queue data for all users in a context.
+     *
+     * @param \context $context Context.
+     * @return void
+     */
+    public static function delete_data_for_all_users_in_context(\context $context): void {
+        global $DB;
+        $usageids = $DB->get_fieldset_select('question_usages', 'id', 'contextid = ?', [$context->id]);
+        if ($usageids) {
+            [$insql, $params] = $DB->get_in_or_equal($usageids, SQL_PARAMS_NAMED, 'usage');
+            $DB->delete_records_select('qtype_aitext_queue', "usageid {$insql}", $params);
+        }
+    }
+
+    /**
+     * Delete queue data for selected users in one context.
+     *
+     * @param approved_userlist $userlist Approved users.
+     * @return void
+     */
+    public static function delete_data_for_users(approved_userlist $userlist): void {
+        global $DB;
+        $context = $userlist->get_context();
+        $usageids = $DB->get_fieldset_select('question_usages', 'id', 'contextid = ?', [$context->id]);
+        $userids = $userlist->get_userids();
+        if ($usageids && $userids) {
+            [$usagein, $usageparams] = $DB->get_in_or_equal($usageids, SQL_PARAMS_NAMED, 'usage');
+            [$userin, $userparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'user');
+            $DB->delete_records_select('qtype_aitext_queue', "usageid {$usagein} AND userid {$userin}",
+                $usageparams + $userparams);
+        }
+    }
+
+    /**
+     * Delete queue data for one user.
+     *
+     * @param approved_contextlist $contextlist Approved contexts.
+     * @return void
+     */
+    public static function delete_data_for_user(approved_contextlist $contextlist): void {
+        global $DB;
+        $userid = $contextlist->get_user()->id;
+        foreach ($contextlist->get_contexts() as $context) {
+            $usageids = $DB->get_fieldset_select('question_usages', 'id', 'contextid = ?', [$context->id]);
+            if ($usageids) {
+                [$insql, $params] = $DB->get_in_or_equal($usageids, SQL_PARAMS_NAMED, 'usage');
+                $params['userid'] = $userid;
+                $DB->delete_records_select('qtype_aitext_queue', "usageid {$insql} AND userid = :userid", $params);
+            }
+        }
     }
 
     /**

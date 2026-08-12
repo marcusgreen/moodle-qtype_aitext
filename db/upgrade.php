@@ -115,5 +115,37 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026020601, 'qtype', 'aitext');
     }
 
+    if ($oldversion < 2026081200) {
+        $table = new xmldb_table('qtype_aitext_queue');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('questionattemptid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('usageid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('slot', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('questionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('sourceattemptstepid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('prompt', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL);
+        $table->add_field('response', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL);
+        $table->add_field('responsehash', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL);
+        $table->add_field('defaultmark', XMLDB_TYPE_NUMBER, '10,5', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'pending');
+        $table->add_field('attempts', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('nextrun', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('feedback', XMLDB_TYPE_TEXT, null, null, null);
+        $table->add_field('marks', XMLDB_TYPE_NUMBER, '10,5', null, null);
+        $table->add_field('lasterror', XMLDB_TYPE_TEXT, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('attemptresponse', XMLDB_INDEX_NOTUNIQUE, ['questionattemptid', 'responsehash']);
+        $table->add_index('statusnextrun', XMLDB_INDEX_NOTUNIQUE, ['status', 'nextrun']);
+        $table->add_index('questionattempt', XMLDB_INDEX_NOTUNIQUE, ['questionattemptid']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026081200, 'qtype', 'aitext');
+    }
+
     return true;
 }

@@ -53,3 +53,14 @@ Besides that:
 The "jsdiff" dependency is being declared as npm dependency in `package.json`, but is already deployed into the plugin's `amd/src` and - by running grunt - into the `amd/build` directory.
 
 If you want or have to update the dependency, you will have to run `npm install` followed by `npm run deployJsDiff` to deploy the new version to the moodle plugin.
+
+
+## Asynchronous Cron-based Evaluation
+
+The plugin can process AI grading asynchronously through Moodle's scheduled task. Enable **Enable Cron-based AI grading** in the plugin settings, configure the AI backend, and ensure Moodle cron is running. New AI Text submissions are stored in the `qtype_aitext_queue` table with status `pending`; the scheduled task processes up to the configured batch size each run and writes the result back into the Moodle question attempt.
+
+Failed jobs are retried with increasing delays and are marked as failed after the configured maximum number of attempts. Jobs that were interrupted while calling the LLM are recovered automatically after a timeout. A response hash prevents a delayed result from overwriting a newer student response.
+
+The asynchronous mode intentionally leaves the question in `needsgrading` until the worker creates a manual-grade step. For finished quiz attempts, the worker also recalculates the attempt total and refreshes the quiz gradebook. The queue contains the student response and prompt required for processing, so administrators should configure the selected AI backend and its data-retention policy appropriately.
+
+To inspect the task, use **Site administration > Server > Scheduled tasks** and locate **Process asynchronous AI grading queue**. The task is registered at one-minute intervals; the effective processing rate is controlled by the batch-size setting and the normal Moodle cron cadence.

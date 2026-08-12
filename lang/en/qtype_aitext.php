@@ -163,3 +163,25 @@ $string['useexpertmodetemplate'] = 'Use expert mode template';
 $string['wordcount'] = 'Word count: {$a}';
 $string['wordcounttoofew'] = 'Word count: {$a->count}, less than the required {$a->limit} words.';
 $string['wordcounttoomuch'] = 'Word count: {$a->count}, more than the limit of {$a->limit} words.';
+
+$string['cron_enabled'] = 'Enable Cron-based AI grading';
+$string['cron_enabled_setting'] = 'When enabled, submitted AI Text responses are queued and graded by the Moodle scheduled task instead of waiting for the LLM during the student request. Ensure Moodle cron is running.';
+$string['cron_batch_size'] = 'Cron AI grading batch size';
+$string['cron_batch_size_setting'] = 'Maximum number of AI grading jobs processed by one scheduled task run.';
+$string['cron_max_attempts'] = 'Maximum AI grading retries';
+$string['cron_max_attempts_setting'] = 'Maximum number of attempts for a failed AI grading job before it is marked as failed.';
+$string['cron_retry_delay'] = 'AI grading retry delay';
+$string['cron_retry_delay_setting'] = 'Initial delay in seconds before retrying a failed AI grading job. The delay increases with each attempt.';
+$string['task_process_ai_queue'] = 'Process asynchronous AI grading queue';
+$string['err_queueattemptmismatch'] = 'The queued AI grading job no longer matches the question attempt.';
+$string['err_queuewrongtype'] = 'The queued question is not an AI Text question.';
+$string['aigradingpending'] = 'Your response has been submitted and is waiting for AI grading. The result will appear after Moodle cron processes the queue.';
+
+$string['privacy:metadata:queue'] = 'Asynchronous AI grading queue record';
+$string['privacy:metadata:queue:tableexplanation'] = 'The queue stores submitted responses and AI grading results until and after asynchronous processing.';
+$string['privacy:metadata:queue:userid'] = 'The student who submitted the response.';
+$string['privacy:metadata:queue:response'] = 'The student response submitted for AI grading.';
+$string['privacy:metadata:queue:prompt'] = 'The prompt sent to the configured AI backend for grading.';
+$string['privacy:metadata:queue:feedback'] = 'The feedback returned by the configured AI backend.';
+$string['privacy:metadata:queue:marks'] = 'The marks returned by the configured AI backend.';
+$string['privacy:metadata:queue:timecreated'] = 'The time when the AI grading job was queued.';
