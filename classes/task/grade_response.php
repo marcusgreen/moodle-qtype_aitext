@@ -49,7 +49,16 @@ class grade_response extends adhoc_task {
             $spellcheck = !empty($customdata->spellcheck);
             $contextid = (int) $customdata->contextid;
 
-            $this->start_stored_progress();
+            // Use the existing progress bar, if available.
+            $idnumber = stored_progress_bar::convert_to_idnumber(get_class($this) . '_' . $this->get_id());
+            $existingbar = stored_progress_bar::get_by_idnumber($idnumber);
+
+            if ($existingbar) {
+                $this->progress = $existingbar;
+            } else {
+                $this->initialise_stored_progress();
+            }
+
             $this->progress->update(0, 100, get_string('async_grading_started', 'qtype_aitext'));
 
             // Load the question so we can call its methods.
