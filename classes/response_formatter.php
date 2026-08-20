@@ -263,6 +263,7 @@ class response_formatter {
      */
     private static function fence_block(string $code): string {
         $code = trim($code, "\n");
+        // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
         $fence = str_repeat('`', self::fence_length($code, 3));
         return "\n" . $fence . "\n" . $code . "\n" . $fence . "\n";
     }
@@ -279,8 +280,10 @@ class response_formatter {
      */
     private static function fence_inline(string $code): string {
         $code = trim($code, "\n");
+        // @codingStandardsIgnoreStart moodle.Strings.ForbiddenStrings.Found
         $ticks = str_repeat('`', self::fence_length($code, 1));
         $pad = ($code === '' || str_starts_with($code, '`') || str_ends_with($code, '`')) ? ' ' : '';
+        // @codingStandardsIgnoreEnd
         return $ticks . $pad . $code . $pad . $ticks;
     }
 
@@ -294,6 +297,7 @@ class response_formatter {
      */
     private static function fence_length(string $code, int $min): int {
         $longest = 0;
+        // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
         if (preg_match_all('/`+/', $code, $matches)) {
             foreach ($matches[0] as $run) {
                 $longest = max($longest, strlen($run));
