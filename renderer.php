@@ -359,7 +359,7 @@ class qtype_aitext_renderer extends qtype_renderer {
         $divoptions['data-answer'] = $response;
         $collapsiblecontent .= html_writer::tag(
             'div',
-            $response,
+            s($response),
             $divoptions,
         );
 
