@@ -41,9 +41,6 @@ namespace qtype_aitext;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class response_formatter {
-    /** @var string A distinctive, html_to_text-safe token used to mark where extracted code goes. */
-    private const CODE_PLACEHOLDER = 'QTYPEAITEXTCODEPLACEHOLDER';
-
     /**
      * Convert a stored student response to the text sent to the AI for grading/feedback.
      *
@@ -105,9 +102,7 @@ class response_formatter {
         $text = html_to_text((string) $dom->saveHTML(), 0, false);
 
         // Put the verbatim, fenced code back where its placeholder is.
-        foreach ($fences as $token => $fenced) {
-            $text = str_replace($token, $fenced, $text);
-        }
+        $text = strtr($text, $fences);
 
         // Collapse runs of blank lines (keeping paragraph separation) and trim the ends.
         return trim(preg_replace('/\n{3,}/', "\n\n", $text));
@@ -168,6 +163,10 @@ class response_formatter {
      * spaces are introduced. Each element is swapped for a unique token so html_to_text processes
      * the surrounding prose only; the tokens are substituted back afterwards.
      *
+     * The token is built from an unpredictable, per-call random prefix/suffix (with the element
+     * index between them to keep each unique), pre-checked not to occur in the source HTML, so a
+     * student cannot craft a response that collides with a placeholder.
+     *
      * @param \DOMDocument $dom The document to mutate.
      * @return array<string, string> Map of placeholder token to fenced code string.
      */
@@ -176,9 +175,16 @@ class response_formatter {
         $fences = [];
         $index = 0;
 
+        // Unpredictable, collision-checked sentinels so no student response can match a placeholder.
+        // random_bytes(18) base64-encodes to exactly 24 padding-free chars, split into two 12-char halves.
+        $html = (string) $dom->saveHTML();
+        do {
+            [$prefix, $suffix] = str_split(base64_encode(random_bytes(18)), 12);
+        } while (str_contains($html, $prefix) || str_contains($html, $suffix));
+
         // Order matters: process <pre> as blocks, and only those <code> spans not inside a <pre>.
         foreach ($xpath->query('//pre | //code[not(ancestor::pre)]') as $node) {
-            $token = self::CODE_PLACEHOLDER . $index . 'END';
+            $token = $prefix . $index . $suffix;
             $fences[$token] = strtolower($node->nodeName) === 'pre'
                 ? self::fence_block($node->textContent)
                 : self::fence_inline($node->textContent);
@@ -300,7 +306,10 @@ class response_formatter {
         // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
         if (preg_match_all('/`+/', $code, $matches)) {
             foreach ($matches[0] as $run) {
-                $longest = max($longest, strlen($run));
+                $runlength = strlen($run);
+                if ($runlength > $longest) {
+                    $longest = $runlength;
+                }
             }
         }
         return max($min, $longest + 1);

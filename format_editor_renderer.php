@@ -94,7 +94,8 @@ class qtype_aitext_format_editor_renderer extends qtype_aitext_format_renderer_b
 
         $response = $step->get_qt_var('answer') ?? '';
         $storedformat = $step->get_qt_var('answerformat');
-        // Render a legacy non-HTML answer to HTML so the forced HTML editor displays it correctly.
+        // Interpret the answer using its stored (possibly legacy) format so format_text converts it to HTML,
+        // letting the forced HTML editor display it correctly instead of its raw source.
         if ($storedformat !== null && $storedformat !== '' && (int) $storedformat !== FORMAT_HTML && $response !== '') {
             $response = format_text($response, $storedformat, [
                 'context' => $context,
