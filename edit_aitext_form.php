@@ -260,10 +260,9 @@ class qtype_aitext_edit_form extends question_edit_form {
             ['rows' => 3],
             $this->editoroptions
         );
-        $mform->addHelpButton('hint[0]', 'hint', 'qtype_aitext');
-
         $repeatedoptions = [];
         $repeatedoptions['hint']['type'] = PARAM_RAW;
+        $repeatedoptions['hint']['helpbutton'] = ['hint', 'qtype_aitext'];
 
         return [$repeated, $repeatedoptions];
     }

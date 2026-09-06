@@ -637,9 +637,9 @@ class qtype_aitext_question extends question_graded_automatically {
             $hintinstruction = get_string('nohintinstruction', 'qtype_aitext');
         }
 
-        // $previousresponses holds only responses from earlier, already committed
-        // submissions; the response being graded now is passed separately as
-        // {{response}} and is not in the array.
+        // The $previousresponses array holds only responses from earlier, already
+        // committed submissions; the response being graded now is passed separately
+        // as {{response}} and is not in the array.
         if (empty($previousresponses)) {
             $earlier = get_string('nopreviousresponses', 'qtype_aitext');
         } else {
