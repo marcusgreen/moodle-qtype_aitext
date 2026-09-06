@@ -230,6 +230,42 @@ class qtype_aitext_edit_form extends question_edit_form {
             $roleprompt = get_string('defaultroleprompt', 'qtype_aitext');
         }
         $PAGE->requires->js_call_amd('qtype_aitext/expertmode', 'init', [$experttemplate, $roleprompt]);
+
+        // Penalty and hints. Under the interactive behaviour each hint allows the
+        // student one more try; the hint text is an instruction to the AI rather than
+        // text shown to the student. The clearwrong and shownumpartscorrect options
+        // are not offered because this question type has no gradable parts.
+        $this->add_interactive_settings();
+    }
+
+    /**
+     * Build the repeated hint fields.
+     *
+     * Overridden only to relabel the hint editor: for this question type the text is
+     * an instruction telling the AI how strong a hint to give, and is never shown to
+     * the student.
+     *
+     * @param bool $withclearwrong unused, this question type has no gradable parts.
+     * @param bool $withshownumpartscorrect unused, this question type has no gradable parts.
+     * @return array of arrays, as expected by repeat_elements.
+     */
+    protected function get_hint_fields($withclearwrong = false, $withshownumpartscorrect = false) {
+        $mform = $this->_form;
+
+        $repeated = [];
+        $repeated[] = $mform->createElement(
+            'editor',
+            'hint',
+            get_string('hintn', 'qtype_aitext'),
+            ['rows' => 3],
+            $this->editoroptions
+        );
+        $mform->addHelpButton('hint[0]', 'hint', 'qtype_aitext');
+
+        $repeatedoptions = [];
+        $repeatedoptions['hint']['type'] = PARAM_RAW;
+
+        return [$repeated, $repeatedoptions];
     }
 
     /**
@@ -295,6 +331,8 @@ class qtype_aitext_edit_form extends question_edit_form {
         );
         $question->graderinfo['format'] = $question->options->graderinfoformat;
         $question->graderinfo['itemid'] = $draftid;
+
+        $question = $this->data_preprocessing_hints($question);
 
         return $question;
     }

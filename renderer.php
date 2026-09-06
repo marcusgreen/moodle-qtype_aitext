@@ -130,8 +130,13 @@ class qtype_aitext_renderer extends qtype_renderer {
             );
         }
 
-        // Add the spellcheck feedback, only in readonly mode and depending on the display options just like manualcomment .
-        if ($question->spellcheck && $options->readonly && $options->manualcomment != question_display_options::HIDDEN) {
+        // Add the spellcheck feedback, only in readonly mode and depending on the display options just like manualcomment.
+        // The state check keeps it hidden during an interactive try-again, where readonly is set to the truthy
+        // qbehaviour_interactive::TRY_AGAIN_VISIBLE marker even though the attempt is still in progress.
+        if (
+            $question->spellcheck && $options->readonly && $qa->get_state()->is_finished()
+            && $options->manualcomment != question_display_options::HIDDEN
+        ) {
             $result .= $this->add_spellchecked_response_container($qa, $options->context, $uniqid);
         }
 

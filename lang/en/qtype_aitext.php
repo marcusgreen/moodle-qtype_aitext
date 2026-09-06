@@ -41,6 +41,35 @@ $string['backends'] = 'AI back end systems';
 $string['backends_text'] = 'Core AI system was introduced with Moodle 4.5, Local AI System is from https://github.com/mebis-lp/moodle-local_ai_manager and Tool AI System is from https://github.com/marcusgreen/moodle-tool_aiconnect';
 $string['cachedef_stringdata'] = 'Cachedef stringdata';
 $string['coreaisubsystem'] = 'Core AI subsystem ';
+$string['defaulthintprompttemplate'] = '=== ROLE ===
+{{role}}
+
+=== TASK ===
+The student has answered the question below and may try again. Write a short hint that helps them improve their next attempt.
+
+=== QUESTION ===
+{{questiontext}}
+
+=== SCORING ===
+{{markscheme}}
+
+=== THE STUDENT\'S CURRENT ANSWER ===
+{{response}}
+
+=== FEEDBACK ALREADY GIVEN FOR THAT ANSWER ===
+{{feedback}}
+
+=== THEIR EARLIER ATTEMPTS ===
+{{previousresponses}}
+
+=== HOW STRONG THIS HINT SHOULD BE ===
+This is attempt number {{attemptnumber}}. {{hintinstruction}}
+
+=== RULES ===
+Do not reveal the answer. Do not write the improved response for the student, or any part of it they could copy. Point them towards what to reconsider and let them do the work. Do not repeat a hint they have already been given. Write two or three sentences of plain prose, addressed to the student. Do not return JSON and do not give a mark.
+
+=== LANGUAGE ===
+Respond in the language "{{language}}".';
 $string['defaultmarksscheme'] = 'Marks scheme';
 $string['defaultmarksscheme_setting'] = 'This will be the default marks scheme for new questions. Questions authors should alter this to suit the question.';
 $string['defaultprompt'] = 'AI prompt';
@@ -89,6 +118,13 @@ $string['formatplain'] = 'Plain text';
 $string['get_llmmfeedback'] = 'Get LLM feedback';
 $string['graderinfo'] = 'Information for graders';
 $string['graderinfoheader'] = 'Grader information';
+$string['hint'] = 'Hint instruction for the AI';
+$string['hint_help'] = 'This text is never shown to the student. It tells the AI how strong a hint to give after this attempt, for example "nudge only, do not name the concept" or "give a worked partial example". Each hint you add here allows the student one more try.';
+$string['hintn'] = 'Hint {no} instruction for the AI';
+$string['hintprompttemplate'] = 'Hint prompt template';
+$string['hintprompttemplate_setting'] = 'The prompt used to ask the AI for a hint between tries, under the "Interactive with multiple tries" behaviour. Placeholders: {{role}}, {{questiontext}}, {{aiprompt}}, {{markscheme}}, {{response}}, {{feedback}}, {{previousresponses}}, {{hintinstruction}}, {{attemptnumber}} and {{language}}.';
+$string['hintsuccessthreshold'] = 'Hint success threshold';
+$string['hintsuccessthreshold_setting'] = 'Under the "Interactive with multiple tries" behaviour, a student stops being offered further tries once they reach this fraction of the available marks. The default of 1.0 requires full marks, which AI-marked free text rarely awards, so most sites will want a lower value such as 0.8.';
 $string['jsonprompt'] = 'JSON prompt';
 $string['jsonprompt_setting'] = 'Instructions sent to convert the returned value into json';
 $string['localaimanager'] = 'Local AI manager';
@@ -105,7 +141,9 @@ $string['minwordlimit_help'] = 'If the response requires that students enter tex
 $string['minwordlimitboundary'] = 'This question requires a response of at least {$a->limit} words and you are attempting to submit {$a->count} words. Please expand your response and try again.';
 $string['model'] = 'Model';
 $string['nlines'] = '{$a} lines';
+$string['nohintinstruction'] = 'No specific instruction was given, so use your own judgement about how much to reveal.';
 $string['nomarkscheme'] = 'No mark scheme provided. Set marks to null.';
+$string['nopreviousresponses'] = 'This is their first attempt.';
 $string['pluginname'] = 'AI Text';
 $string['pluginname_help'] = 'In response to a question, the respondent enters text. A response template may be provided. Responses are given a preliminary grade by an AI system (e.g. ChatGPT) then can be graded manually.';
 $string['pluginname_link'] = 'question/type/AI Text';

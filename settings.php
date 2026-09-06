@@ -82,6 +82,29 @@ if ($ADMIN->fulltree) {
         80,
         3
     ));
+    // Prompt used to generate a hint between tries under the interactive behaviour.
+    $settings->add(new admin_setting_configtextarea(
+        'qtype_aitext/hintprompttemplate',
+        new lang_string('hintprompttemplate', 'qtype_aitext'),
+        new lang_string('hintprompttemplate_setting', 'qtype_aitext'),
+        new lang_string('defaulthintprompttemplate', 'qtype_aitext'),
+        PARAM_RAW,
+        80,
+        20
+    ));
+
+    // A regex paramtype rather than PARAM_FLOAT: admin_setting_configtext::validate()
+    // compares the raw input against clean_param() as a string, and PARAM_FLOAT turns
+    // '1.0' into the float 1.0, which stringifies back as '1', so any trailing zero
+    // would be rejected as invalid. The regex also confines the value to 0 - 1.
+    $settings->add(new admin_setting_configtext(
+        'qtype_aitext/hintsuccessthreshold',
+        new lang_string('hintsuccessthreshold', 'qtype_aitext'),
+        new lang_string('hintsuccessthreshold_setting', 'qtype_aitext'),
+        '1.0',
+        '/^(0(\.\d+)?|1(\.0+)?)$/'
+    ));
+
     $settings->add(new admin_setting_configselect(
         'qtype_aitext/responseformat',
         new lang_string('responseformat', 'qtype_aitext'),

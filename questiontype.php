@@ -163,6 +163,10 @@ class qtype_aitext extends question_type {
                 'response' => $sr,
             ]);
         }
+
+        // Hints are instructions telling the AI how strong a hint to give between
+        // tries under the interactive behaviour. They also set the number of tries.
+        $this->save_hints($formdata);
     }
     /**
      * Called when previewing a question or when displayed in a quiz

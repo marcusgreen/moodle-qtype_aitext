@@ -146,6 +146,12 @@ class qtype_aitext_question extends question_graded_automatically {
     /** @var string|null Cached spellcheck response from the last grade_response() call. */
     public $lastspellcheckresponse = null;
 
+    /** @var string|null Cached hint text from the last generate_hint() call. */
+    public $lastaihint = null;
+
+    /** @var string|null Cached hint prompt from the last generate_hint() call. */
+    public $lastaihintprompt = null;
+
     /**
      * Choose the question behaviour to use for this question attempt.
      *
@@ -153,9 +159,13 @@ class qtype_aitext_question extends question_graded_automatically {
      * persists AI grading results (comment, prompt, spellcheck) as cached
      * behaviour variables on the grading step.
      *
+     * Interactive-style behaviours (interactive, interactivecountback) are routed
+     * to qbehaviour_interactive_for_aitext, which grades on every submit and lets
+     * the student retry, giving an AI-generated hint between tries.
+     *
      * Immediate-style behaviours (immediatefeedback, immediatecbm, adaptive,
-     * adaptivenopenalty, interactive, interactivecountback) are routed to
-     * qbehaviour_immediate_for_aitext, which grades on every submit.
+     * adaptivenopenalty) are routed to qbehaviour_immediate_for_aitext, which
+     * grades on every submit.
      *
      * Manualgraded is kept as-is via the core archetypal behaviour: no AI
      * grading occurs in that mode, so no adapter is needed. Note that
@@ -170,10 +180,15 @@ class qtype_aitext_question extends question_graded_automatically {
      * @return question_behaviour the behaviour instance to use.
      */
     public function make_behaviour(question_attempt $qa, $preferredbehaviour) {
+        // Interactive: multiple tries, each retry preceded by an AI-generated hint.
+        if (in_array($preferredbehaviour, ['interactive', 'interactivecountback'], true)) {
+            return question_engine::make_behaviour('interactive_for_aitext', $qa, $preferredbehaviour);
+        }
+
         if (
             in_array(
                 $preferredbehaviour,
-                ['immediatefeedback', 'immediatecbm', 'adaptive', 'adaptivenopenalty', 'interactive', 'interactivecountback'],
+                ['immediatefeedback', 'immediatecbm', 'adaptive', 'adaptivenopenalty'],
                 true
             )
         ) {
@@ -199,6 +214,8 @@ class qtype_aitext_question extends question_graded_automatically {
         $this->lastaicomment = null;
         $this->lastaiprompt = null;
         $this->lastspellcheckresponse = null;
+        $this->lastaihint = null;
+        $this->lastaihintprompt = null;
         $this->attemptcontextid = null;
         // Resolve the usage context from the step.
         $this->resolve_attempt_context($step);
@@ -518,6 +535,138 @@ class qtype_aitext_question extends question_graded_automatically {
     }
 
     /**
+     * Ask the LLM for a hint to help the student improve their next attempt.
+     *
+     * Called by qbehaviour_interactive_for_aitext after grading a submission that
+     * leaves the student with a try remaining. Unlike grade_response() the reply is
+     * plain prose, not JSON: a hint carries no marks, so there is nothing to parse
+     * and plain text is more robust.
+     *
+     * Failure is never fatal. If the request fails the student simply gets the
+     * "Try again" button with no hint, rather than being blocked from retrying.
+     *
+     * @param array $response The response the student just submitted.
+     * @param string|null $hintinstruction The teacher's instruction for this try, if any.
+     * @param string $previousfeedback The feedback just generated for this response.
+     * @param int $attemptnumber Which submission this is, counting from 1.
+     * @param string[] $previousresponses Earlier submitted responses, oldest first.
+     * @return string HTML hint text, or an empty string if none could be generated.
+     */
+    public function generate_hint(
+        array $response,
+        ?string $hintinstruction,
+        string $previousfeedback,
+        int $attemptnumber,
+        array $previousresponses = []
+    ): string {
+        $this->lastaihint = null;
+        $this->lastaihintprompt = null;
+
+        if (empty($response['answer'])) {
+            return '';
+        }
+
+        $prompt = $this->build_full_ai_hint_prompt(
+            $response['answer'],
+            $hintinstruction,
+            $previousfeedback,
+            $attemptnumber,
+            $previousresponses
+        );
+        $this->lastaihintprompt = $prompt;
+
+        try {
+            $hint = $this->perform_request($prompt, 'feedback');
+        } catch (\moodle_exception $e) {
+            // A missing hint must not stop the student retrying.
+            debugging('AI hint unavailable: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return '';
+        }
+
+        if (trim($hint) === '') {
+            return '';
+        }
+
+        $hint = $this->format_ai_markdown(trim($hint));
+        $disclaimer = $this->build_disclaimer();
+        if ($disclaimer !== '') {
+            $hint .= ' ' . $disclaimer;
+        }
+
+        $this->lastaihint = $hint;
+        return $hint;
+    }
+
+    /**
+     * Build the complete prompt asking the LLM for a hint.
+     *
+     * Uses the hintprompttemplate admin setting, falling back to the
+     * defaulthintprompttemplate language string. Placeholders follow the same
+     * convention as the grading template.
+     *
+     * @param string $response The response the student just submitted.
+     * @param string|null $hintinstruction The teacher's instruction for this try, if any.
+     * @param string $previousfeedback The feedback just generated for this response.
+     * @param int $attemptnumber Which submission this is, counting from 1.
+     * @param string[] $previousresponses Earlier submitted responses, oldest first.
+     * @return string The complete prompt ready to send to the AI.
+     */
+    public function build_full_ai_hint_prompt(
+        string $response,
+        ?string $hintinstruction,
+        string $previousfeedback,
+        int $attemptnumber,
+        array $previousresponses = []
+    ): string {
+        $template = get_config('qtype_aitext', 'hintprompttemplate');
+        if (empty($template)) {
+            $template = get_string('defaulthintprompttemplate', 'qtype_aitext');
+        }
+
+        $roleprompt = get_config('qtype_aitext', 'roleprompt');
+        if (empty($roleprompt)) {
+            $roleprompt = get_string('defaultroleprompt', 'qtype_aitext');
+        }
+
+        $markschemetext = trim((string) $this->markscheme);
+        if ($markschemetext === '') {
+            $markschemetext = get_string('nomarkscheme', 'qtype_aitext');
+        }
+
+        if ($hintinstruction === null || trim($hintinstruction) === '') {
+            $hintinstruction = get_string('nohintinstruction', 'qtype_aitext');
+        }
+
+        // $previousresponses holds only responses from earlier, already committed
+        // submissions; the response being graded now is passed separately as
+        // {{response}} and is not in the array.
+        if (empty($previousresponses)) {
+            $earlier = get_string('nopreviousresponses', 'qtype_aitext');
+        } else {
+            $earlier = '';
+            foreach ($previousresponses as $i => $earlierresponse) {
+                $earlier .= ($i + 1) . '. ' . strip_tags($earlierresponse) . "\n";
+            }
+            $earlier = trim($earlier);
+        }
+
+        $replacements = [
+            '{{role}}' => trim($roleprompt),
+            '{{questiontext}}' => strip_tags($this->questiontext ?? ''),
+            '{{aiprompt}}' => trim($this->clean_legacy_tags((string) $this->aiprompt)),
+            '{{markscheme}}' => $markschemetext,
+            '{{response}}' => strip_tags($response),
+            '{{feedback}}' => strip_tags($previousfeedback),
+            '{{hintinstruction}}' => trim($hintinstruction),
+            '{{attemptnumber}}' => (string) $attemptnumber,
+            '{{previousresponses}}' => $earlier,
+            '{{language}}' => $this->determine_output_language((string) $this->aiprompt),
+        ];
+
+        return str_replace(array_keys($replacements), array_values($replacements), $template);
+    }
+
+    /**
      *
      * Convert string json returned from LLM call to an object,
      * if it is not valid json apend as string to new object
@@ -543,26 +692,53 @@ class qtype_aitext_question extends question_graded_automatically {
             $contentobject->feedback = $feedback;
             $contentobject->marks = null;
         }
-        $disclaimer = get_config('qtype_aitext', 'disclaimer');
-        // The format_text will interprete a backslash as escaping character. To preserve one we need to double them first.
-        // This is especially important so that the mathjax filter still has a chance to have its delimiters \( ... \).
-        // Limit the number of backslashes to not double them if they are already doubled.
-        $contentobject->feedback = str_replace('\\\\', '\\', $contentobject->feedback);
-        $contentobject->feedback = str_replace('\\', '\\\\', $contentobject->feedback);
-        $contentobject->feedback = format_text($contentobject->feedback, FORMAT_MARKDOWN, ['para' => false]);
+        $contentobject->feedback = $this->format_ai_markdown($contentobject->feedback);
+        $contentobject->feedback .= ' ' . $this->build_disclaimer();
+
+        return $contentobject;
+    }
+
+    /**
+     * Convert markdown returned by the LLM into HTML, preserving backslashes.
+     *
+     * format_text() interprets a backslash as an escaping character. To preserve one
+     * we need to double them first. This is especially important so that the mathjax
+     * filter still has a chance to have its delimiters \( ... \). The number of
+     * backslashes is limited so they are not doubled if they are already doubled.
+     *
+     * @param string $text The raw text from the LLM.
+     * @return string HTML.
+     */
+    private function format_ai_markdown(string $text): string {
+        $text = str_replace('\\\\', '\\', $text);
+        $text = str_replace('\\', '\\\\', $text);
+        return format_text($text, FORMAT_MARKDOWN, ['para' => false]);
+    }
+
+    /**
+     * The configured disclaimer, translated, with the model placeholder resolved.
+     *
+     * Must be called directly after the perform_request() whose model should be
+     * named, because it reads $this->modelused.
+     *
+     * @return string The disclaimer text, empty if none is configured.
+     */
+    private function build_disclaimer(): string {
+        $disclaimer = (string) get_config('qtype_aitext', 'disclaimer');
+        if (trim($disclaimer) === '') {
+            return '';
+        }
         // Capture the model before translating: llm_translate() may itself issue a
         // perform_request('translate') which would overwrite $this->modelused with the
-        // translation model. Read it here so {{model}} reflects the feedback model.
-        // Use ?: rather than ?? so an empty string from a backend also falls back to
-        // the configured model rather than rendering a blank placeholder.
+        // translation model. Read it here so {{model}} reflects the model that
+        // generated the content. Use ?: rather than ?? so an empty string from a
+        // backend also falls back to the configured model rather than rendering a
+        // blank placeholder.
         $model = $this->modelused ?: ($this->model ?: '');
         $disclaimer = $this->llm_translate($disclaimer);
         // Replace {{model}} with the model the backend actually used (falls back to the configured model).
         // The legacy [[model]] form is still honoured for disclaimers configured before the rename.
-        $disclaimer = str_replace(['{{model}}', '[[model]]'], $model, $disclaimer);
-        $contentobject->feedback .= ' ' . $disclaimer;
-
-        return $contentobject;
+        return str_replace(['{{model}}', '[[model]]'], $model, $disclaimer);
     }
 
     /**
