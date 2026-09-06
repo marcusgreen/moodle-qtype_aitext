@@ -559,7 +559,6 @@ class qtype_aitext_question extends question_graded_automatically {
         $contentobject = $this->extract_single_json_object($feedback);
         if (!is_null($contentobject)) {
             $contentobject->feedback = trim($contentobject->feedback);
-            $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"', $contentobject->feedback);
         } else {
             $contentobject = new \stdClass();
             $contentobject->feedback = $feedback;
