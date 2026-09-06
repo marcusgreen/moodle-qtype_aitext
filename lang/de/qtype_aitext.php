@@ -36,6 +36,9 @@ $string['answerfiles'] = 'Antwortdateien';
 $string['answertext'] = 'Antworttext';
 $string['attachmentsoptional'] = 'Anhänge sind optional';
 $string['automatic_spellcheck'] = 'Automatische Rechtschreibprüfung';
+$string['automatic_spellcheck_help'] = 'Wenn aktiviert, gibt die KI die Antwort der Lernenden wortgetreu wieder und korrigiert nur die Rechtschreibung; die Unterschiede werden der Lehrkraft angezeigt.
+
+Die Rechtschreibprüfung zielt auf Fließtext. Code wird unverändert übernommen, sofern er erkannt werden kann (in HTML-Antworten); in reinen Textantworten lässt sich Code jedoch nicht von Fließtext unterscheiden. Wenn Sie erwarten, dass die Lernenden mit Code antworten, deaktivieren Sie diese Option gegebenenfalls.';
 $string['cachedef_stringdata'] = 'Cachedef stringdata';
 $string['defaultmarksscheme'] = 'Markierungsschema';
 $string['defaultmarksscheme_setting'] = 'Dies wird das Standard-Bewertungsschema für neue Fragen sein. Fragenautoren sollten dieses Schema an die jeweilige Frage anpassen.';

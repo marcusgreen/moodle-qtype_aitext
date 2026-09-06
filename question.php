@@ -26,6 +26,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use qtype_aitext\response_formatter;
+
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 
 
@@ -316,7 +318,7 @@ class qtype_aitext_question extends question_graded_automatically {
      * @throws moodle_exception
      */
     private function get_spellchecking(array $response): string {
-        $fullaiprompt = $this->build_full_ai_spellchecking_prompt($response['answer']);
+        $fullaiprompt = $this->build_full_ai_spellchecking_prompt($response);
         $response = $this->perform_request($fullaiprompt, 'feedback');
         return $response;
     }
@@ -349,7 +351,7 @@ class qtype_aitext_question extends question_graded_automatically {
         }
 
         $fullaiprompt = $this->build_full_ai_prompt(
-            $response['answer'],
+            $response,
             $this->aiprompt,
             $this->defaultmark,
             $this->markscheme
@@ -383,13 +385,13 @@ class qtype_aitext_question extends question_graded_automatically {
      *
      * Uses the structured template system. Also used by the prompt tester in the editing form.
      *
-     * @param string $response The student's response text.
+     * @param array $response The student's response data (expects keys 'answer' and optionally 'answerformat').
      * @param string $aiprompt The grading instructions from the question.
      * @param float $defaultmark The maximum achievable score.
      * @param string $markscheme The marking criteria.
      * @return string The complete prompt ready to send to the AI.
      */
-    public function build_full_ai_prompt($response, $aiprompt, $defaultmark, $markscheme): string {
+    public function build_full_ai_prompt(array $response, $aiprompt, $defaultmark, $markscheme): string {
         return $this->build_template_prompt($response, $aiprompt, $defaultmark, $markscheme);
     }
 
@@ -400,13 +402,13 @@ class qtype_aitext_question extends question_graded_automatically {
      * - Standard mode: Uses the admin-configured template with {{placeholders}}.
      * - Expert mode: If aiprompt contains {{response}}, it becomes the complete template.
      *
-     * @param string $response The student's response text.
+     * @param array $response The student's response data (expects keys 'answer' and optionally 'answerformat').
      * @param string $aiprompt The grading instructions from the question.
      * @param float $defaultmark The maximum achievable score.
      * @param string $markscheme The marking criteria.
      * @return string The complete prompt with all placeholders replaced.
      */
-    private function build_template_prompt(string $response, string $aiprompt, float $defaultmark, string $markscheme): string {
+    private function build_template_prompt(array $response, string $aiprompt, float $defaultmark, string $markscheme): string {
         $template = get_config('qtype_aitext', 'prompttemplate');
         if (empty($template)) {
             $template = get_string('defaultprompttemplate', 'qtype_aitext');
@@ -428,6 +430,14 @@ class qtype_aitext_question extends question_graded_automatically {
 
         $cleanedaiprompt = $this->clean_legacy_tags($aiprompt);
 
+        // Convert the student's response to the text sent to the AI (format-aware, entity-decoding,
+        // with code preserved and delimited by Markdown fences). See
+        // response_formatter::to_feedback_text().
+        $responsetext = response_formatter::to_feedback_text(
+            $response['answer'] ?? '',
+            $response['answerformat'] ?? FORMAT_HTML
+        );
+
         // Expert mode: {{response}} in aiprompt makes it the complete template.
         $isexpertmode = strpos($cleanedaiprompt, '{{response}}') !== false;
 
@@ -436,7 +446,7 @@ class qtype_aitext_question extends question_graded_automatically {
             $expertreplacement = [
                 '{{questiontext}}' => strip_tags($this->questiontext ?? ''),
                 '{{markscheme}}' => $markschemetext,
-                '{{response}}' => strip_tags($response),
+                '{{response}}' => $responsetext,
                 '{{language}}' => $language,
                 '{{role}}' => trim($roleprompt),
             ];
@@ -447,7 +457,7 @@ class qtype_aitext_question extends question_graded_automatically {
                 '{{questiontext}}' => strip_tags($this->questiontext ?? ''),
                 '{{aiprompt}}' => trim($cleanedaiprompt),
                 '{{markscheme}}' => $markschemetext,
-                '{{response}}' => strip_tags($response),
+                '{{response}}' => $responsetext,
                 '{{language}}' => $language,
             ];
             $prompt = str_replace(array_keys($replacements), array_values($replacements), $template);
@@ -509,12 +519,16 @@ class qtype_aitext_question extends question_graded_automatically {
     /**
      * Build the full ai spellchecking prompt.
      *
-     * @param string $response
+     * @param array $response The student's response data (expects keys 'answer' and optionally 'answerformat').
      * @return string
      * @throws coding_exception
      */
-    public function build_full_ai_spellchecking_prompt(string $response): string {
-        return get_string('spellcheck_prompt', 'qtype_aitext') . ($response);
+    public function build_full_ai_spellchecking_prompt(array $response): string {
+        $responsetext = response_formatter::to_spellcheck_text(
+            $response['answer'] ?? '',
+            $response['answerformat'] ?? FORMAT_HTML
+        );
+        return get_string('spellcheck_prompt', 'qtype_aitext') . $responsetext;
     }
 
     /**
@@ -537,7 +551,6 @@ class qtype_aitext_question extends question_graded_automatically {
         $contentobject = $this->extract_single_json_object($feedback);
         if (!is_null($contentobject)) {
             $contentobject->feedback = trim($contentobject->feedback);
-            $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"', $contentobject->feedback);
         } else {
             $contentobject = new \stdClass();
             $contentobject->feedback = $feedback;
