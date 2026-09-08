@@ -367,13 +367,13 @@ class qtype_aitext_question extends question_graded_automatically {
         $contentobject = $this->process_feedback($feedback);
         $this->lastaicomment = $contentobject->feedback;
 
-        // If there are no marks, write the feedback and set to needs grading .
-        if (is_null($contentobject->marks)) {
-            return [0.0, question_state::$needsgrading];
-        }
+        // If there are no marks, write the feedback and set to needs grading.
         $fraction = 0.0;
+        if (is_null($contentobject->marks)) {
+            return [$fraction, question_state::$needsgrading];
+        }
         if (is_numeric($contentobject->marks) && $this->defaultmark > 0) {
-            $fraction = (float) $contentobject->marks / $this->defaultmark;
+            $fraction = min(max(0, (float) $contentobject->marks / $this->defaultmark), 1.0);
         }
         return [$fraction, question_state::graded_state_for_fraction($fraction)];
     }
