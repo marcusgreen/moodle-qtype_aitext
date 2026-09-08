@@ -38,6 +38,13 @@ use qtype_aitext\task\grade_response;
  */
 class qtype_aitext_question extends question_graded_automatically_with_countback {
     /**
+     * MOODLE-1896. Regrade type constants.
+     */
+    private const REGRADE_NONE = 0;
+    private const REGRADE_DRY_RUN = 1;
+    private const REGRADE_COMMIT = 2;
+    
+    /**
      * Plain text or html
      * @var string
      */
@@ -242,6 +249,30 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
             return $this->grade_response_sync($response);
         }
 
+        // During regrade, grade synchronously. Cache the result during dry run so the
+        // commit phase can reuse it without a second AI call. Outside of a dry-run/commit
+        // pair the cache is never read, preventing stale results.
+        $regradetype = $this->regrade_type();
+
+        if ($regradetype !== self::REGRADE_NONE) {
+            $cache = \cache::make('qtype_aitext', 'regrade');
+            $cachekey = (string) $this->step->get_id();
+
+            if ($regradetype === self::REGRADE_DRY_RUN) {
+                $result = $this->grade_response_sync($response);
+                $cache->set($cachekey, $result);
+                return $result;
+            }
+
+            // Actual regrade: consume cached dry-run result if present, then clear it.
+            if (($cached = $cache->get($cachekey)) !== false) {
+                $cache->delete($cachekey);
+                return $cached;
+            }
+
+            return $this->grade_response_sync($response);
+        }
+
         $stepid = $this->step->get_id();
         $questionattemptid = $DB->get_field('question_attempt_steps', 'questionattemptid', ['id' => $stepid]);
 
@@ -301,14 +332,15 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $feedback = $this->perform_request($fullaiprompt, 'feedback');
         $contentobject = $this->process_feedback($feedback);
 
+        // Calculate the grade fraction.
+        $fraction = 0.0;
         if (is_null($contentobject->marks)) {
-            $grade = [0.0, question_state::$needsgrading];
+            $state = question_state::$needsgrading;
         } else {
-            $fraction = 0.0;
             if (is_numeric($contentobject->marks) && $this->defaultmark > 0) {
-                $fraction = (float)$contentobject->marks / $this->defaultmark;
+                $fraction = min(max(0.0, (float) $contentobject->marks / $this->defaultmark), 1.0);
             }
-            $grade = [$fraction, question_state::graded_state_for_fraction($fraction)];
+            $state = question_state::graded_state_for_fraction($fraction);
         }
 
         $this->insert_attempt_step_data('-aiprompt', $fullaiprompt);
@@ -316,7 +348,7 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         $this->insert_attempt_step_data('-comment', $contentobject->feedback);
         $this->insert_attempt_step_data('-commentformat', FORMAT_HTML);
 
-        return $grade;
+        return [$fraction, $state];
     }
 
     /**
@@ -331,6 +363,31 @@ class qtype_aitext_question extends question_graded_automatically_with_countback
         } catch (\Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * Determine whether we are in a regrade context, and if so whether it is a dry run.
+     *
+     * @return int REGRADE_NONE, REGRADE_DRY_RUN, or REGRADE_COMMIT
+     */
+    private function regrade_type(): int {
+        $isregrade = false;
+        $dryflag = false;
+
+        foreach (debug_backtrace(0, 8) as $frame) {
+            if (($frame['function'] ?? '') === 'regrade' && ($frame['class'] ?? '') === 'question_attempt') {
+                $isregrade = true;
+            }
+            if (($frame['function'] ?? '') === 'regrade_attempt') {
+                $dryflag = !empty($frame['args'][1] ?? false);
+            }
+        }
+
+        if (!$isregrade) {
+            return self::REGRADE_NONE;
+        }
+
+        return $dryflag ? self::REGRADE_DRY_RUN : self::REGRADE_COMMIT;
     }
 
     /**
