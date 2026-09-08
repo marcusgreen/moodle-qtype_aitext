@@ -97,6 +97,7 @@ class grade_response extends adhoc_task {
             } else {
                 if (is_numeric($contentobject->marks) && $defaultmark > 0) {
                     $fraction = (float) $contentobject->marks / $defaultmark;
+                    $fraction = min(max(0.0, (float) $contentobject->marks / $defaultmark), 1.0);
                 }
                 $state = \question_state::graded_state_for_fraction($fraction);
             }
