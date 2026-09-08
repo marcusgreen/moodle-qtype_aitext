@@ -31,4 +31,9 @@ $definitions = [
     'stringdata' => [
         'mode' => cache_store::MODE_SESSION,
     ],
+    'regrade' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'ttl' => 3600,
+    ],
 ];
