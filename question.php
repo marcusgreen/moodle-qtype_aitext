@@ -373,7 +373,7 @@ class qtype_aitext_question extends question_graded_automatically {
             return [$fraction, question_state::$needsgrading];
         }
         if (is_numeric($contentobject->marks) && $this->defaultmark > 0) {
-            $fraction = min(max(0, (float) $contentobject->marks / $this->defaultmark), 1.0);
+            $fraction = min(max(0.0, (float) $contentobject->marks / $this->defaultmark), 1.0);
         }
         return [$fraction, question_state::graded_state_for_fraction($fraction)];
     }
