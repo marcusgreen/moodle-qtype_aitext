@@ -190,44 +190,41 @@ class qtype_aitext_renderer extends qtype_renderer {
     }
 
     /**
-     * Return the ai evaluation into the feedback area, instead
-     * of the normal fixed/hint feedback when in preview mode.
+     * Return the AI evaluation as the question's specific feedback.
+     *
+     * Left to the base class feedback() to decide when this is shown (it checks
+     * $options->feedback), so general feedback, right-answer display, and other
+     * core feedback options keep working normally alongside the AI comment.
      *
      * @param question_attempt $qa
-     * @param question_display_options $options
      * @return string HTML fragment.
      */
-    public function feedback(question_attempt $qa, question_display_options $options) {
+    protected function specific_feedback(question_attempt $qa) {
         // Get data written in the question.php grade_response method.
         $comment = $qa->get_last_behaviour_var('_comment');
-
-        if ($this->page->pagetype === 'question-bank-previewquestion-preview') {
-            // Ensure $comment is an array and has content.
-            if (!empty($comment)) {
-                $this->page->requires->js_call_amd('qtype_aitext/showprompt', 'init', []);
-
-                $prompt = $qa->get_last_behaviour_var('_aiprompt');
-
-                // Clean the prompt so no script/JS can be injected, while keeping safe HTML.
-                $prompt = format_text($prompt, FORMAT_HTML, [
-                    'context' => $options->context ?? $this->page->context,
-                    'noclean' => false,
-                ]);
-
-                $showprompt  = '<br /><button id="showprompt" class="rounded">';
-                $showprompt .= get_string('showprompt', 'qtype_aitext') . '</button>';
-                $showprompt .= '<div id="fullprompt" class="hidden">' . $prompt . '</div>';
-
-                // Store the modified feedback in a variable.
-                $feedback = $comment . $showprompt;
-                return $feedback;
-            }
-
-            // Return the comment if it exists, otherwise empty string.
-            return $comment ?? '';
+        if (empty($comment)) {
+            return '';
         }
 
-        return '';
+        if ($this->page->pagetype !== 'question-bank-previewquestion-preview') {
+            return $comment;
+        }
+
+        $this->page->requires->js_call_amd('qtype_aitext/showprompt', 'init', []);
+
+        $prompt = $qa->get_last_behaviour_var('_aiprompt');
+
+        // Clean the prompt so no script/JS can be injected, while keeping safe HTML.
+        $prompt = format_text($prompt, FORMAT_HTML, [
+            'context' => $this->page->context,
+            'noclean' => false,
+        ]);
+
+        $showprompt  = '<br /><button id="showprompt" class="rounded">';
+        $showprompt .= get_string('showprompt', 'qtype_aitext') . '</button>';
+        $showprompt .= '<div id="fullprompt" class="hidden">' . $prompt . '</div>';
+
+        return $comment . $showprompt;
     }
 
     /**
