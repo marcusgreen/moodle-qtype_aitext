@@ -54,6 +54,7 @@ class qtype_aitext_edit_form extends question_edit_form {
 
         // Spelling correction.
         $mform->addElement('checkbox', 'spellcheck', get_string('automatic_spellcheck', 'qtype_aitext'));
+        $mform->addHelpButton('spellcheck', 'automatic_spellcheck', 'qtype_aitext');
 
         // Ai prompt.
         $mform->addElement(

@@ -179,7 +179,7 @@ final class question_test extends \advanced_testcase {
         // Setup common test data.
         $question = qtype_aitext_test_helper::make_aitext_question([]);
         $question->questiontext = 'Write a poem about nature';
-        $studentresponse = 'The rain in Spain falls mainly on the plain';
+        $studentresponse = ['answer' => 'The rain in Spain falls mainly on the plain', 'answerformat' => FORMAT_HTML];
         $markscheme = 'One mark for correct grammar';
         $defaultmark = 5;
 
@@ -254,7 +254,12 @@ final class question_test extends \advanced_testcase {
         set_config('prompttemplate', '{{markscheme}}', 'qtype_aitext');
         set_config('translatepostfix', false, 'qtype_aitext');
 
-        $result = $question->build_full_ai_prompt('Student answer', 'Grade this', 10, '');
+        $result = $question->build_full_ai_prompt(
+            ['answer' => 'Student answer', 'answerformat' => FORMAT_HTML],
+            'Grade this',
+            10,
+            ''
+        );
 
         // Should contain the fallback text for empty markscheme.
         $this->assertStringContainsString('null', $result);
