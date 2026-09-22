@@ -1,5 +1,10 @@
 ### Moodle AIText question type
 
+## Next releasae
+
+Thanks to Pekka-Ilmari for reporting an issue when importing XML
+https://github.com/marcusgreen/moodle-qtype_aitext/issues/85
+
 ## Release 2.1.0 Aug 2026
 
 This is a significant release. Grading now runs through dedicated companion question behaviours (`qbehaviour_immediate_for_aitext` and `qbehaviour_deferred_for_aitext`) instead of overriding core behaviours. This makes AIText grading more predictable and keeps it isolated from other question types. Existing quiz attempts that used the legacy `interactivecountback` behaviour are automatically migrated on upgrade; other question types' attempts are left untouched.
