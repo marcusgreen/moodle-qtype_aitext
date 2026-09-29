@@ -153,7 +153,11 @@ class edit_spellcheck extends dynamic_form {
         $this->set_data((object)[
             'spellcheck_editor' => ['text' => $spellcheckvalue, 'format' => FORMAT_PLAIN],
             'questionattemptid' => $questionattemptid,
-            'student_answer' => $studentanswer,
+            'student_answer' => format_text(
+                $studentanswer,
+                $qa->get_last_qt_var('answerformat') ?? FORMAT_PLAIN,
+                ['context' => $this->get_context_for_dynamic_submission()]
+            ),
         ]);
     }
 
