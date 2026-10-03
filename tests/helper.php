@@ -75,6 +75,7 @@ class qtype_aitext_test_helper extends question_test_helper {
         $q->generalfeedback = 'I hope your story had a beginning, a middle and an end.';
         $q->responseformat = 'editor';
         $q->responsefieldlines = 10;
+        $q->spellcheck = 0;
         $q->minwordlimit = null;
         $q->maxwordlimit = null;
         $q->sampleanswers = [];
