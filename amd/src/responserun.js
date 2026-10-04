@@ -63,7 +63,8 @@ export const init = (contextid) => {
         // Find the nearest following eval div (should be in the same repeated group).
         let evalEl = null;
         for (const candidate of allEvals) {
-            if (responseTextarea.compareDocumentPosition(candidate) & Node.DOCUMENT_POSITION_FOLLOWING) { // eslint-disable-line no-bitwise
+            // eslint-disable-next-line no-bitwise
+            if (responseTextarea.compareDocumentPosition(candidate) & Node.DOCUMENT_POSITION_FOLLOWING) {
                 evalEl = candidate;
                 Log.debug('Found matching eval div for index ' + idx);
                 break;
