@@ -1,9 +1,24 @@
 ### Moodle AIText question type
 
-## Next releasae
+## Release 2.1.1 Oct 2026
 
-Thanks to Pekka-Ilmari for reporting an issue when importing XML
+Now supports Moodle 5.3 (tested against MOODLE_503_STABLE).
+
+Fixed the default marking scheme value preventing a new question from being saved.
+https://github.com/marcusgreen/moodle-qtype_aitext/issues/88
+
+The grade fraction returned by the AI is now clamped between 0 and 1, so an out-of-range score can no longer produce invalid grades.
+https://github.com/marcusgreen/moodle-qtype_aitext/issues/90
+
+Importing aitext questions from XML without sample responses no longer produces PHP warnings. Thanks to Pekka-Ilmari for reporting.
 https://github.com/marcusgreen/moodle-qtype_aitext/issues/85
+
+The dependency on the companion behaviours (qbehaviour_immediate_for_aitext and qbehaviour_deferred_for_aitext) is no longer pinned to an exact version, so the behaviours can be updated independently.
+
+Restore tests no longer depend on mod_qbank.
+https://github.com/marcusgreen/moodle-qtype_aitext/issues/69
+
+Thanks to Richard Aljaste for the fixes for #88 and #90, and to Paola Maneggia and the ByCS team for CI improvements.
 
 ## Release 2.1.0 Aug 2026
 
