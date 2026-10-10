@@ -128,5 +128,13 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026072800, 'qtype', 'aitext');
     }
 
+    if ($oldversion < 2026101000) {
+        // Import the bundled user tour for the question editing form.
+        \qtype_aitext\local\tour::install();
+
+        // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2026101000, 'qtype', 'aitext');
+    }
+
     return true;
 }

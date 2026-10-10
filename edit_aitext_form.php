@@ -38,6 +38,8 @@ class qtype_aitext_edit_form extends question_edit_form {
      */
     protected function definition_inner($mform) {
         global $PAGE;
+        // Fallback import of the editing tour, for sites where it could not be imported at install.
+        \qtype_aitext\local\tour::install();
         // Get the question ID from the URL or session.
         $questionid = optional_param('id', 0, PARAM_INT);
         /** @var qtype_aitext $qtype */

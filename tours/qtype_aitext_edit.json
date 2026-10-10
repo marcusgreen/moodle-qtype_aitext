@@ -1,0 +1,94 @@
+{
+  "name": "tourname,qtype_aitext",
+  "description": "tourdescription,qtype_aitext",
+  "pathmatch": "/question/bank/editquestion/question.php%",
+  "enabled": "0",
+  "sortorder": "0",
+  "endtourlabel": "",
+  "configdata": "{\"placement\":\"bottom\",\"orphan\":\"0\",\"backdrop\":\"1\",\"reflex\":\"0\",\"filtervalues\":{\"category\":[],\"course\":[],\"courseformat\":[],\"role\":[],\"theme\":[],\"cssselector\":[\"#id_aiprompt\"]}}",
+  "displaystepnumbers": true,
+  "version": "1",
+  "steps": [
+    {
+      "title": "tourstep1title,qtype_aitext",
+      "content": "tourstep1content,qtype_aitext",
+      "contentformat": "1",
+      "targettype": "2",
+      "targetvalue": "",
+      "sortorder": "0",
+      "configdata": "{\"orphan\":\"1\",\"backdrop\":\"1\"}"
+    },
+    {
+      "title": "tourstep2title,qtype_aitext",
+      "content": "tourstep2content,qtype_aitext",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_questiontext",
+      "sortorder": "1",
+      "configdata": "{\"placement\":\"bottom\"}"
+    },
+    {
+      "title": "tourstep3title,qtype_aitext",
+      "content": "tourstep3content,qtype_aitext",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_aiprompt",
+      "sortorder": "2",
+      "configdata": "{\"placement\":\"top\"}"
+    },
+    {
+      "title": "tourstep4title,qtype_aitext",
+      "content": "tourstep4content,qtype_aitext",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_markscheme",
+      "sortorder": "3",
+      "configdata": "{\"placement\":\"top\"}"
+    },
+    {
+      "title": "tourstep5title,qtype_aitext",
+      "content": "tourstep5content,qtype_aitext",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_defaultmark",
+      "sortorder": "4",
+      "configdata": "{\"placement\":\"bottom\"}"
+    },
+    {
+      "title": "tourstep6title,qtype_aitext",
+      "content": "tourstep6content,qtype_aitext",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_model",
+      "sortorder": "5",
+      "configdata": "{\"placement\":\"bottom\"}"
+    },
+    {
+      "title": "tourstep7title,qtype_aitext",
+      "content": "tourstep7content,qtype_aitext",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#id_responsetest",
+      "sortorder": "6",
+      "configdata": "{\"placement\":\"top\"}"
+    },
+    {
+      "title": "tourstep8title,qtype_aitext",
+      "content": "tourstep8content,qtype_aitext",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#id_responseoptions",
+      "sortorder": "7",
+      "configdata": "{\"placement\":\"top\"}"
+    },
+    {
+      "title": "tourstep9title,qtype_aitext",
+      "content": "tourstep9content,qtype_aitext",
+      "contentformat": "1",
+      "targettype": "2",
+      "targetvalue": "",
+      "sortorder": "8",
+      "configdata": "{\"orphan\":\"1\",\"backdrop\":\"1\"}"
+    }
+  ]
+}
