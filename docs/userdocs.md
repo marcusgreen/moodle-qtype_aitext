@@ -2,7 +2,7 @@
 
 AI Text is a Moodle question type that sends a student's written response to a Large Language Model (LLM), such as OpenAI's ChatGPT, Google Gemini, or open models run through Ollama or GroqCloud. The LLM returns feedback and, optionally, a mark. Feedback can be given in each student's own preferred language (see [Feedback language](#feedback-language)).
 
-AI Text is not tied to any one AI company: you **bring your own inference**. You can use a commercial service, or host a model yourself, for example with [Ollama](https://ollama.com) on your own server, so student responses never leave your own infrastructure. See [Choose a back end](#choose-a-back-end).
+AI Text is not tied to any one AI company: you **bring your own inference**. You can use a commercial service, or host a model yourself, for example with [Ollama](https://ollama.com) on your own server, so student responses never leave your own infrastructure. The model does not have to be an expensive frontier model: AI Text has worked well with the open-weights model [gpt-oss-120b](https://huggingface.co/openai/gpt-oss-120b), which produced the feedback in the screenshots in this guide. See [Choose a back end](#choose-a-back-end).
 
 It is designed for **formative assessment**: giving students fast feedback while they learn. It is not a replacement for feedback from a teacher, and it should never be used for high-stakes assessment (see [Limitations and responsible use](#limitations-and-responsible-use)).
 
@@ -171,7 +171,7 @@ The quality of the feedback depends on the quality of the prompt. Getting good r
 - **Describe images.** Images in the question text are not sent, so describe anything the student has to interpret.
 - **Use mark bands.** For example: "10 marks if… 5 marks if… 0 marks if…". Clear bands give more consistent marking, especially for partial credit.
 - **Allow for flattery.** LLMs tend to be generous. It can help to tell the LLM to give no credit for answers that are nonsense or off-topic.
-- **Use a capable model.** In testing, the smallest models have not given useful feedback. Larger models are usually more consistent.
+- **Use a capable model.** In testing, the smallest models have not given useful feedback. Larger models are usually more consistent, but a frontier model is not needed: the open-weights gpt-oss-120b has given good results.
 
 ### Feedback that does not give away the answer
 
