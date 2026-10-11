@@ -66,7 +66,7 @@ AI Text does not talk to the LLM directly. It uses a "back end" plugin, chosen i
 | Back end | Notes |
 |---|---|
 | **Core AI subsystem** (default) | Built into Moodle 4.5 and later. Supports OpenAI, Azure OpenAI and Ollama, and further providers are available as [plugins](https://moodle.org/plugins/browse.php?list=category&id=90). Many third-party LLM services accept the OpenAI API format, so they can often be reached through one of these providers. |
-| **Local AI manager** | [moodle-local_ai_manager](https://github.com/bycs-lp/moodle-local_ai_manager), developed by ByCS for the Moodle platform of Bavarian schools. Comprehensive, with usage limits and cost controls, and it can run alongside the core AI subsystem. |
+| **Local AI manager** | [moodle-local_ai_manager](https://github.com/bycs-lp/moodle-local_ai_manager), developed by ByCS for the Moodle platform of Bavarian schools, which manages approximately 1.8 million Moodle accounts. Comprehensive, with usage limits and cost controls, and it can run alongside the core AI subsystem. |
 | **Tool AI manager** | [moodle-tool_aiconnect](https://github.com/marcusgreen/moodle-tool_aiconnect), the original lightweight back end. Treat it as legacy: it has had less testing and has no token counting or cost controls. It is the only back end that supports [choosing a model per question](#choosing-a-model-per-question). |
 
 Whichever back end you use, you need an API key and the endpoint URL from your inference provider. For example, the TogetherAI endpoint is `https://api.together.xyz/v1/chat/completions`.
@@ -359,7 +359,7 @@ Work in progress: [qbehaviour_interactive_for_aitext](https://github.com/marcusg
 - MoodleMoot Global, September 2025: <https://www.youtube.com/watch?v=zFP4-zQBh2k&t=1617s>
 - Moodle Academy, October 2024: <https://www.youtube.com/watch?v=JEDTJQ_Ox_8&t=1459s>
 - Hirschel et al., "Exploring AI to automate EFL corrective written feedback in the first language": <https://www.castledown.com/journals/tltl/article/view/tltl.v7n1.2208>. A study of AI Text used to teach English to native Japanese speakers.
-- ByCS (mebis), the Moodle platform for Bavarian schools, contributes to AI Text and maintains a related version: <https://github.com/mebis-lp/moodle-qtype_aitext>
+- ByCS (mebis), the Moodle platform for Bavarian schools with approximately 1.8 million accounts, contributes to AI Text and maintains a related version: <https://github.com/mebis-lp/moodle-qtype_aitext>
 - News on AI in education from the plugin's author: <https://fosstodon.org/@marcusgreen>
 - LTNC, "Moodle AI Text Question Type: revolutie of risico in automatische beoordeling?" (in Dutch, July 2025). An overview of the benefits and risks of AI marking: <https://ltnc.nl/blog/moodle-ai-text-question-type-revolutie-of-risico-in-automatische-beoordeling>
 
