@@ -1,16 +1,19 @@
 # AI Text question type: user guide
 
-AI Text is a Moodle question type that sends a student's written response to a Large Language Model (LLM), such as OpenAI's ChatGPT, Google Gemini, or open models run through Ollama or GroqCloud. The LLM returns feedback and, optionally, a mark.
+AI Text is a Moodle question type that sends a student's written response to a Large Language Model (LLM), such as OpenAI's ChatGPT, Google Gemini, or open models run through Ollama or GroqCloud. The LLM returns feedback and, optionally, a mark. Feedback can be given in each student's own preferred language (see [Feedback language](#feedback-language)).
+
+AI Text is not tied to any one AI company: you **bring your own inference**. You can use a commercial service, or host a model yourself, for example with [Ollama](https://ollama.com) on your own server, so student responses never leave your own infrastructure. See [Choose a back end](#choose-a-back-end).
 
 It is designed for **formative assessment**: giving students fast feedback while they learn. It is not a replacement for feedback from a teacher, and it should never be used for high-stakes assessment (see [Limitations and responsible use](#limitations-and-responsible-use)).
 
-The plugin is available from the Moodle plugins database at <https://moodle.org/plugins/qtype_aitext>.
+The plugin is available from the Moodle Marketplace at <https://marketplace.moodle.com/plugins/qtype_aitext>.
 
 ## Contents
 
 - [How it works](#how-it-works)
 - [Setting up (administrators)](#setting-up-administrators)
 - [Creating an AI Text question](#creating-an-ai-text-question)
+- [Example questions](#example-questions)
 - [Writing good prompts](#writing-good-prompts)
 - [Testing a question](#testing-a-question)
 - [Using AI Text in a quiz](#using-ai-text-in-a-quiz)
@@ -19,6 +22,7 @@ The plugin is available from the Moodle plugins database at <https://moodle.org/
 - [Admin settings reference](#admin-settings-reference)
 - [Limitations and responsible use](#limitations-and-responsible-use)
 - [Frequently asked questions](#frequently-asked-questions)
+- [Roadmap](#roadmap)
 - [Further reading and videos](#further-reading-and-videos)
 
 ## How it works
@@ -34,7 +38,26 @@ When a student submits a response, AI Text builds a prompt and sends it to the L
 
 The LLM's feedback is shown to the student, followed by a **disclaimer** making clear that it came from an AI system and not a person.
 
+### What students see
+
+The student reads the question and writes a response:
+
+![A food hygiene question showing a fridge, with an empty answer box and a Check button](images/student-question.png)
+
+After submitting, the student gets the AI's feedback and mark. In this example the feedback says which parts of the answer are correct or missing, without giving away the missing part:
+
+![The same question after submitting, marked 7 out of 10, with AI feedback and a disclaimer naming the model](images/student-feedback.png)
+
 ## Setting up (administrators)
+
+### Install the companion behaviours
+
+AI Text grades responses through two companion question behaviour plugins, which must be installed alongside it. Without them, AI Text questions cannot be graded.
+
+- [qbehaviour_immediate_for_aitext](https://github.com/marcusgreen/moodle-qbehaviour_immediate_for_aitext), installed in `question/behaviour/immediate_for_aitext`
+- [qbehaviour_deferred_for_aitext](https://github.com/marcusgreen/moodle-qbehaviour_deferred_for_aitext), installed in `question/behaviour/deferred_for_aitext`
+
+Teachers never choose these behaviours directly. AI Text selects one automatically based on the quiz settings (see [How questions behave](#how-questions-behave)).
 
 ### Choose a back end
 
@@ -62,7 +85,11 @@ Providers retire models from time to time. If a listed model is retired, questio
 
 If you are new to the Moodle quiz, see the [Quiz activity documentation](https://docs.moodle.org/en/Quiz_activity).
 
-The minimum an AI Text question needs is **question text** and an **AI prompt**. The main fields are:
+The minimum an AI Text question needs is **question text** and an **AI prompt**.
+
+![The AI Text editing form, showing the question name, default mark, question text, AI prompt and mark scheme](images/editing-form.png)
+
+The main fields are:
 
 | Field | Purpose |
 |---|---|
@@ -77,7 +104,32 @@ The minimum an AI Text question needs is **question text** and an **AI prompt**.
 
 Because HTML is stripped from the student's response, the LLM cannot give feedback on formatting such as bold or italics.
 
-The `examples/imageinterpretation.xml` file in the plugin folder contains eight ready-made questions, covering topics from workplace safety to chest X-rays, which you can import into a question bank and adapt.
+To start from a working question rather than a blank form, import the [example questions](#example-questions) that ship with the plugin.
+
+## Example questions
+
+The plugin ships with eight example questions in `examples/imageinterpretation.xml`. Each shows an image and asks the student to interpret it, so they also show how to describe an image in the AI prompt, since images are not sent to the AI.
+
+| Question | Subject | The student must |
+|---|---|---|
+| Workplace hazard identification: fire exit | Health and safety | Identify the hazard in a warehouse and the risk it poses |
+| Chest X-ray interpretation: pneumothorax | Medicine | Diagnose the abnormality, give the visual evidence, and state the next step |
+| Mechanical inspection: damaged spur gear | Engineering | Find the fault in a gear and explain why it matters |
+| Mechanical inspection: bolted flange joint | Engineering | Find the assembly error, name the bolt, and explain what could happen in service |
+| Food hygiene: fridge storage | Catering | Identify the hygiene hazard, explain the risk, and say how to reorganise the fridge |
+| ECG interpretation: rhythm strip | Nursing | Identify the heart rhythm, give the supporting features, and state the nursing action |
+| Electronics: LED indicator circuit | Electronics | Find the design fault, explain what happens, and correct it with a calculation |
+| Data literacy: misleading bar chart | Statistics | Explain how a chart misleads, quantify the effect, and redesign it |
+
+Each question includes:
+
+- an AI prompt with a description of the image and the points a good answer contains
+- a mark scheme with mark bands
+- [feedback rules](#feedback-that-does-not-give-away-the-answer) that stop the AI revealing the answer
+- sample responses for the Response Tester, from a full-marks answer to a wrong one
+- the full answer in General feedback, shown to students when the quiz review options allow
+
+To use them, go to a question bank, select **Import**, choose the **Moodle XML format**, and upload `examples/imageinterpretation.xml` from the plugin folder. You can also download it from [GitHub](https://github.com/marcusgreen/moodle-qtype_aitext/blob/main/examples/imageinterpretation.xml).
 
 ## Writing good prompts
 
@@ -118,6 +170,8 @@ These rules reduce leaks but cannot guarantee there are none. To show students t
 
 The **Response Tester** section of the editing form holds sample responses. Click **Evaluate sample response** to send one to the LLM and see the feedback and mark it gives.
 
+![The Response Tester with an incorrect sample answer and the AI's evaluation, marked 0 out of 10](images/response-tester.png)
+
 Add a sample response for each mark band, including at least one weak or incorrect answer, then adjust the AI prompt and mark scheme until the results are what you expect. LLM output varies from run to run, so evaluate each sample more than once.
 
 ### Preview and the full prompt
@@ -127,6 +181,20 @@ When you preview a question and submit a response, the feedback includes a **Sho
 After a question is in use, check a sample of real student responses as well.
 
 ## Using AI Text in a quiz
+
+### How questions behave
+
+The quiz **How questions behave** setting controls when responses are sent to the AI:
+
+| Setting | When the AI grades |
+|---|---|
+| Immediate feedback, Interactive with multiple tries, Adaptive mode (and their CBM and no-penalty variants) | Each time the student submits a response |
+| Deferred feedback (and deferred CBM) | Once, when the student finishes the attempt |
+| Manual grading | Never. A teacher marks the response. |
+
+**Interactive with multiple tries** is currently graded like Immediate feedback. Multiple tries with AI hints between them is planned (see [Roadmap](#interactive-with-multiple-tries)).
+
+If the AI service is unavailable, grading fails gracefully rather than producing an error, so the student's attempt is not lost.
 
 ### Teacher moderation
 
@@ -140,15 +208,16 @@ A quiz can be set up so students do not see the LLM's feedback until a teacher h
 
 ## Feedback language
 
-By default, feedback is given in the language of the question. The output language is chosen in this order:
+AI Text can give feedback in each student's own language, whatever language the question is written in. A question written in English can give feedback in Japanese to one student and in German to another, with no extra work for the teacher.
 
-1. `[[language=xx]]` in the AI prompt, where `xx` is a two-letter language code such as `de` or `ja`, gives feedback in that language.
-2. `[[language=""]]` in the AI prompt gives feedback in the language of the question, ignoring the site setting.
-3. Otherwise, if the **Translate postfix** setting is on (the default), feedback is given in the student's preferred Moodle language.
+This works through the **Translate postfix** setting, which is on by default. The feedback language is the language the student is using in Moodle, which they set under **Preferences > Preferred language** in their user menu. If a course uses the **Force language** setting, that language is used for everyone in the course. The disclaimer is translated into the same language.
 
-The **Force language** course setting sets the language for everyone in a course, so it also controls the feedback language when **Translate postfix** is on.
+Teachers can override this for a single question by adding a tag to the AI prompt:
 
-The disclaimer is translated into the same language.
+- `[[language=xx]]` always gives feedback in one language, where `xx` is a two-letter code such as `de` or `ja`. This is useful in language courses, where feedback should be in the language being learned.
+- `[[language=""]]` gives feedback in the language of the question, whatever the student's own language.
+
+If **Translate postfix** is turned off and the prompt has no tag, feedback is given in the language of the question.
 
 ## Expert mode
 
@@ -228,12 +297,38 @@ Inference providers usually charge per million tokens, and grading a single resp
 
 Providers limit how many requests they will accept in a given time. A whole class submitting a quiz at once sends a burst of requests that may hit those limits.
 
+## Roadmap
+
+These features are planned. They are not in the current release.
+
+### Evaluation on the cron
+
+At present a response is sent to the AI as soon as the student submits it, and the student waits for the reply. With evaluation on the cron, responses are queued and graded in the background by Moodle's scheduled tasks, and students see their feedback when it is ready. Benefits include:
+
+- **Low resource inference.** Grading no longer has to finish while the student waits, so slower hardware becomes practical, for example a small model on a modest local server or a Raspberry Pi, or cheaper batch-priced services.
+- **No timeouts.** Slow responses from the AI service no longer hold up or break a quiz attempt.
+- **Smoother load.** When a whole class submits at once, requests are spread out instead of arriving in a burst that can hit the provider's rate limits.
+
+Work in progress: [pull request #92](https://github.com/marcusgreen/moodle-qtype_aitext/pull/92).
+
+### Interactive with multiple tries
+
+Support for Moodle's **Interactive with multiple tries** behaviour, so students can make several attempts at a question. After each try that is not yet correct, the AI gives a hint based on what the student actually wrote, building on the hints from earlier tries, so each new attempt gets help relevant to where the student is now.
+
+Work in progress: [qbehaviour_interactive_for_aitext](https://github.com/marcusgreen/moodle-qbehaviour_interactive_for_aitext).
+
 ## Further reading and videos
 
 - Moodle.org forum discussion: <https://moodle.org/mod/forum/discuss.php?d=455612>
+- Evaluative AI with Moodle, MoodleMoot Estonia, April 2026: <https://www.youtube.com/watch?v=dlVEGQlOvW0>
 - Webinar with Cursive, November 2025: <https://www.youtube.com/watch?v=jKcKFAbx6sw>
 - MoodleMoot Global, September 2025: <https://www.youtube.com/watch?v=zFP4-zQBh2k&t=1617s>
 - Moodle Academy, October 2024: <https://www.youtube.com/watch?v=JEDTJQ_Ox_8&t=1459s>
 - Hirschel et al., "Exploring AI to automate EFL corrective written feedback in the first language": <https://www.castledown.com/journals/tltl/article/view/tltl.v7n1.2208>. A study of AI Text used to teach English to native Japanese speakers.
 - ByCS (mebis), the Moodle platform for Bavarian schools, contributes to AI Text and maintains a related version: <https://github.com/mebis-lp/moodle-qtype_aitext>
 - News on AI in education from the plugin's author: <https://fosstodon.org/@marcusgreen>
+- LTNC, "Moodle AI Text Question Type: revolutie of risico in automatische beoordeling?" (in Dutch, July 2025). An overview of the benefits and risks of AI marking: <https://ltnc.nl/blog/moodle-ai-text-question-type-revolutie-of-risico-in-automatische-beoordeling>
+
+### Related projects
+
+- [moodle-qtype_aitext_rubric](https://github.com/pekkanikander/moodle-qtype_aitext_rubric): an independent fork that adds JSON rubric grading, screening of suspect answers for human review, and adjustable feedback detail. At the time of writing it is in alpha and not yet used in production.
