@@ -108,7 +108,14 @@ To start from a working question rather than a blank form, import the [example q
 
 ## Example questions
 
-The plugin ships with eight example questions in `examples/imageinterpretation.xml`. Each shows an image and asks the student to interpret it, so they also show how to describe an image in the AI prompt, since images are not sent to the AI.
+The plugin ships with two sets of examples in the `examples` folder:
+
+- `imageinterpretation.xml`: eight image-interpretation questions to import into a question bank
+- `four_quizzes.mbz`: a demo course with four ready-made quizzes (see [Demo course](#demo-course-four-quizzes))
+
+### Image interpretation questions
+
+`examples/imageinterpretation.xml` contains eight questions. Each shows an image and asks the student to interpret it, so they also show how to describe an image in the AI prompt, since images are not sent to the AI.
 
 | Question | Subject | The student must |
 |---|---|---|
@@ -130,6 +137,31 @@ Each question includes:
 - the full answer in General feedback, shown to students when the quiz review options allow
 
 To use them, go to a question bank, select **Import**, choose the **Moodle XML format**, and upload `examples/imageinterpretation.xml` from the plugin folder. You can also download it from [GitHub](https://github.com/marcusgreen/moodle-qtype_aitext/blob/main/examples/imageinterpretation.xml).
+
+### Demo course: four quizzes
+
+`examples/four_quizzes.mbz` is a Moodle course backup called "AIText demo course". It contains four short quizzes on everyday school subjects, with nine AI Text questions. The English questions are in the course question bank, and each of the other quizzes keeps its questions in its own question bank. The backup contains no user data or attempts.
+
+| Quiz | How questions behave | Questions |
+|---|---|---|
+| English Quiz | Interactive with multiple tries | **Asking questions** (write a sentence asking someone to phone you tomorrow, 2 marks), **The past tense** (write a sentence in the past tense, 3 marks), **What is wrong** (find the error in "Tomorrow I am go to town", 5 marks) |
+| Basic maths questions | Immediate feedback | **Averages** (the difference between mean and median, 5 marks), **Percentages** (why a 10% rise then a 10% discount does not return to the original price, 2 marks) |
+| Biology | Immediate feedback | **Photosynthesis** (what a plant needs and produces, 5 marks), **Digestion** (what happens to food from mouth to bloodstream, 6 marks) |
+| ICT | Immediate feedback | **Ram and Rom** (the differences between RAM and ROM, 6 marks) |
+
+A ninth question, **The CPU** (the purpose of the CPU and two of its components, 5 marks), is in the ICT quiz's question bank but not in the quiz, ready to be added.
+
+Together they show a range of prompting techniques worth copying:
+
+- **Short and long prompts.** The English questions use one or two sentences. The Maths and ICT questions give the AI a full brief, including the student's age and the level of the course.
+- **Mark schemes with one mark per point**, as in Photosynthesis and Digestion, which give consistent partial credit.
+- **Rejecting nonsense.** Every question has a gibberish sample response, such as `3;ic1#`, to check that the AI gives no marks for it. The Maths questions start their mark scheme with a "critical validation" block that tells the AI exactly what to do with an answer that is not real text.
+- **Tone.** Prompts such as "give brief, encouraging feedback", "Refer to the student as you" and "Don't be too harsh" set how the feedback reads.
+- **Formatting.** The English mark schemes ask the AI to format its feedback in HTML and emphasise the mark.
+- **Checking calculations without giving the answer away.** Percentages tells the AI to check the student's arithmetic and say which step is wrong, without stating the correct price. One of its sample responses contains a deliberate arithmetic slip to test this.
+- **Feedback that does not reveal answers.** The ICT prompts ask for feedback on which points are right, missing or incorrect, with suggestions on what to revise rather than the correct answers.
+
+To use the course, go to **Site administration > Courses > Restore course** (or **Restore** in an existing course's menu) and upload `examples/four_quizzes.mbz`. The backup was made with Moodle 5.2, so it can only be restored on Moodle 5.2 or later.
 
 ## Writing good prompts
 
@@ -242,6 +274,8 @@ give an analysis of the English grammar.
 ```
 
 The output format instructions and the maximum score are always added to the end, even in expert mode.
+
+These placeholders only work in expert mode. In an ordinary AI prompt they are sent to the AI unchanged, so there is no need to write `{{questiontext}}`: the question text is already included by the site's prompt template.
 
 When the **Enable expert mode** setting is on, the editing form shows a **Use expert mode template** button. It replaces the AI prompt with a copy of the site's prompt template, ready to customise.
 
