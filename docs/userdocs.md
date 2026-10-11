@@ -345,6 +345,8 @@ At present a response is sent to the AI as soon as the student submits it, and t
 
 Work in progress: [pull request #92](https://github.com/marcusgreen/moodle-qtype_aitext/pull/92).
 
+Moodle core is moving the same way. [MDL-82654](https://moodle.atlassian.net/browse/MDL-82654), "Implement asynchronous grading of quiz attempts", proposes that when a student clicks "Submit all and finish", the attempt is marked "Submitted" and graded later by a background task, to ease server load during large quiz sessions. At the time of writing it is in development. If it is added to Moodle, AI Text could use the same mechanism for its background grading.
+
 ### Interactive with multiple tries
 
 Support for Moodle's **Interactive with multiple tries** behaviour, so students can make several attempts at a question. After each try that is not yet correct, the AI gives a hint based on what the student actually wrote, building on the hints from earlier tries, so each new attempt gets help relevant to where the student is now.
