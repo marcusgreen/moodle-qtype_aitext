@@ -189,4 +189,37 @@ class qtype_aitext_test_helper extends question_test_helper {
         $q->responseformat = 'noinline';
         return $q;
     }
+
+    /**
+     * Configure a core AI OpenAI provider for a live test, or skip the test.
+     *
+     * Credentials come from TEST_LLM_APIKEY and TEST_LLM_ORGID, defined in
+     * config.php or set as environment variables. The org id is optional.
+     * The calling test must reset qtype_aitext_question::$livetest in tearDown().
+     *
+     * @param \advanced_testcase $testcase the calling test
+     * @return void
+     */
+    public static function require_live_llm(\advanced_testcase $testcase): void {
+        $apikey = defined('TEST_LLM_APIKEY') ? TEST_LLM_APIKEY : getenv('TEST_LLM_APIKEY');
+        $orgid = defined('TEST_LLM_ORGID') ? TEST_LLM_ORGID : getenv('TEST_LLM_ORGID');
+        if (empty($apikey) || str_starts_with($apikey, 'XXXX')) {
+            $testcase->markTestSkipped('Set TEST_LLM_APIKEY in config.php or the environment to run live LLM tests');
+        }
+        $testcase->resetAfterTest();
+        $config = ['apikey' => $apikey];
+        if (!empty($orgid) && !str_starts_with($orgid, 'XXXX')) {
+            $config['orgid'] = $orgid;
+        }
+        set_config('backend', 'core_ai_subsystem', 'qtype_aitext');
+        $manager = \core\di::get(\core_ai\manager::class);
+        $manager->create_provider_instance(
+            classname: '\aiprovider_openai\provider',
+            name: 'qtype_aitext live test',
+            enabled: true,
+            config: $config,
+        );
+        question_bank::load_question_definition_classes('aitext');
+        qtype_aitext_question::$livetest = true;
+    }
 }

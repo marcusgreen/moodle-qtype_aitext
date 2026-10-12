@@ -68,6 +68,11 @@ class qtype_aitext_question extends question_graded_automatically {
      */
     public $modelused = null;
 
+    /**
+     * Set by live PHPUnit tests to bypass the test stub and call the real LLM.
+     * @var bool
+     */
+    public static bool $livetest = false;
 
     /**
      * Options including from sampleanswers table
@@ -249,7 +254,7 @@ class qtype_aitext_question extends question_graded_automatically {
      */
     public function perform_request(string $prompt, string $purpose = 'feedback'): string {
         $this->modelused = null;
-        if (defined('BEHAT_SITE_RUNNING') || (defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
+        if (!self::$livetest && (defined('BEHAT_SITE_RUNNING') || (defined('PHPUNIT_TEST') && PHPUNIT_TEST))) {
             $this->modelused = 'test';
             return "AI Feedback";
         }

@@ -48,29 +48,23 @@ final class question_test extends \advanced_testcase {
     public $question;
 
     /**
-     * There is a live connection to the External AI system
-     * When run locally it will make a connection. Otherwise the
-     * tests will be skipped
-     * @var bool
-     */
-    protected bool $islive = false;
-
-    /**
-     * Config.php should include the apikey and orgid in the form
-     * define("TEST_LLM_APIKEY", "XXXXXXXXXXXX");
-     * define("TEST_LLM_ORGID", "XXXXXXXXXXXX");
-     * Summary of setUp
+     * Create the question type instance used by the tests.
      * @return void
      */
     protected function setUp(): void {
         parent::setUp();
         $this->question = new \qtype_aitext();
-        if (defined('TEST_LLM_APIKEY') && defined('TEST_LLM_ORGID')) {
-            set_config('apikey', TEST_LLM_APIKEY, 'aiprovider_openai');
-            set_config('orgid', TEST_LLM_ORGID, 'aiprovider_openai');
-            set_config('enabled', true, 'aiprovider_openai');
-            $this->islive = true;
+    }
+
+    /**
+     * Turn the live LLM flag off so it cannot leak into later tests.
+     * @return void
+     */
+    protected function tearDown(): void {
+        if (class_exists('qtype_aitext_question', false)) {
+            \qtype_aitext_question::$livetest = false;
         }
+        parent::tearDown();
     }
 
     /**
@@ -128,18 +122,14 @@ final class question_test extends \advanced_testcase {
         $this->assertEquals(FORMAT_HTML, $options->graderinfoformat);
     }
     /**
-     * Make a trivial request to the LLM to check the code works
-     * Only designed to test the 4.5 subsystem when run locally
-     * not when in GHA ci
+     * Make a trivial request to the LLM to check the code works.
+     * Skipped unless TEST_LLM_APIKEY is set in config.php or the environment.
      *
      * @covers \qtype_aitext\question::perform_request
      * @return void
      */
     public function test_perform_request(): void {
-        $this->resetAfterTest(true);
-        if (!$this->islive) {
-                $this->markTestSkipped('No live connection to the AI system');
-        }
+        qtype_aitext_test_helper::require_live_llm($this);
         $aitext = qtype_aitext_test_helper::make_aitext_question([]);
         $aitext->questiontext = 'What is 2 * 4?';
         $response = $aitext->perform_request('What is 2 * 4 only return a single number');
