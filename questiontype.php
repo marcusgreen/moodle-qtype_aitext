@@ -379,7 +379,6 @@ class qtype_aitext extends question_type {
     public function export_to_xml($question, qformat_xml $format, $extra = null) {
         $fs = get_file_storage();
         $textfields = $this->get_text_fields();
-        ;
         $formatfield = '/^(' . implode('|', $textfields) . ')format$/';
         $fields = $this->extra_question_fields();
         array_shift($fields); // Remove table name.
@@ -409,6 +408,7 @@ class qtype_aitext extends question_type {
             $output .= '      <response>' . $format->xml_escape($sampleresponse->response) . "</response>\n";
             $output .= "     </sampleresponse>\n";
         }
+        $output .= '    <!-- AI Text version:' . get_config('qtype_aitext', 'version') . " -->\n";
         return $output;
     }
     /**

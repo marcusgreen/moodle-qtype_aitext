@@ -1,5 +1,11 @@
 ### Moodle AIText question type
 
+## Unreleased
+
+Moodle XML exports now include a comment recording the AIText plugin version, to help diagnose issues.
+
+Thanks to Norbert Forster for the suggestion that led to this update.
+
 ## Release 2.1.1 Oct 2026
 
 Now supports Moodle 5.3 (tested against MOODLE_503_STABLE).
