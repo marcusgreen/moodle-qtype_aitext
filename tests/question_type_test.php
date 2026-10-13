@@ -229,4 +229,34 @@ final class question_type_test extends \advanced_testcase {
         $this->assertEquals('Nudge only.', $qo->hint[0]['text']);
         $this->assertEquals('Give a partial example.', $qo->hint[1]['text']);
     }
+
+    /**
+     * A loaded question must expose its hints as 0-indexed question_hint objects,
+     * as get_hint() and the interactive behaviour expect.
+     *
+     * @covers ::initialise_question_instance()
+     *
+     * @return void
+     */
+    public function test_loaded_question_has_usable_hints(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $category = $generator->create_question_category();
+        $question = $generator->create_question('aitext', 'editor', [
+            'category' => $category->id,
+            'hint' => [
+                ['text' => 'First instruction', 'format' => FORMAT_HTML],
+                ['text' => 'Second instruction', 'format' => FORMAT_HTML],
+            ],
+        ]);
+
+        $loaded = \question_bank::load_question($question->id);
+
+        $this->assertSame([0, 1], array_keys($loaded->hints));
+        $this->assertInstanceOf(\question_hint::class, $loaded->hints[0]);
+        $this->assertEquals('First instruction', $loaded->hints[0]->hint);
+        $this->assertEquals('Second instruction', $loaded->hints[1]->hint);
+    }
 }

@@ -187,7 +187,6 @@ class qtype_aitext extends question_type {
         $question->responsetemplateformat = $questiondata->options->responsetemplateformat;
         $question->aiprompt = $questiondata->options->aiprompt;
         $question->markscheme = $questiondata->options->markscheme;
-        parent::get_question_options($question);
         $question->sampleresponses = $this->get_sampleresponses($question);
 
         /* Legacy quesitons may not have a model set, so assign the first in the settings */
