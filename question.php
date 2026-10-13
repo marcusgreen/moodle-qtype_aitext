@@ -158,6 +158,14 @@ class qtype_aitext_question extends question_graded_automatically {
     public $lastaihintprompt = null;
 
     /**
+     * @var bool True when the student will be allowed another try after this submission.
+     *
+     * Set by qbehaviour_interactive_for_aitext before grading. While it is true, the grading
+     * prompt forbids the AI from giving corrections, so the feedback cannot give away the answer.
+     */
+    public bool $retrypossible = false;
+
+    /**
      * Choose the question behaviour to use for this question attempt.
      *
      * Routes the requested preferred behaviour to an adapted variant that
@@ -473,6 +481,12 @@ class qtype_aitext_question extends question_graded_automatically {
                 '{{language}}' => $language,
             ];
             $prompt = str_replace(array_keys($replacements), array_values($replacements), $template);
+        }
+
+        // While another try remains, forbid corrections in the feedback. This is added in expert
+        // mode too, so no question's own prompt can override it.
+        if ($this->retrypossible) {
+            $prompt .= "\n\n=== THE STUDENT WILL TRY AGAIN ===\n" . get_string('retryfeedbackrule', 'qtype_aitext');
         }
 
         // Always append the output format section at the end of the prompt.

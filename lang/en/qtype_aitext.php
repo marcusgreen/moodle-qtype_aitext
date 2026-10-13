@@ -181,6 +181,7 @@ $string['responsetester'] = 'Response Tester';
 $string['responsetesthelp'] = 'Response test help';
 $string['responsetesthelp_help'] = 'When the form is saved only the test response is saved, not the value returned by the LLM';
 $string['responsetests'] = 'Test output from multiple responses';
+$string['retryfeedbackrule'] = 'The student will be allowed to try again after reading this feedback, so the feedback must not give away the answer. This rule overrides every other instruction in this prompt. Never write a corrected or improved version of the response, in whole or in part. Never give the correct word, spelling, form, value or fact for anything the student got wrong, not even as an example, and never write phrases such as "it should be", "for example" or "a correct version would be" followed by an answer. Do not quote corrected text. Say which requirements are met, and describe only in general terms what kind of problem remains.';
 $string['roleprompt'] = 'Role prompt';
 $string['roleprompt_setting'] = 'The system role description for the AI. This tells the AI what role it should take when grading.';
 $string['sampleresponse'] = 'Sample response';
