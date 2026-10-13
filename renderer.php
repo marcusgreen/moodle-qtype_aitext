@@ -206,6 +206,11 @@ class qtype_aitext_renderer extends qtype_renderer {
             return '';
         }
 
+        // Run the comment through format_text() so filters such as MathJax apply,
+        // as the behaviour renderers do. specific_feedback() is not passed the display
+        // options, so the page context stands in for $options->context.
+        $comment = format_text($comment, FORMAT_HTML, ['context' => $this->page->context]);
+
         if ($this->page->pagetype !== 'question-bank-previewquestion-preview') {
             return $comment;
         }
