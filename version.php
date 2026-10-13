@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_aitext';
-$plugin->version = 2026100400;
+$plugin->version = 2026101300;
 $plugin->requires = 2024100700;  // Moodle 4.5.
 $plugin->release = '2.1.1';
 $plugin->supported = [405, 503];
@@ -33,4 +33,5 @@ $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [
     'qbehaviour_deferred_for_aitext' => ANY_VERSION,
     'qbehaviour_immediate_for_aitext' => ANY_VERSION,
+    'qbehaviour_interactive_for_aitext' => ANY_VERSION,
 ];
