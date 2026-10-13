@@ -50,6 +50,9 @@ The student has answered the question below and may try again. Write a short hin
 === QUESTION ===
 {{questiontext}}
 
+=== GRADING INSTRUCTIONS ===
+{{aiprompt}}
+
 === SCORING ===
 {{markscheme}}
 
