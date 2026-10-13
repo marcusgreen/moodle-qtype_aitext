@@ -371,6 +371,8 @@ class qtype_aitext extends question_type {
                 $qo->sampleresponses[$key] = $format->getpath($srxml, ['#', 'response', 0, '#'], 0);
             }
         }
+        // Hints are exported generically by qformat_xml, but must be imported here.
+        $format->import_hints($qo, $data, false, false, $format->get_format($qo->questiontextformat));
         return $qo;
     }
     /**

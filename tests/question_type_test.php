@@ -195,4 +195,38 @@ final class question_type_test extends \advanced_testcase {
             $DB->count_records('qtype_aitext_sampleresponses', ['question' => $question->id])
         );
     }
+
+    /**
+     * Hints written by the generic Moodle XML export must survive import, as they
+     * set the number of tries under the interactive behaviour.
+     *
+     * @covers ::import_from_xml()
+     *
+     * @return void
+     */
+    public function test_import_from_xml_imports_hints(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/question/format.php');
+        require_once($CFG->dirroot . '/question/format/xml/format.php');
+
+        $xml = '<question type="aitext">
+    <name><text>Hint import</text></name>
+    <questiontext format="html"><text>Describe a cat.</text></questiontext>
+    <hint format="html"><text>Nudge only.</text></hint>
+    <hint format="html"><text>Give a partial example.</text></hint>
+  </question>';
+        // The xmlize() function is deprecated from Moodle 5.1, but core\xml_parser does not exist in 4.5.
+        if (class_exists(\core\xml_parser::class)) {
+            $data = (new \core\xml_parser())->parse($xml);
+        } else {
+            require_once($CFG->libdir . '/xmlize.php');
+            $data = xmlize($xml);
+        }
+
+        $qo = $this->qtype->import_from_xml($data['question'], null, new \qformat_xml());
+
+        $this->assertCount(2, $qo->hint);
+        $this->assertEquals('Nudge only.', $qo->hint[0]['text']);
+        $this->assertEquals('Give a partial example.', $qo->hint[1]['text']);
+    }
 }
