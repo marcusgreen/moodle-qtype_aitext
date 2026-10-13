@@ -888,4 +888,30 @@ final class question_test extends \advanced_testcase {
         $this->assertStringNotContainsString($languagename . 'Only', $prompt);
         $this->assertStringContainsString('. Only return the exact text', $prompt);
     }
+
+    /**
+     * The hint prompt includes the question's AI prompt, and strips HTML from the
+     * teacher's hint instruction, falling back to the default when only markup is left.
+     *
+     * @covers \qtype_aitext_question::build_full_ai_hint_prompt
+     * @return void
+     */
+    public function test_build_full_ai_hint_prompt(): void {
+        $this->resetAfterTest();
+        // Use the default template from the language string, not a copy stored at install.
+        unset_config('hintprompttemplate', 'qtype_aitext');
+        $aitext = qtype_aitext_test_helper::make_aitext_question([
+            'aiprompt' => 'Check the verb is in the past tense.',
+        ]);
+
+        $prompt = $aitext->build_full_ai_hint_prompt('I go home', '<p>Nudge <b>only</b>.</p>', 'Wrong tense.', 1);
+        $this->assertStringContainsString('Check the verb is in the past tense.', $prompt);
+        $this->assertStringContainsString('Nudge only.', $prompt);
+        $this->assertStringNotContainsString('<p>', $prompt);
+        $this->assertStringNotContainsString('{{', $prompt);
+
+        // An editor left blank still holds markup; that must count as no instruction.
+        $prompt = $aitext->build_full_ai_hint_prompt('I go home', '<p><br></p>', 'Wrong tense.', 1);
+        $this->assertStringContainsString(get_string('nohintinstruction', 'qtype_aitext'), $prompt);
+    }
 }

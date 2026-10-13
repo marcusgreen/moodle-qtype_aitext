@@ -638,7 +638,10 @@ class qtype_aitext_question extends question_graded_automatically {
             $markschemetext = get_string('nomarkscheme', 'qtype_aitext');
         }
 
-        if ($hintinstruction === null || trim($hintinstruction) === '') {
+        // The instruction comes from an HTML editor, so strip tags like the other placeholders.
+        // Strip before the emptiness check, as an editor left blank can still hold markup.
+        $hintinstruction = strip_tags((string) $hintinstruction);
+        if (trim($hintinstruction) === '') {
             $hintinstruction = get_string('nohintinstruction', 'qtype_aitext');
         }
 
