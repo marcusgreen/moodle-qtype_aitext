@@ -64,9 +64,8 @@ final class aitext_repeated_restore_test extends advanced_testcase {
         $course1 = $generator->create_course();
         $teacher = $USER;
         $generator->enrol_user($teacher->id, $course1->id, 'editingteacher');
-        $qbank = $generator->get_plugin_generator('mod_qbank')->create_instance(['course' => $course1->id]);
-        $context = \context_module::instance($qbank->cmid);
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $context = \context_course::instance($course1->id);
 
         // Create a question category.
         $cat = $questiongenerator->create_question_category(['contextid' => $context->id]);

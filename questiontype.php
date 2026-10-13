@@ -96,7 +96,7 @@ class qtype_aitext extends question_type {
     }
 
     /**
-     * Markscheme may not be required here
+     * Save default values for next time.
      *
      * @param stdClass $fromform
      * @return void
@@ -105,7 +105,6 @@ class qtype_aitext extends question_type {
         parent::save_defaults_for_new_questions($fromform);
         $this->set_default_value('responseformat', $fromform->responseformat);
         $this->set_default_value('responsefieldlines', $fromform->responsefieldlines);
-        $this->set_default_value('markscheme', $fromform->markscheme);
     }
     /**
      * Write the question data from the editing form to the database
@@ -154,7 +153,7 @@ class qtype_aitext extends question_type {
 
         $DB->update_record('qtype_aitext', $options);
         $DB->delete_records('qtype_aitext_sampleresponses', ['question' => $formdata->id]);
-        foreach ($formdata->sampleresponses as $sr) {
+        foreach ($formdata->sampleresponses ?? [] as $sr) {
             if (trim((string) $sr) === '') {
                 continue;
             }
@@ -386,7 +385,6 @@ class qtype_aitext extends question_type {
     public function export_to_xml($question, qformat_xml $format, $extra = null) {
         $fs = get_file_storage();
         $textfields = $this->get_text_fields();
-        ;
         $formatfield = '/^(' . implode('|', $textfields) . ')format$/';
         $fields = $this->extra_question_fields();
         array_shift($fields); // Remove table name.
@@ -416,6 +414,7 @@ class qtype_aitext extends question_type {
             $output .= '      <response>' . $format->xml_escape($sampleresponse->response) . "</response>\n";
             $output .= "     </sampleresponse>\n";
         }
+        $output .= '    <!-- AI Text version:' . get_config('qtype_aitext', 'version') . " -->\n";
         return $output;
     }
     /**

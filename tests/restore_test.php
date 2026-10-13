@@ -49,7 +49,7 @@ final class restore_test extends \restore_date_testcase {
         // Create a course with one essay question in its question bank.
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
-        $qbank = $generator->create_module('qbank', ['course' => $course->id]);
+        $qbank = $generator->create_module('quiz', ['course' => $course->id, 'name' => 'Question bank 1']);
         $context = \context_module::instance($qbank->cmid);
         $category = question_get_default_category($context->id, true);
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
@@ -64,7 +64,7 @@ final class restore_test extends \restore_date_testcase {
 
         $modinfo = get_fast_modinfo($newcourseid);
         $newqbanks = array_filter(
-            $modinfo->get_instances_of('qbank'),
+            $modinfo->get_instances_of('quiz'),
             static fn($qbank) => $qbank->get_name() === 'Question bank 1'
         );
         $newqbank = reset($newqbanks);

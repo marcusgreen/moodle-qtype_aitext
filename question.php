@@ -68,6 +68,11 @@ class qtype_aitext_question extends question_graded_automatically {
      */
     public $modelused = null;
 
+    /**
+     * Set by live PHPUnit tests to bypass the test stub and call the real LLM.
+     * @var bool
+     */
+    public static bool $livetest = false;
 
     /**
      * Options including from sampleanswers table
@@ -266,7 +271,7 @@ class qtype_aitext_question extends question_graded_automatically {
      */
     public function perform_request(string $prompt, string $purpose = 'feedback'): string {
         $this->modelused = null;
-        if (defined('BEHAT_SITE_RUNNING') || (defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
+        if (!self::$livetest && (defined('BEHAT_SITE_RUNNING') || (defined('PHPUNIT_TEST') && PHPUNIT_TEST))) {
             $this->modelused = 'test';
             return "AI Feedback";
         }
@@ -384,13 +389,13 @@ class qtype_aitext_question extends question_graded_automatically {
         $contentobject = $this->process_feedback($feedback);
         $this->lastaicomment = $contentobject->feedback;
 
-        // If there are no marks, write the feedback and set to needs grading .
-        if (is_null($contentobject->marks)) {
-            return [0.0, question_state::$needsgrading];
-        }
+        // If there are no marks, write the feedback and set to needs grading.
         $fraction = 0.0;
+        if (is_null($contentobject->marks)) {
+            return [$fraction, question_state::$needsgrading];
+        }
         if (is_numeric($contentobject->marks) && $this->defaultmark > 0) {
-            $fraction = (float) $contentobject->marks / $this->defaultmark;
+            $fraction = min(max(0.0, (float) $contentobject->marks / $this->defaultmark), 1.0);
         }
         return [$fraction, question_state::graded_state_for_fraction($fraction)];
     }
@@ -815,10 +820,14 @@ class qtype_aitext_question extends question_graded_automatically {
             return $text;
         }
 
+        // Use the full language name (e.g. "Eesti" for et) rather than the ISO code, because LLMs do not
+        // reliably map two-letter codes to languages and will otherwise translate into an arbitrary language.
+        $languagename = get_string('thislanguage', 'langconfig');
+
         $cache = cache::make('qtype_aitext', 'stringdata');
         if (($translation = $cache->get(current_language() . '_' . $text)) === false) {
-            $prompt = 'translate "' . $text . '" into ' . current_language() .
-                    'Only return the exact text, do not wrap it in other text.';
+            $prompt = 'translate "' . $text . '" into ' . $languagename .
+                    '. Only return the exact text, do not wrap it in other text.';
             $translation = $this->perform_request($prompt, 'translate');
             $translation = trim($translation, '"');
             $cache->set(current_language() . '_' . $text, $translation);

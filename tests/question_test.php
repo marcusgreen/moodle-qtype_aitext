@@ -28,6 +28,7 @@ global $CFG;
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 require_once($CFG->dirroot . '/question/type/aitext/tests/helper.php');
 require_once($CFG->dirroot . '/question/type/aitext/questiontype.php');
+require_once($CFG->dirroot . '/question/type/aitext/question.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 
 use qtype_aitext_test_helper;
@@ -48,29 +49,23 @@ final class question_test extends \advanced_testcase {
     public $question;
 
     /**
-     * There is a live connection to the External AI system
-     * When run locally it will make a connection. Otherwise the
-     * tests will be skipped
-     * @var bool
-     */
-    protected bool $islive = false;
-
-    /**
-     * Config.php should include the apikey and orgid in the form
-     * define("TEST_LLM_APIKEY", "XXXXXXXXXXXX");
-     * define("TEST_LLM_ORGID", "XXXXXXXXXXXX");
-     * Summary of setUp
+     * Create the question type instance used by the tests.
      * @return void
      */
     protected function setUp(): void {
         parent::setUp();
         $this->question = new \qtype_aitext();
-        if (defined('TEST_LLM_APIKEY') && defined('TEST_LLM_ORGID')) {
-            set_config('apikey', TEST_LLM_APIKEY, 'aiprovider_openai');
-            set_config('orgid', TEST_LLM_ORGID, 'aiprovider_openai');
-            set_config('enabled', true, 'aiprovider_openai');
-            $this->islive = true;
+    }
+
+    /**
+     * Turn the live LLM flag off so it cannot leak into later tests.
+     * @return void
+     */
+    protected function tearDown(): void {
+        if (class_exists('qtype_aitext_question', false)) {
+            \qtype_aitext_question::$livetest = false;
         }
+        parent::tearDown();
     }
 
     /**
@@ -128,18 +123,14 @@ final class question_test extends \advanced_testcase {
         $this->assertEquals(FORMAT_HTML, $options->graderinfoformat);
     }
     /**
-     * Make a trivial request to the LLM to check the code works
-     * Only designed to test the 4.5 subsystem when run locally
-     * not when in GHA ci
+     * Make a trivial request to the LLM to check the code works.
+     * Skipped unless TEST_LLM_APIKEY is set in config.php or the environment.
      *
      * @covers \qtype_aitext\question::perform_request
      * @return void
      */
     public function test_perform_request(): void {
-        $this->resetAfterTest(true);
-        if (!$this->islive) {
-                $this->markTestSkipped('No live connection to the AI system');
-        }
+        qtype_aitext_test_helper::require_live_llm($this);
         $aitext = qtype_aitext_test_helper::make_aitext_question([]);
         $aitext->questiontext = 'What is 2 * 4?';
         $response = $aitext->perform_request('What is 2 * 4 only return a single number');
@@ -814,5 +805,87 @@ final class question_test extends \advanced_testcase {
         // Assert that the resolved context is not returning the user context, but the qbank context instead.
         $this->assertNotEquals($usercontext->id, $resolvedcontextid);
         $this->assertEquals($qbankcontext->id, $resolvedcontextid);
+    }
+
+    /**
+     * Invoke the protected llm_translate() on a mock and return the prompt it sends to the LLM.
+     *
+     * The perform_request() call (which would hit an external LLM) is mocked so the test can
+     * capture the prompt string that llm_translate() builds, without any network access.
+     *
+     * @param string $text the text passed to llm_translate().
+     * @return string the prompt string handed to perform_request().
+     */
+    protected function capture_translate_prompt(string $text): string {
+        $captured = '';
+        $mock = $this->getMockBuilder(\qtype_aitext_question::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['perform_request'])
+            ->getMock();
+        $mock->method('perform_request')->willReturnCallback(
+            function (string $prompt, string $purpose = 'feedback') use (&$captured): string {
+                $captured = $prompt;
+                return '"TRANSLATED"';
+            }
+        );
+
+        $method = new \ReflectionMethod(\qtype_aitext_question::class, 'llm_translate');
+        $method->setAccessible(true);
+        $method->invoke($mock, $text);
+
+        return $captured;
+    }
+
+    /**
+     * Issue #72: the translation prompt must name the target language, not the ISO code.
+     *
+     * Reproduces the bug where current_language() ('et') was placed in the prompt verbatim
+     * ('... into et'), which LLMs do not reliably map to a language, causing the disclaimer to
+     * be returned in an arbitrary language (Dutch, Malay, ...). After the fix the prompt must
+     * contain the resolved language name from langconfig instead of the bare code.
+     *
+     * @covers ::llm_translate()
+     */
+    public function test_llm_translate_prompt_uses_language_name(): void {
+        global $SESSION;
+        $this->resetAfterTest();
+        set_config('translatepostfix', 1, 'qtype_aitext');
+        // Force a non-English language. Set forcelang directly rather than via
+        // force_current_language(), which silently ignores languages whose pack is not installed.
+        $SESSION->forcelang = 'et';
+
+        $prompt = $this->capture_translate_prompt('Response provided by an AI system');
+
+        // The resolved language name (e.g. "Eesti", or the langconfig fallback) must appear.
+        $languagename = get_string('thislanguage', 'langconfig');
+        $this->assertStringContainsString('into ' . $languagename, $prompt);
+
+        // The bare two-letter code must NOT be used as the translation target.
+        $this->assertStringNotContainsString('into et', $prompt);
+    }
+
+    /**
+     * Issue #72: the language and the trailing instruction must be separated.
+     *
+     * Reproduces the concatenation bug: current_language() . 'Only return...' produced
+     * '... into etOnly return the exact text', gluing the language token to the next word.
+     * After the fix a separator must sit between the language name and "Only return".
+     *
+     * @covers ::llm_translate()
+     */
+    public function test_llm_translate_prompt_separates_instruction(): void {
+        global $SESSION;
+        $this->resetAfterTest();
+        set_config('translatepostfix', 1, 'qtype_aitext');
+        // Force a non-English language. Set forcelang directly rather than via
+        // force_current_language(), which silently ignores languages whose pack is not installed.
+        $SESSION->forcelang = 'et';
+
+        $prompt = $this->capture_translate_prompt('Response provided by an AI system');
+
+        $languagename = get_string('thislanguage', 'langconfig');
+        // The instruction must be delimited, not glued to the language name ("EestiOnly").
+        $this->assertStringNotContainsString($languagename . 'Only', $prompt);
+        $this->assertStringContainsString('. Only return the exact text', $prompt);
     }
 }
