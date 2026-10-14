@@ -123,3 +123,31 @@ function qtype_aitext_upgrade_migrate_countback_attempts(): int {
 
     return count($attemptids);
 }
+
+/**
+ * Reset the JSON prompt setting if it still holds the old, malformed default.
+ *
+ * Until 2026101400 the default JSON prompt showed the LLM the format
+ * {feedback":"string","marks":"number"}, with the opening quote of the first key missing.
+ * Models copy that example and return {feedback:"...","marks":3}, which is not valid JSON,
+ * so the raw reply ended up as the comment and the question stayed in "Requires grading".
+ * Only an unedited default is reset (compared with whitespace collapsed); the upgrade then
+ * applies the corrected default from settings.php. A customised prompt is left alone.
+ *
+ * @return bool true if the setting was reset.
+ */
+function qtype_aitext_upgrade_reset_old_jsonprompt(): bool {
+    $olddefault = 'Return only a JSON object which enumerates a set of 2 elements.The JSON object should be in ' .
+        'this format: {feedback":"string","marks":"number"} where marks is a single number summing all marks. ' .
+        'Also show the marks as part of the feedback.';
+    $current = get_config('qtype_aitext', 'jsonprompt');
+    if ($current === false) {
+        return false;
+    }
+    $normalise = fn(string $text): string => trim(preg_replace('/\s+/', ' ', $text));
+    if ($normalise($current) !== $normalise($olddefault)) {
+        return false;
+    }
+    unset_config('jsonprompt', 'qtype_aitext');
+    return true;
+}

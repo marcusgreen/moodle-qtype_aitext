@@ -211,4 +211,30 @@ final class upgradelib_test extends \advanced_testcase {
 
         return $attemptid;
     }
+
+    /**
+     * The old malformed default JSON prompt is reset; a customised prompt is kept.
+     *
+     * @covers ::qtype_aitext_upgrade_reset_old_jsonprompt
+     */
+    public function test_upgrade_reset_old_jsonprompt(): void {
+        $this->resetAfterTest();
+
+        // The old default exactly as settings.php stored it, including its tab indentation.
+        $olddefault = "Return only a JSON object which enumerates a set of 2 elements.The JSON object should be in\n" .
+            "\tthis format: {feedback\":\"string\",\"marks\":\"number\"} where marks is a single number summing all marks.\n" .
+            "   \tAlso show the marks as part of the feedback.";
+        set_config('jsonprompt', $olddefault, 'qtype_aitext');
+        $this->assertTrue(qtype_aitext_upgrade_reset_old_jsonprompt());
+        $this->assertFalse(get_config('qtype_aitext', 'jsonprompt'));
+
+        // Nothing to reset when the setting is absent.
+        $this->assertFalse(qtype_aitext_upgrade_reset_old_jsonprompt());
+
+        // A prompt the admin changed is left alone.
+        $custom = 'Return JSON: {"feedback":"...","marks":N}';
+        set_config('jsonprompt', $custom, 'qtype_aitext');
+        $this->assertFalse(qtype_aitext_upgrade_reset_old_jsonprompt());
+        $this->assertEquals($custom, get_config('qtype_aitext', 'jsonprompt'));
+    }
 }
