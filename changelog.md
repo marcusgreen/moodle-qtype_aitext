@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+Fixed AI replies sometimes appearing as raw JSON in the comment, with the question left in "Requires grading" after the quiz was finished. The default JSON prompt showed the AI a malformed example (`{feedback":...`), which models copied, returning JSON that could not be read. The default is corrected (an unedited old default is replaced on upgrade), and near-JSON replies with unquoted keys, a missing closing brace or line breaks inside the feedback are now read correctly.
+
 Moodle XML exports now include a comment recording the AIText plugin version, to help diagnose issues.
 
 Thanks to Norbert Forster for the suggestion that led to this update.

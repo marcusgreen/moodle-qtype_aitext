@@ -540,6 +540,9 @@ class qtype_aitext_question extends question_graded_automatically {
             return $contentobject;
         }
         $contentobject = $this->extract_single_json_object($feedback);
+        if (is_null($contentobject)) {
+            $contentobject = $this->salvage_feedback_object($feedback);
+        }
         if (!is_null($contentobject)) {
             $contentobject->feedback = trim($contentobject->feedback);
             $contentobject->feedback = preg_replace(['/\[\[/', '/\]\]/'], '"', $contentobject->feedback);
@@ -609,7 +612,7 @@ class qtype_aitext_question extends question_graded_automatically {
             // This avoids corrupting already properly escaped backslashes (e.g. \\( \\frac{x}{3} \\)).
             $decoded = json_decode($json);
             if (json_last_error() === JSON_ERROR_NONE) {
-                return $decoded;
+                return $this->normalise_feedback_object($decoded);
             }
             $json = preg_replace_callback(
                 '/\\\\{1,2}\(.*?\\\\{1,2}\)|\\\\{1,2}\[.*?\\\\{1,2}\]|\$\$.*?\$\$|\$[^$]+\$/s',
@@ -623,10 +626,54 @@ class qtype_aitext_question extends question_graded_automatically {
             );
             $decoded = json_decode($json);
             if (json_last_error() === JSON_ERROR_NONE) {
-                return $decoded;
+                return $this->normalise_feedback_object($decoded);
             }
         }
         return null;
+    }
+
+    /**
+     * Check a decoded JSON value is a usable feedback object.
+     *
+     * @param mixed $decoded the result of json_decode().
+     * @return stdClass|null the object with a string feedback and a marks property (null if absent), or null.
+     */
+    private function normalise_feedback_object($decoded): ?stdClass {
+        if (!($decoded instanceof stdClass) || !isset($decoded->feedback) || !is_string($decoded->feedback)) {
+            return null;
+        }
+        if (!property_exists($decoded, 'marks')) {
+            $decoded->marks = null;
+        }
+        return $decoded;
+    }
+
+    /**
+     * Recover feedback and marks from an LLM reply that looks like JSON but does not decode.
+     *
+     * Small models often return near-JSON: unquoted keys ({feedback:"...","marks":3}), a reply
+     * cut off before the closing brace, or raw line breaks inside the feedback string. Without
+     * this, the raw reply became the comment and the question was left needing manual grading.
+     *
+     * @param string $text the raw LLM reply.
+     * @return stdClass|null an object with feedback and marks (null if not found), or null if no feedback was found.
+     */
+    private function salvage_feedback_object(string $text): ?stdClass {
+        $key = fn(string $name): string => '[{,]\\s*["\']?' . $name . '["\']?\\s*:\\s*';
+        if (!preg_match('/' . $key('feedback') . '"((?:[^"\\\\]|\\\\.)*)"/s', $text, $matches)) {
+            return null;
+        }
+        // Decode the JSON string escapes; raw control characters are escaped first so they decode too.
+        $raw = str_replace(["\r", "\n", "\t"], ['\\r', '\\n', '\\t'], $matches[1]);
+        $feedback = json_decode('"' . $raw . '"');
+        $contentobject = new stdClass();
+        $contentobject->feedback = is_string($feedback) ? $feedback : $matches[1];
+        $contentobject->marks = null;
+        // Take the last match: the marks key follows the feedback, which may itself mention marks.
+        if (preg_match_all('/' . $key('marks') . '"?\\s*(-?\\d+(?:\\.\\d+)?)/', $text, $matches)) {
+            $contentobject->marks = (float) end($matches[1]);
+        }
+        return $contentobject;
     }
 
     /**

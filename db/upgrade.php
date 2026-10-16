@@ -128,5 +128,15 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026072800, 'qtype', 'aitext');
     }
 
+    if ($oldversion < 2026101400) {
+        // Replace the malformed default JSON prompt; settings.php supplies the corrected default.
+        if (qtype_aitext_upgrade_reset_old_jsonprompt()) {
+            mtrace("Reset the qtype_aitext JSON prompt from the old malformed default to the corrected default.");
+        }
+
+        // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2026101400, 'qtype', 'aitext');
+    }
+
     return true;
 }

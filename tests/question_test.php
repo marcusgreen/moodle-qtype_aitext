@@ -390,11 +390,57 @@ final class question_test extends \advanced_testcase {
                 'expectedmarks' => 0,
             ],
             'broken_json' => [
+                // A reply cut off before the closing brace is salvaged rather than shown raw.
                 'json' => '{"feedback": "Good job", "marks": 0',
                 'exceptionexpected' => false,
-                'expectedfeedback' => '{"feedback": "Good job", "marks": 0',
+                'expectedfeedback' => 'Good job',
                 'expectedmathjaxapplied' => false,
                 'expectedmarks' => 0,
+            ],
+            'unquoted_feedback_key' => [
+                // Real gemma4:e4b reply, copying the old malformed default JSON prompt.
+                'json' => '{feedback:"[[After I will finish my job]] uses after to form a time clause. '
+                    . 'It should be [[After I finish my job]].","marks":3}',
+                'exceptionexpected' => false,
+                'expectedfeedback' => '"After I will finish my job" uses after to form a time clause. '
+                    . 'It should be "After I finish my job".',
+                'expectedmathjaxapplied' => false,
+                'expectedmarks' => 3,
+            ],
+            'all_keys_unquoted_marks_as_string' => [
+                'json' => "{\n  feedback: \"Well done\",\n  marks: \"4\"\n}",
+                'exceptionexpected' => false,
+                'expectedfeedback' => 'Well done',
+                'expectedmathjaxapplied' => false,
+                'expectedmarks' => 4,
+            ],
+            'raw_line_break_inside_feedback' => [
+                'json' => "{\"feedback\": \"First line.\nSecond line.\", \"marks\": 2}",
+                'exceptionexpected' => false,
+                'expectedfeedback' => "First line.\nSecond line.",
+                'expectedmathjaxapplied' => false,
+                'expectedmarks' => 2,
+            ],
+            'unquoted_key_feedback_mentions_marks' => [
+                'json' => '{feedback:"Grammar marks: 2, content marks: 2.","marks":4}',
+                'exceptionexpected' => false,
+                'expectedfeedback' => 'Grammar marks: 2, content marks: 2.',
+                'expectedmathjaxapplied' => false,
+                'expectedmarks' => 4,
+            ],
+            'valid_json_without_marks' => [
+                'json' => '{"feedback": "Good job"}',
+                'exceptionexpected' => false,
+                'expectedfeedback' => 'Good job',
+                'expectedmathjaxapplied' => false,
+                'expectedmarks' => null,
+            ],
+            'valid_json_without_feedback_key' => [
+                'json' => '{"comment": "Good job", "marks": 2}',
+                'exceptionexpected' => false,
+                'expectedfeedback' => '{"comment": "Good job", "marks": 2}',
+                'expectedmathjaxapplied' => false,
+                'expectedmarks' => null,
             ],
             'valid_json_markdown_formatted' => [
                 // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
