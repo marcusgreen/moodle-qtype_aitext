@@ -128,5 +128,19 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026072800, 'qtype', 'aitext');
     }
 
+    if ($oldversion < 2026101800) {
+        // Define field sendformatting to be added to qtype_aitext.
+        $table = new xmldb_table('qtype_aitext');
+        $field = new xmldb_field('sendformatting', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'spellcheck');
+
+        // Conditionally launch add field sendformatting.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2026101800, 'qtype', 'aitext');
+    }
+
     return true;
 }

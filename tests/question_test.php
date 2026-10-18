@@ -252,6 +252,60 @@ final class question_test extends \advanced_testcase {
     }
 
     /**
+     * Test which formatting in the response reaches the AI prompt.
+     *
+     * @covers \qtype_aitext_question::build_full_ai_prompt
+     * @dataProvider response_formatting_provider
+     * @param bool $sendformatting Whether the question keeps formatting.
+     * @param string $responseformat The response format of the question.
+     * @param string $response The student response.
+     * @param string $expected The response as it should appear in the prompt.
+     */
+    public function test_build_full_ai_prompt_response_formatting(
+        bool $sendformatting,
+        string $responseformat,
+        string $response,
+        string $expected
+    ): void {
+        $this->resetAfterTest(true);
+
+        $question = qtype_aitext_test_helper::make_aitext_question([]);
+        $question->sendformatting = $sendformatting;
+        $question->responseformat = $responseformat;
+
+        set_config('prompttemplate', '[{{response}}]', 'qtype_aitext');
+        set_config('jsonprompt', '', 'qtype_aitext');
+        set_config('translatepostfix', false, 'qtype_aitext');
+
+        $result = $question->build_full_ai_prompt($response, 'Grade this', 1, '');
+        $this->assertStringStartsWith('[' . $expected . ']', $result);
+
+        // Expert mode prompts get the same response text.
+        $result = $question->build_full_ai_prompt($response, 'Answer: [{{response}}]', 1, '');
+        $this->assertStringStartsWith('Answer: [' . $expected . ']', $result);
+    }
+
+    /**
+     * Data provider for test_build_full_ai_prompt_response_formatting.
+     *
+     * @return array
+     */
+    public static function response_formatting_provider(): array {
+        $html = '<p style="color:red">H<sub>2</sub>O and <span class="x"><em>Nature</em></span>&nbsp;<img src="a.png"></p>';
+        return [
+            'Formatting off strips all tags' => [false, 'editor', $html, 'H2O and Nature&nbsp;'],
+            'Formatting on keeps basic tags without attributes' => [
+                true, 'editor', $html, '<p>H<sub>2</sub>O and <em>Nature</em>&nbsp;</p>',
+            ],
+            'Formatting on is ignored for plain text responses' => [true, 'plain', 'H<sub>2</sub>O', 'H2O'],
+            'Lists and line breaks are kept' => [
+                true, 'editor', '<ul><li>One<br/></li><li><strong>Two</strong></li></ul><script>x</script>',
+                '<ul><li>One<br></li><li><strong>Two</strong></li></ul>x',
+            ],
+        ];
+    }
+
+    /**
      * Verify that all kinds of feedback JSONs are parsed properly.
      *
      * @covers ::process_feedback()

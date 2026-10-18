@@ -123,6 +123,7 @@ class qtype_aitext extends question_type {
         }
 
         $options->spellcheck = !empty($formdata->spellcheck);
+        $options->sendformatting = !empty($formdata->sendformatting);
         $options->aiprompt = $formdata->aiprompt;
         $options->markscheme = $formdata->markscheme;
         $options->model = trim($formdata->model);
@@ -313,6 +314,7 @@ class qtype_aitext extends question_type {
             'markscheme',
             'model',
             'spellcheck',
+            'sendformatting',
         ];
     }
     /**

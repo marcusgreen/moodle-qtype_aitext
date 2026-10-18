@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+New per-question option "Send formatting to AI". When it is ticked and the response format is the HTML editor, basic formatting (subscript, superscript, bold, italic, underline, paragraphs and lists) is kept in the response sent to the AI, so it can assess things like chemical formulae or the layout of a reference. Thanks to Dave Foord for the idea.
+https://github.com/marcusgreen/moodle-qtype_aitext/issues/50
+
 The student's answer shown in the "Edit spellcheck" dialog is now escaped, so markup in an answer can no longer run in the grader's browser. Thanks to Peter Mayer and the ByCS team.
 https://github.com/marcusgreen/moodle-qtype_aitext/pull/94
 
