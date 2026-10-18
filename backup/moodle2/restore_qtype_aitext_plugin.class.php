@@ -233,6 +233,7 @@ class restore_qtype_aitext_plugin extends restore_qtype_plugin {
             $defaultoptions->responsetemplateformat = FORMAT_HTML;
             $defaultoptions->maxbytes = 0;
             $defaultoptions->spellcheck = 0;
+            $defaultoptions->sendformatting = 0;
             $DB->insert_record('qtype_aitext', $defaultoptions);
         }
     }

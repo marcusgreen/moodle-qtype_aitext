@@ -55,6 +55,11 @@ class qtype_aitext_edit_form extends question_edit_form {
         // Spelling correction.
         $mform->addElement('checkbox', 'spellcheck', get_string('automatic_spellcheck', 'qtype_aitext'));
 
+        // Keep basic formatting in the response sent to the AI. Only the HTML editor produces formatting.
+        $mform->addElement('advcheckbox', 'sendformatting', get_string('sendformatting', 'qtype_aitext'));
+        $mform->addHelpButton('sendformatting', 'sendformatting', 'qtype_aitext');
+        $mform->hideIf('sendformatting', 'responseformat', 'neq', 'editor');
+
         // Ai prompt.
         $mform->addElement(
             'textarea',
@@ -272,6 +277,7 @@ class qtype_aitext_edit_form extends question_edit_form {
         $question->maxwordlimit = $question->options->maxwordlimit;
         $question->aiprompt = $question->options->aiprompt;
         $question->spellcheck = $question->options->spellcheck;
+        $question->sendformatting = $question->options->sendformatting ?? 0;
         // Make the count start from 0 like the repeat array elements.
         $question->sampleresponses = [];
         foreach ($question->options->sampleresponses as $sampleresponse) {

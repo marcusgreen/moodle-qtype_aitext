@@ -36,6 +36,9 @@ require_once($CFG->dirroot . '/question/type/questionbase.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_question extends question_graded_automatically {
+    /** @var string[] Formatting tags kept in the response when formatting is sent to the AI. */
+    const AI_FORMATTING_TAGS = ['sub', 'sup', 'b', 'strong', 'i', 'em', 'u', 'p', 'br', 'ul', 'ol', 'li'];
+
     /**
      * Plain text or html
      * @var string
@@ -134,6 +137,9 @@ class qtype_aitext_question extends question_graded_automatically {
 
     /** @var bool $spellcheck if spellcheck is enabled */
     public bool $spellcheck;
+
+    /** @var bool $sendformatting if basic formatting in the response is kept when it is sent to the AI */
+    public bool $sendformatting = false;
 
 
     /** @var array  */
@@ -441,7 +447,7 @@ class qtype_aitext_question extends question_graded_automatically {
             $expertreplacement = [
                 '{{questiontext}}' => strip_tags($this->questiontext ?? ''),
                 '{{markscheme}}' => $markschemetext,
-                '{{response}}' => strip_tags($response),
+                '{{response}}' => $this->prepare_response_for_ai($response),
                 '{{language}}' => $language,
                 '{{role}}' => trim($roleprompt),
             ];
@@ -452,7 +458,7 @@ class qtype_aitext_question extends question_graded_automatically {
                 '{{questiontext}}' => strip_tags($this->questiontext ?? ''),
                 '{{aiprompt}}' => trim($cleanedaiprompt),
                 '{{markscheme}}' => $markschemetext,
-                '{{response}}' => strip_tags($response),
+                '{{response}}' => $this->prepare_response_for_ai($response),
                 '{{language}}' => $language,
             ];
             $prompt = str_replace(array_keys($replacements), array_values($replacements), $template);
@@ -510,6 +516,25 @@ class qtype_aitext_question extends question_graded_automatically {
         return trim($cleaned);
     }
 
+
+    /**
+     * Prepare the student response for inclusion in the AI prompt.
+     *
+     * All markup is removed unless the question keeps formatting and the response comes from the HTML editor.
+     * In that case basic formatting tags are kept, without attributes, so the AI can assess things like
+     * subscripts in chemical formulae or italics in references.
+     *
+     * @param string $response The student's response.
+     * @return string The response as it is sent to the AI.
+     */
+    protected function prepare_response_for_ai(string $response): string {
+        if (!$this->sendformatting || !str_contains($this->responseformat ?? '', 'editor')) {
+            return strip_tags($response);
+        }
+        $response = strip_tags($response, self::AI_FORMATTING_TAGS);
+        // Remove attributes such as inline styles and classes from the remaining tags.
+        return preg_replace('/<(\/?)([a-z0-9]+)[^>]*>/i', '<$1$2>', $response);
+    }
 
     /**
      * Build the full ai spellchecking prompt.
