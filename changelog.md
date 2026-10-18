@@ -2,12 +2,19 @@
 
 ## Unreleased
 
-Moodle XML exports now include a comment recording the AIText plugin version, to help diagnose issues.
+Fixed the default JSON prompt, which had a missing quote that caused AI responses to fail to decode, leaving questions in "Requires grading". Thanks to Adam Jenkins.
+https://github.com/marcusgreen/moodle-qtype_aitext/pull/93
 
-Thanks to Norbert Forster for the suggestion that led to this update.
-
-The AI disclaimer is now translated into the user's current language. Previously the translation prompt passed only the two-letter language code (e.g. "et"), which the AI could map to the wrong language.
+The AI disclaimer is now translated into the user's current language.
 https://github.com/marcusgreen/moodle-qtype_aitext/issues/72
+
+Moodle XML exports now record the AIText plugin version. Thanks to Norbert Forster for the suggestion.
+
+The Response Tester is now expanded and Response options collapsed by default on the editing form.
+
+Added examples/imageinterpretation.xml with eight image interpretation questions.
+
+The live AI request test now calls a real provider when an API key is configured, and is skipped otherwise.
 
 ## Release 2.1.1 Oct 2026
 
