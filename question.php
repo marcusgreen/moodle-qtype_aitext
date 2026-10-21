@@ -296,7 +296,10 @@ class qtype_aitext_question extends question_graded_automatically {
                     throw new moodle_exception('err_retrievingfeedback', 'qtype_aitext');
                 }
             }
-            $this->modelused = $llmresponse->get_model_used();
+            // The get_model_used() method was added in Moodle 5.0 (MDL-83154).
+            $this->modelused = method_exists($llmresponse, 'get_model_used')
+                ? $llmresponse->get_model_used()
+                : null;
             return $responsedata['generatedcontent'];
         } else if ($backend == 'tool_aimanager') {
             if (class_exists('\tool_aiconnect\ai\ai')) {
