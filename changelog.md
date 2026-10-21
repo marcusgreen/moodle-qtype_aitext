@@ -5,7 +5,8 @@
 Fixed "Call to undefined method response_generate_text::get_model_used()" when grading with the Moodle core AI subsystem on Moodle 4.5. The method only exists from Moodle 5.0, so on 4.5 the [[model]] disclaimer placeholder falls back to the configured model. Thanks to daniel221722 for reporting.
 https://github.com/marcusgreen/moodle-qtype_aitext/issues/96
 
-CI now also tests against Moodle 4.5 (MOODLE_405_STABLE, PHP 8.1, PostgreSQL).
+CI now also tests against Moodle 4.5 (MOODLE_405_STABLE, PHP 8.1, PostgreSQL), with tests fixed to pass there. Thanks to daniel221722.
+https://github.com/marcusgreen/moodle-qtype_aitext/pull/97
 
 The student's answer shown in the "Edit spellcheck" dialog is now escaped, so markup in an answer can no longer run in the grader's browser. Thanks to Peter Mayer and the ByCS team.
 https://github.com/marcusgreen/moodle-qtype_aitext/pull/94
