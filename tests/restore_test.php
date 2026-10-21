@@ -51,8 +51,8 @@ final class restore_test extends \restore_date_testcase {
         $course = $generator->create_course();
         $qbank = $generator->create_module('quiz', ['course' => $course->id, 'name' => 'Question bank 1']);
         $context = \context_module::instance($qbank->cmid);
-        $category = question_get_default_category($context->id, true);
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $category = $questiongenerator->create_question_category(['contextid' => $context->id]);
         $aitext = $questiongenerator->create_question('aitext', 'editor', ['category' => $category->id]);
 
         // Remove the options record, which means that the backup will look like a backup made in an old Moodle.
