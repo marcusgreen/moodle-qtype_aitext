@@ -30,6 +30,8 @@ Feature: Test duplicating a quiz containing an aitext question
 
   @javascript @_file_upload
   Scenario: Upload and restore an mbz backup Filename
+    # The fixture was made on Moodle 5.0 and contains a mod_qbank activity, which 4.5 cannot restore.
+    Given the site is running Moodle version 5.0 or higher
     When I am on the "Course 1" "restore" page logged in as admin
     And I press "Manage course backups"
     And I upload "question/type/aitext/tests/fixtures/aitext_english_quiz.mbz" file to "Files" filemanager

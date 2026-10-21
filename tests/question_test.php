@@ -669,16 +669,15 @@ final class question_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         // To verify that we really return the current quiz activity's context we avoid creating the question in the same context of
-        // course, but use a qbank in a different course.
-        $qbankcourse = $this->getDataGenerator()->create_course();
-        $qbank = $this->getDataGenerator()->create_module('qbank', ['course' => $qbankcourse->id]);
-        $cm = get_coursemodule_from_instance('qbank', $qbank->id, $qbankcourse->id, false, MUST_EXIST);
-        $qbankcontext = \context_module::instance($cm->id);
+        // course, but use another quiz's question bank in a different course.
+        $bankcourse = $this->getDataGenerator()->create_course();
+        $bankquiz = $this->getDataGenerator()->create_module('quiz', ['course' => $bankcourse->id]);
+        $bankcontext = \context_module::instance($bankquiz->cmid);
 
-        // Create question in the qbank context.
+        // Create question in the question bank quiz context.
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
         $questioncategory = $questiongenerator->create_question_category([
-            'contextid' => $qbankcontext->id,
+            'contextid' => $bankcontext->id,
         ]);
         $questionrecord = $questiongenerator->create_question('aitext', 'editor', [
             'category' => $questioncategory->id,
@@ -711,7 +710,7 @@ final class question_test extends \advanced_testcase {
         $this->assertNotNull($firststep->get_id());
 
         $aitext = \question_bank::load_question($questionrecord->id);
-        $this->assertEquals($qbankcontext->id, (int) $aitext->contextid);
+        $this->assertEquals($bankcontext->id, (int) $aitext->contextid);
         $this->assertNotEquals($quizobj->get_context()->id, (int) $aitext->contextid);
 
         $aitext->apply_attempt_state($firststep);
@@ -721,17 +720,16 @@ final class question_test extends \advanced_testcase {
     }
 
     /**
-     * Verify that preview usage resolves to the qbank context where preview is executed.
+     * Verify that preview usage resolves to the module context where preview is executed.
      *
      * @covers ::get_contextid_for_ai_request
      */
-    public function test_get_contextid_for_ai_request_uses_qbank_context_in_preview(): void {
+    public function test_get_contextid_for_ai_request_uses_module_context_in_preview(): void {
         $this->resetAfterTest();
 
         $course = $this->getDataGenerator()->create_course();
-        $qbank = $this->getDataGenerator()->create_module('qbank', ['course' => $course->id]);
-        $cm = get_coursemodule_from_instance('qbank', $qbank->id, $course->id, false, MUST_EXIST);
-        $qbankcontext = \context_module::instance($cm->id);
+        $bankquiz = $this->getDataGenerator()->create_module('quiz', ['course' => $course->id]);
+        $bankcontext = \context_module::instance($bankquiz->cmid);
 
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
         $questioncategory = $questiongenerator->create_question_category([
@@ -742,7 +740,7 @@ final class question_test extends \advanced_testcase {
         ]);
         $aitext = \question_bank::load_question($questionrecord->id);
 
-        $previewquba = \question_engine::make_questions_usage_by_activity('core_question_preview', $qbankcontext);
+        $previewquba = \question_engine::make_questions_usage_by_activity('core_question_preview', $bankcontext);
         $previewquba->set_preferred_behaviour('deferredfeedback');
         $slot = $previewquba->add_question($aitext, 1);
         $previewquba->start_all_questions();
@@ -752,12 +750,12 @@ final class question_test extends \advanced_testcase {
         $firststep = $previewquba->get_question_attempt($slot)->get_step(0);
         $this->assertNotNull($firststep->get_id());
 
-        $this->assertNotEquals($qbankcontext->id, $aitext->contextid);
+        $this->assertNotEquals($bankcontext->id, $aitext->contextid);
 
         $aitext->apply_attempt_state($firststep);
         $resolvedcontextid = $aitext->get_contextid_for_ai_request();
 
-        $this->assertEquals($qbankcontext->id, $resolvedcontextid);
+        $this->assertEquals($bankcontext->id, $resolvedcontextid);
     }
 
     /**
@@ -771,15 +769,14 @@ final class question_test extends \advanced_testcase {
         $this->setAdminUser();
 
         $course = $this->getDataGenerator()->create_course();
-        $qbank = $this->getDataGenerator()->create_module('qbank', ['course' => $course->id]);
-        $cm = get_coursemodule_from_instance('qbank', $qbank->id, $course->id, false, MUST_EXIST);
-        $qbankcontext = \context_module::instance($cm->id);
+        $bankquiz = $this->getDataGenerator()->create_module('quiz', ['course' => $course->id]);
+        $bankcontext = \context_module::instance($bankquiz->cmid);
 
         $usercontext = \context_user::instance($USER->id);
 
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
         $questioncategory = $questiongenerator->create_question_category([
-            'contextid' => $qbankcontext->id,
+            'contextid' => $bankcontext->id,
         ]);
         $questionrecord = $questiongenerator->create_question('aitext', 'editor', [
             'category' => $questioncategory->id,
@@ -802,9 +799,9 @@ final class question_test extends \advanced_testcase {
         $aitext->apply_attempt_state($firststep);
         $resolvedcontextid = $aitext->get_contextid_for_ai_request();
 
-        // Assert that the resolved context is not returning the user context, but the qbank context instead.
+        // Assert that the resolved context is not returning the user context, but the question bank context instead.
         $this->assertNotEquals($usercontext->id, $resolvedcontextid);
-        $this->assertEquals($qbankcontext->id, $resolvedcontextid);
+        $this->assertEquals($bankcontext->id, $resolvedcontextid);
     }
 
     /**

@@ -51,8 +51,8 @@ final class restore_test extends \restore_date_testcase {
         $course = $generator->create_course();
         $qbank = $generator->create_module('quiz', ['course' => $course->id, 'name' => 'Question bank 1']);
         $context = \context_module::instance($qbank->cmid);
-        $category = question_get_default_category($context->id, true);
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $category = $questiongenerator->create_question_category(['contextid' => $context->id]);
         $aitext = $questiongenerator->create_question('aitext', 'editor', ['category' => $category->id]);
 
         // Remove the options record, which means that the backup will look like a backup made in an old Moodle.
@@ -70,13 +70,14 @@ final class restore_test extends \restore_date_testcase {
         $newqbank = reset($newqbanks);
 
         // Verify that the restored question has options.
-        $newcategory = question_get_default_category(\context_module::instance($newqbank->id)->id, true);
+        $newcontext = \context_module::instance($newqbank->id);
         $newaitext = $DB->get_record_sql('SELECT q.*
                                               FROM {question} q
                                               JOIN {question_versions} qv ON qv.questionid = q.id
                                               JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
-                                             WHERE qbe.questioncategoryid = ?
-                                               AND q.qtype = ?', [$newcategory->id, 'aitext']);
+                                              JOIN {question_categories} qc ON qc.id = qbe.questioncategoryid
+                                             WHERE qc.contextid = ?
+                                               AND q.qtype = ?', [$newcontext->id, 'aitext'], MUST_EXIST);
         $this->assertTrue($DB->record_exists('qtype_aitext', ['questionid' => $newaitext->id]));
     }
 }
