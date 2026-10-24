@@ -6,6 +6,8 @@
 
 *by Marcus Green*
 
+🇬🇧 **English** · 🇩🇪 **[Deutsch](./README.de.md)**
+
 A Moodle question type that accepts free-text answers and grades them with a remote Large Language Model (LLM) such as ChatGPT or a self-hosted Ollama model. Each question defines its own grading prompt and optional marking scheme, so the AI evaluates responses against criteria you set.
 
 
