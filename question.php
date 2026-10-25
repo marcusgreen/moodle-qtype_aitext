@@ -692,9 +692,10 @@ class qtype_aitext_question extends question_graded_automatically {
     public function summarise_response(array $response) {
         $output = null;
         if (isset($response['answer'])) {
+            $defaultformat = str_contains($this->responseformat, 'editor') ? FORMAT_HTML : FORMAT_PLAIN;
             $output .= question_utils::to_plain_text(
                 $response['answer'],
-                $response['answerformat'],
+                $response['answerformat'] ?? $defaultformat,
                 ['para' => false]
             );
         }

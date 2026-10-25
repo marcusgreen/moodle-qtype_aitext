@@ -1,9 +1,55 @@
-.qtype-aitext .countwords {
-    margin-top: 0.5rem; /* mt-2 */
-    margin-bottom: 0;
+/* Styles for the aitext question in the Moodle App. Ionic variables keep light/dark mode readable. */
+.qtype_aitext .qtype_aitext_answer {
+    padding-top: 8px;
+    padding-bottom: 8px;
 }
-.qtype-aitext .minwords,
-.qtype-aitext .minwords {
-    margin-top: 0;
-    margin-bottom: 0;
+
+.qtype_aitext .qtype_aitext_answer textarea,
+.qtype_aitext .qtype_aitext_answer .qtype_aitext_response.readonly {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 6px 12px;
+    border: 1px solid var(--ion-color-medium, #92949c);
+    border-radius: 4px;
+    background-color: var(--ion-background-color-step-50, var(--ion-color-step-50, #f2f2f2));
+    color: var(--ion-text-color, #000);
+    font: inherit;
+}
+
+.qtype_aitext .qtype_aitext_answer .qtype_aitext_response.readonly {
+    min-height: 3em;
+}
+
+.qtype_aitext .qtype_aitext_answer textarea[readonly],
+.qtype_aitext .qtype_aitext_answer .qtype_aitext_response.readonly {
+    border-style: dashed;
+    background-color: var(--ion-background-color-step-100, var(--ion-color-step-100, #e6e6e6));
+}
+
+.qtype_aitext .qtype_aitext_answer textarea:focus {
+    outline: 2px solid var(--ion-color-primary, #f98012);
+    outline-offset: 1px;
+}
+
+.qtype_aitext .qtype_aitext_answer select {
+    margin-top: 8px;
+}
+
+.qtype_aitext .qtype_aitext_answer p {
+    margin: 8px 0 0;
+    font-size: 0.875em;
+    color: var(--ion-color-medium, #666);
+}
+
+.qtype_aitext .visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }

@@ -5,12 +5,8 @@
             [text]="question.text"></core-format-text>
         </p>
     </ion-item>
-    <ion-item>
+    <div class="qtype_aitext_answer ion-padding-horizontal">
         <core-format-text [component]="component" [componentId]="componentId"
-        [text]="question.textarea"></core-format-text>
-    </ion-item>
-    <ion-item>
-        <core-format-text [component]="component" [componentId]="componentId"
-        [text]="question.itemcount" (afterRender)="questionRendered()"></core-format-text>
-    </ion-item>
+        [text]="question.answer"></core-format-text>
+    </div>
 </section>

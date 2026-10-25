@@ -42,107 +42,43 @@ var result = {
             this.question.text = text.innerHTML;
         }
 
-        var textarea = div.querySelector('.answer textarea');
-        if (textarea === null) {
-            // Review or check.
-            textarea = div.querySelector('.answer .qtype_aitext_response');
-        }
-        if (textarea) {
-            textarea.style.borderRadius = '4px';
-            textarea.style.padding = '6px 12px';
-            if (textarea.matches('.readonly')) {
-                textarea.style.border = '2px #b8dce2 solid'; // Light blue.
-                textarea.style.backgroundColor = '#e7f3f5'; // Lighter blue.
-            } else {
-                textarea.style.backgroundColor = '#edf6f7'; // Lightest blue.
-            }
-            this.question.textarea = textarea.outerHTML;
+        var answer = div.querySelector('.answer');
+        var response = null;
+        if (answer) {
+            // Editable textarea, or the read-only textarea/div shown in review.
+            response = answer.querySelector('textarea') || answer.querySelector('.qtype_aitext_response');
         }
 
-        var itemcount = div.querySelector('.itemcount');
-        if (itemcount) {
+        if (!text || !response) {
+            // Oops, the expected elements, text and response, were not found !!
+            return that.CoreQuestionHelperProvider.showComponentError(that.onAbort);
+        }
 
-            // Replace bootstrap styles with inline styles because
-            // adding styles to 'mobile/styles_app.css' doesn't seem to be effective :-(
-            that.replaceBootstrapClasses(itemcount);
-
-            itemcount.querySelectorAll('p').forEach(function(p) {
-                that.replaceBootstrapClasses(p);
+        // Keep the response together with its label, the hidden inputs that must be
+        // submitted with it (e.g. answerformat), any format menu and the word count message.
+        var html = '';
+        var label = answer.querySelector('label.visually-hidden');
+        if (label) {
+            html += label.outerHTML;
+        }
+        html += response.outerHTML;
+        answer.querySelectorAll('input[type="hidden"]').forEach(function(input) {
+            html += input.outerHTML;
+        });
+        answer.querySelectorAll('select').forEach(function(select) {
+            answer.querySelectorAll('label').forEach(function(selectlabel) {
+                if (selectlabel.htmlFor === select.id) {
+                    html += selectlabel.outerHTML;
+                }
             });
+            html += select.outerHTML;
+        });
+        answer.querySelectorAll(':scope > p').forEach(function(p) {
+            html += p.outerHTML;
+        });
+        this.question.answer = html;
 
-            // Fix background and text color on "wordswarning" span.
-            var warning = itemcount.querySelector(".warning");
-            if (warning) {
-                that.replaceBootstrapClasses(warning);
-            }
-
-            this.question.itemcount = itemcount.outerHTML;
-        }
-
-        this.questionRendered = function() {
-
-            var textarea = this.componentContainer.querySelector('textarea');
-            var itemcount = this.componentContainer.querySelector('.itemcount');
-            if (textarea && itemcount) {
-
-                // Maybe "this.CoreLangProvider" has a method for fetching a string
-                // but I can't find it, so we use our own method, thus:
-                var minwordswarning = that.getPluginString("qtype_aitext", "minwordswarning");
-                var maxwordswarning = that.getPluginString("qtype_aitext", "maxwordswarning");
-
-                var countitems = itemcount.querySelector(".countitems");
-                var value = countitems.querySelector(".value");
-                var warning = countitems.querySelector(".warning");
-
-                var itemtype = itemcount.dataset.itemtype;
-                var minitems = parseInt(itemcount.dataset.minitems);
-                var maxitems = parseInt(itemcount.dataset.maxitems);
-
-                var itemsplit = '';
-                switch (itemtype) {
-                    case "chars": itemsplit = ""; break;
-                    case "words": itemsplit = "[\\s—–]+"; break;
-                    case "sentences": itemsplit = "[\\.?!]+"; break;
-                    case "paragraphs": itemsplit = "[\\r\\n]+"; break;
-                }
-
-                if (itemsplit) {
-                    itemsplit = new RegExp(itemsplit);
-                    textarea.addEventListener("keyup", function() {
-                        var text = textarea.value;
-                        var warningtext = "";
-                        var count = 0;
-                        if (text) {
-                            count = text.split(itemsplit).filter(function(item) {
-                                return (item !== "");
-                            }).length;
-                            if (minitems && (count < minitems)) {
-                                warningtext = minwordswarning;
-                            }
-                            if (maxitems && (count > maxitems)) {
-                                warningtext = maxwordswarning;
-                            }
-                        }
-                        value.innerText = count;
-                        if (warning) {
-                            warning.innerText = warningtext;
-                            if (warningtext == "") {
-                                warning.style.display = "none";
-                            } else {
-                                warning.style.display = "inline";
-                            }
-                        }
-                    });
-                }
-            }
-        };
-
-        if (text && textarea) {
-            return true;
-        }
-
-        // Oops, the expected elements, text and textarea, were not found !!
-        return that.CoreQuestionHelperProvider.showComponentError(that.onAbort);
+        return true;
     }
 };
 /* eslint-disable-next-line */

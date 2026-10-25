@@ -32,7 +32,7 @@ $addons = [
             'aitext' => [ // Handler unique name (can be anything).
                 'displaydata' => [
                     'title' => 'AIText question',
-                    'icon' => '/question/type/aitext/pix/icon.gif',
+                    'icon' => '/question/type/aitext/pix/icon.png',
                     'class' => '',
                 ],
                 'delegate' => 'CoreQuestionDelegate', // Delegate (where to display the link to the add-on).
@@ -42,7 +42,7 @@ $addons = [
                 ], // Function needs caching for offline.
                 'styles' => [
                     'url' => $CFG->wwwroot . '/question/type/aitext/mobile/qtype_aitext_app.css',
-                    'version' => '0.1',
+                    'version' => '0.2',
                 ],
             ],
         ],
