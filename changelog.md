@@ -1,6 +1,6 @@
 ### Moodle AIText question type
 
-## Unreleased
+## Release 2.1.2 Oct 2026
 
 Answers submitted from the Moodle App now include their format, so line breaks are kept when the answer is displayed. Previously the format was dropped, which also caused an "Undefined array key answerformat" warning.
 https://github.com/marcusgreen/moodle-qtype_aitext/pull/98
