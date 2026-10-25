@@ -62,7 +62,13 @@ var result = {
             html += label.outerHTML;
         }
         html += response.outerHTML;
+        // The app has no rich text editor, so editor formats get a plain textarea too. Submit
+        // the answer as plain text, otherwise its line breaks are lost when shown as HTML.
+        var editable = response.tagName === 'TEXTAREA' && !response.readOnly;
         answer.querySelectorAll('input[type="hidden"]').forEach(function(input) {
+            if (editable && /answerformat$/.test(input.name)) {
+                input.setAttribute('value', '2'); // FORMAT_PLAIN.
+            }
             html += input.outerHTML;
         });
         answer.querySelectorAll('select').forEach(function(select) {
