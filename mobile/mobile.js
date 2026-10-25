@@ -60,11 +60,13 @@ var result = {
 
             // Submit the format with the answer. The app has no rich text editor, so the
             // answer is always typed as plain text; sending it as HTML would lose line breaks.
-            div.querySelectorAll('.answer input[type="hidden"]').forEach(function(input) {
+            // The format is a hidden input, or a menu when the stored format is not HTML.
+            div.querySelectorAll('.answer input[type="hidden"], .answer select').forEach(function(input) {
                 if (/answerformat$/.test(input.name) && !textarea.readOnly) {
-                    input.setAttribute('value', '2'); // FORMAT_PLAIN.
+                    this.question.textarea += '<input type="hidden" name="' + input.name + '" value="2">'; // FORMAT_PLAIN.
+                } else if (input.type === 'hidden') {
+                    this.question.textarea += input.outerHTML;
                 }
-                this.question.textarea += input.outerHTML;
             }, this);
         }
 
