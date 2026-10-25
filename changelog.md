@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+Answers submitted from the Moodle App now include their format, so line breaks are kept when the answer is displayed. Previously the format was dropped, which also caused an "Undefined array key answerformat" warning.
+https://github.com/marcusgreen/moodle-qtype_aitext/pull/98
+
 Fixed "Call to undefined method response_generate_text::get_model_used()" when grading with the Moodle core AI subsystem on Moodle 4.5. The method only exists from Moodle 5.0, so on 4.5 the [[model]] disclaimer placeholder falls back to the configured model.
 https://github.com/marcusgreen/moodle-qtype_aitext/issues/96
 
