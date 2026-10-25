@@ -57,6 +57,17 @@ var result = {
                 textarea.style.backgroundColor = '#edf6f7'; // Lightest blue.
             }
             this.question.textarea = textarea.outerHTML;
+
+            // Submit the format with the answer. The app has no rich text editor, so the
+            // answer is always typed as plain text; sending it as HTML would lose line breaks.
+            // The format is a hidden input, or a menu when the stored format is not HTML.
+            div.querySelectorAll('.answer input[type="hidden"], .answer select').forEach(function(input) {
+                if (/answerformat$/.test(input.name) && !textarea.readOnly) {
+                    this.question.textarea += '<input type="hidden" name="' + input.name + '" value="2">'; // FORMAT_PLAIN.
+                } else if (input.type === 'hidden') {
+                    this.question.textarea += input.outerHTML;
+                }
+            }, this);
         }
 
         var itemcount = div.querySelector('.itemcount');

@@ -537,6 +537,30 @@ final class question_test extends \advanced_testcase {
         ));
     }
 
+    /**
+     * Test summarise_response() falls back to the question's response format when the
+     * response has no answerformat, e.g. responses submitted from older Moodle App versions.
+     *
+     * @covers ::summarise_response()
+     */
+    public function test_summarise_response_without_answerformat(): void {
+        $this->resetAfterTest();
+
+        $aitext = qtype_aitext_test_helper::make_aitext_question([]);
+        $aitext->start_attempt(new question_attempt_step(), 1);
+
+        // Editor formats fall back to HTML, so tags are removed.
+        $aitext->responseformat = 'editor';
+        $summary = $aitext->summarise_response(['answer' => '<p>First</p><p>Second</p>']);
+        $this->assertStringNotContainsString('<p>', $summary);
+        $this->assertStringContainsString('First', $summary);
+        $this->assertStringContainsString('Second', $summary);
+
+        // Plain formats fall back to plain text, so the text is kept as typed.
+        $aitext->responseformat = 'plain';
+        $this->assertEquals('x<y', $aitext->summarise_response(['answer' => 'x<y']));
+    }
+
 
     /**
      * Test aitext is_same_response, used when scrolling beween questions
