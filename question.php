@@ -191,6 +191,13 @@ class qtype_aitext_question extends question_graded_automatically {
         }
 
         // Everything else (deferredfeedback, deferredcbm, anything unknown) → deferred adapter.
+        // Use the queued adapter instead when it is installed and enabled, so responses are graded by a background task.
+        if (
+            class_exists(\qbehaviour_queued_for_aitext\helper::class)
+            && \qbehaviour_queued_for_aitext\helper::is_enabled()
+        ) {
+            return question_engine::make_behaviour('queued_for_aitext', $qa, $preferredbehaviour);
+        }
         return question_engine::make_behaviour('deferred_for_aitext', $qa, $preferredbehaviour);
     }
 
