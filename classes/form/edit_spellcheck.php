@@ -20,6 +20,7 @@ use context;
 use context_module;
 use core_form\dynamic_form;
 use moodle_url;
+use qtype_aitext\response_formatter;
 use question_engine;
 
 /**
@@ -44,8 +45,8 @@ class edit_spellcheck extends dynamic_form {
         $mform->addElement('hidden', 'questionattemptid');
         $mform->setType('questionattemptid', PARAM_INT);
 
+        // Notice: set_type has no effect on static elements, student_answer is sanitized by response_formatter::to_spellcheck_text.
         $mform->addElement('static', 'student_answer', get_string('spellcheck_student_anser_desc', 'qtype_aitext'));
-        $mform->setType('student_answer', PARAM_RAW);
 
         $editoroptions = [
             'context' => $this->context,
@@ -149,13 +150,15 @@ class edit_spellcheck extends dynamic_form {
 
         // Get the student's answer directly from the question attempt.
         $studentanswer = $qa->get_last_qt_var('answer', '');
+        $studentanswerformat = $qa->get_last_qt_var('answerformat') ?? FORMAT_PLAIN;
+        $studentanswertext = response_formatter::to_spellcheck_text($studentanswer, $studentanswerformat);
 
         $this->set_data((object)[
             'spellcheck_editor' => ['text' => $spellcheckvalue, 'format' => FORMAT_PLAIN],
             'questionattemptid' => $questionattemptid,
             'student_answer' => format_text(
-                $studentanswer,
-                $qa->get_last_qt_var('answerformat') ?? FORMAT_PLAIN,
+                $studentanswertext,
+                FORMAT_PLAIN,
                 ['context' => $this->get_context_for_dynamic_submission()]
             ),
         ]);
