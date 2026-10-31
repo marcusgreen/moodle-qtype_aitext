@@ -203,7 +203,7 @@ class qtype_aitext extends question_type {
      */
     public function get_sampleresponses($question) {
         global $DB;
-        $sampleresponses = $DB->get_records('qtype_aitext_sampleresponses', ['question' => $question->id]);
+        $sampleresponses = $DB->get_records('qtype_aitext_sampleresponses', ['question' => $question->id], 'id ASC');
         return $sampleresponses;
     }
 

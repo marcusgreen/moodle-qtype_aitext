@@ -78,7 +78,8 @@ class backup_qtype_aitext_plugin extends backup_qtype_plugin {
         // Set source to populate the data.
         $sampleresponse->set_source_table(
             'qtype_aitext_sampleresponses',
-            ['question' => backup::VAR_PARENTID]
+            ['question' => backup::VAR_PARENTID],
+            'id ASC'
         );
 
         // Don't need to annotate ids nor files.
