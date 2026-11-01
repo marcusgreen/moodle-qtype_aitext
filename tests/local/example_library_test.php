@@ -116,6 +116,27 @@ final class example_library_test extends \advanced_testcase {
         $this->assertStringNotContainsString('@@PLUGINFILE@@', $preview['questiontext']);
         $this->assertNotEmpty($preview['generalfeedback']);
         $this->assertContains(['facet' => 'feature', 'label' => 'Image'], $preview['tags']);
+        $this->assertFalse($preview['canprefill']);
+        $this->assertTrue(example_library::get_preview('english/future-tense')['canprefill']);
+    }
+
+    /**
+     * Examples without images can prefill the new question form, as imported question data.
+     */
+    public function test_get_question_data(): void {
+        $this->assertTrue(example_library::can_prefill(example_library::get_example('english/future-tense')));
+        $this->assertFalse(example_library::can_prefill(example_library::get_example('medicine/ecg-rhythm-strip')));
+        $this->assertNull(example_library::get_question_data('medicine/ecg-rhythm-strip'));
+        $this->assertNull(example_library::get_question_data('../../../../config'));
+
+        $question = example_library::get_question_data('english/future-tense');
+        $this->assertSame('aitext', $question->qtype);
+        $this->assertSame('The future tense', $question->name);
+        $this->assertEquals(3, $question->defaultmark);
+        $this->assertSame('plain', $question->responseformat);
+        $this->assertStringContainsString('future tense', $question->aiprompt);
+        $this->assertCount(3, $question->sampleresponses);
+        $this->assertContains('level:esl', $question->tags);
     }
 
     /**

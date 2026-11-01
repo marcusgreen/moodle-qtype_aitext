@@ -87,6 +87,18 @@ if ($data = $form->get_data()) {
     if (!in_array($category->contextid, $allowed)) {
         throw new moodle_exception('nopermissions', 'error', '', 'moodle/question:add');
     }
+    if (!empty($data->prefill)) {
+        if (!example_library::can_prefill(example_library::get_example($data->example))) {
+            throw new moodle_exception('invalidparameter', 'debug');
+        }
+        // Open the new question form filled in from the example; nothing is saved until the form is.
+        redirect(new moodle_url('/question/bank/editquestion/question.php', [
+            'qtype' => 'aitext',
+            'category' => $category->id,
+            'example' => $data->example,
+            'returnurl' => $returnurl ?: $backurl->out_as_local_url(false),
+        ] + array_intersect_key($urlparams, ['cmid' => 1, 'courseid' => 1])));
+    }
     $results = example_library::import(examples_form::selected_paths($data), $category);
 }
 

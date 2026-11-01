@@ -48,3 +48,34 @@ Feature: Browse, preview and import AI Text example questions
     And "The future tense" "link" should exist in the ".alert-success" "css_element"
     And "Polite request" "link" should exist in the ".alert-success" "css_element"
     And "Subject verb agreement" "link" should exist in the ".alert-success" "css_element"
+
+  @javascript
+  Scenario: Use an example as the starting point for a new question
+    When I click on "English" "text"
+    And I click on "The future tense" "link"
+    And I press "Use as starting point"
+    Then the following fields match these values:
+      | Question name         | The future tense |
+      | Default mark          | 3                |
+      | id_sampleresponses_0  | zx9!qpl          |
+      | id_sampleresponses_2  | Next weekend I go to see footbal match. |
+    And the field "id_aiprompt" matches value "Check whether the sentence is written in the future tense (for example using \"will\" or \"going to\" plus the base verb) and that it describes something happening next weekend. Explain any grammar or spelling errors in simple language. Stop processing if it is nonsense."
+    And I set the field "Question name" to "My future tense question"
+    And I press "id_submitbutton"
+    And I should see "My future tense question"
+    And I choose "Edit question" action for "My future tense question" in the question bank
+    And the following fields match these values:
+      | id_sampleresponses_1 | Next weekend I will visit my grandparents in Manchester. |
+      | Default mark         | 3                                                        |
+
+  @javascript
+  Scenario: Examples with images can only be imported
+    When I click on "Medicine" "text"
+    And I click on "ECG interpretation: rhythm strip" "link"
+    Then I should see "This example includes images" in the "[data-region='preview']" "css_element"
+    And the "Use as starting point" "button" should be disabled
+    And the "Import this question" "button" should be enabled
+    # Switching to an example without images enables it again.
+    And I click on "English" "text"
+    And I click on "The future tense" "link"
+    And the "Use as starting point" "button" should be enabled

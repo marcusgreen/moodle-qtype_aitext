@@ -235,9 +235,46 @@ class example_library {
             'markscheme' => trim((string) $question->markscheme),
             'samples' => $samples,
             'hassamples' => !empty($samples),
+            'canprefill' => self::can_prefill($example),
             'generalfeedback' => $optional($question->generalfeedback),
             'graderinfo' => $optional($question->graderinfo),
         ];
+    }
+
+    /**
+     * Whether an example can prefill the new question form.
+     *
+     * Examples with embedded images are import only, because their files would need copying
+     * into the form's draft areas.
+     *
+     * @param stdClass $example from get_example()
+     * @return bool
+     */
+    public static function can_prefill(stdClass $example): bool {
+        return !in_array('image', $example->facets['feature']);
+    }
+
+    /**
+     * An example read as question data, as the XML import would create it.
+     *
+     * @param string $path example path
+     * @return stdClass|null null if there is no such example or it cannot prefill the form
+     */
+    public static function get_question_data(string $path): ?stdClass {
+        global $CFG;
+        $example = self::get_example($path);
+        if (!$example || !self::can_prefill($example)) {
+            return null;
+        }
+        require_once($CFG->libdir . '/questionlib.php');
+        require_once($CFG->dirroot . '/question/format.php');
+        require_once($CFG->dirroot . '/question/format/xml/format.php');
+        $qformat = new qformat_xml();
+        ob_start();
+        $questions = $qformat->readquestions(file($example->file));
+        ob_end_clean();
+        $question = reset($questions);
+        return ($question && $question->qtype === 'aitext') ? $question : null;
     }
 
     /**

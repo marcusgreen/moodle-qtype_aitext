@@ -43,15 +43,18 @@ const markSelected = (root, link) => {
 /**
  * Point the import form at the chosen example and enable its buttons.
  *
+ * The prefill button is only enabled when the preview says the example can prefill a new question.
+ *
  * @param {HTMLElement} root library region
  * @param {string} path example path
  */
 const updateForm = (root, path) => {
     const form = root.querySelector('.qtype_aitext_examples-import form');
+    const preview = root.querySelector('[data-region="preview"] [data-canprefill]');
+    const canPrefill = preview && preview.dataset.canprefill === '1';
     form.querySelector('input[name="example"]').value = path;
-    form.querySelectorAll('input[type="submit"], button[type="submit"]').forEach((button) => {
-        button.disabled = false;
-        button.removeAttribute('disabled');
+    form.querySelectorAll('[type="submit"]').forEach((button) => {
+        button.disabled = button.name === 'prefill' && !canPrefill;
     });
 };
 

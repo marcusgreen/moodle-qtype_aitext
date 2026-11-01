@@ -30,6 +30,7 @@ use qtype_aitext\local\example_library;
  * updates when another example is chosen.
  *
  * Custom data: contexts (contexts the user can add questions to), example (selected path or '').
+ * Examples with images cannot prefill a new question, so the prefill button stays disabled for them.
  *
  * @package    qtype_aitext
  * @copyright  2026 Marcus Green
@@ -59,10 +60,14 @@ class examples_form extends \moodleform {
             ['contexts' => $this->_customdata['contexts']]
         );
 
-        $attributes = empty($this->_customdata['example']) ? ['disabled' => 'disabled'] : [];
+        $example = example_library::get_example($this->_customdata['example'] ?? '');
+        $disabled = ['disabled' => 'disabled'];
+        $attributes = $example ? [] : $disabled;
+        $prefillattributes = $example && example_library::can_prefill($example) ? [] : $disabled;
         $buttons = [
             $mform->createElement('submit', 'importone', get_string('examplesimportone', 'qtype_aitext'), $attributes),
             $mform->createElement('submit', 'importsubject', get_string('examplesimportsubject', 'qtype_aitext'), $attributes),
+            $mform->createElement('submit', 'prefill', get_string('examplesprefill', 'qtype_aitext'), $prefillattributes),
         ];
         $mform->addGroup($buttons, 'buttons', '', ' ', false);
     }

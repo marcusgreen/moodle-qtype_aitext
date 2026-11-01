@@ -30,6 +30,9 @@
   * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
   */
 class qtype_aitext_edit_form extends question_edit_form {
+    /** @var stdClass|null|false example used to prefill a new question; false until looked up */
+    protected $exampledata = false;
+
     /**
      * Add aitext specific form fields for editing
      *
@@ -259,6 +262,10 @@ class qtype_aitext_edit_form extends question_edit_form {
      * @return int count of sample answers
      */
     protected function get_sample_count() {
+        $example = $this->get_example_data();
+        if ($example && !empty($example->sampleresponses)) {
+            return count($example->sampleresponses);
+        }
         if (isset($this->question->id)) {
             if (isset($this->question->options->sampleresponses)) {
                 if (count($this->question->options->sampleresponses) > 0) {
@@ -268,6 +275,57 @@ class qtype_aitext_edit_form extends question_edit_form {
         }
         // Always have one empty sample answer set of fields.
         return 1;
+    }
+
+    /**
+     * The example question chosen in the example library to prefill a new question, if any.
+     *
+     * @return stdClass|null question data as imported from the example
+     */
+    protected function get_example_data(): ?stdClass {
+        if ($this->exampledata === false) {
+            $this->exampledata = null;
+            $path = optional_param('example', '', PARAM_PATH);
+            if ($path !== '' && empty($this->question->id)) {
+                $this->exampledata = \qtype_aitext\local\example_library::get_question_data($path);
+            }
+        }
+        return $this->exampledata;
+    }
+
+    /**
+     * Prefill a new question from an example, as if the example were a saved question.
+     *
+     * @param stdClass $question the data being passed to the form
+     */
+    public function set_data($question) {
+        $example = $this->get_example_data();
+        if ($example && empty($question->id)) {
+            $basefields = [
+                'name', 'questiontext', 'questiontextformat', 'generalfeedback', 'generalfeedbackformat', 'defaultmark', 'tags',
+            ];
+            foreach ($basefields as $field) {
+                $question->$field = $example->$field;
+            }
+            $options = new stdClass();
+            $fields = question_bank::get_qtype('aitext')->extra_question_fields();
+            array_shift($fields);
+            foreach ($fields as $field) {
+                if (isset($example->$field) && !is_array($example->$field)) {
+                    $options->$field = $example->$field;
+                }
+            }
+            foreach (['graderinfo', 'responsetemplate'] as $field) {
+                $options->$field = $example->$field['text'];
+                $options->{$field . 'format'} = $example->$field['format'];
+            }
+            $options->sampleresponses = [];
+            foreach ($example->sampleresponses ?? [] as $response) {
+                $options->sampleresponses[] = (object) ['response' => $response];
+            }
+            $question->options = $options;
+        }
+        parent::set_data($question);
     }
 
     /**

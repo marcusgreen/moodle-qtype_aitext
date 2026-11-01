@@ -26,6 +26,7 @@
     * responselines, defaultgrade, minwordlimit, maxwordlimit - response settings
     * aiprompt, markscheme - plain text
     * samples - list of {response}, hassamples
+    * canprefill - whether the example can prefill a new question (images are import only)
     * generalfeedback, graderinfo - HTML, may be empty
 
     Example context (json):
@@ -45,11 +46,13 @@
         "markscheme": "Award marks out of 3.",
         "samples": [{"response": "Next weekend I will visit my grandparents."}],
         "hassamples": true,
+        "canprefill": true,
         "generalfeedback": "",
         "graderinfo": ""
     }
 }}
-<article class="qtype_aitext_examples-preview" data-path="{{path}}" data-subject="{{subject}}" data-subjectlabel="{{subjectlabel}}">
+<article class="qtype_aitext_examples-preview" data-path="{{path}}" data-subject="{{subject}}" data-subjectlabel="{{subjectlabel}}"
+        data-canprefill="{{#canprefill}}1{{/canprefill}}{{^canprefill}}0{{/canprefill}}">
     <h3 class="h4">{{name}}</h3>
     <p>{{description}}</p>
     <p>
@@ -58,6 +61,9 @@
         {{/tags}}
     </p>
 
+    {{^canprefill}}
+        <p class="alert alert-info">{{#str}} examplesimportonly, qtype_aitext {{/str}}</p>
+    {{/canprefill}}
     <div class="que aitext mb-3">
         <div class="content">
             <div class="formulation clearfix">
