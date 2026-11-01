@@ -41,3 +41,19 @@ function qtype_aitext_pluginfile($course, $cm, $context, $filearea, $args, $forc
     require_once($CFG->libdir . '/questionlib.php');
     question_pluginfile($course, $context, 'qtype_aitext', $filearea, $args, $forcedownload, $options);
 }
+
+/**
+ * Fragment callback rendering the preview of one example question for the example library.
+ *
+ * @param array $args context and path (example path relative to the examples folder)
+ * @return string HTML
+ */
+function qtype_aitext_output_fragment_example_preview(array $args): string {
+    global $OUTPUT;
+    require_capability('moodle/question:add', $args['context']);
+    $preview = \qtype_aitext\local\example_library::get_preview((string) ($args['path'] ?? ''));
+    if (!$preview) {
+        throw new moodle_exception('invalidparameter', 'debug');
+    }
+    return $OUTPUT->render_from_template('qtype_aitext/examplepreview', $preview);
+}

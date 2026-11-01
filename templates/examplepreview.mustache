@@ -1,0 +1,103 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template qtype_aitext/examplepreview
+
+    Preview of one example question: how the student sees it, and how it is set up for the AI.
+
+    Context variables required for this template:
+    * path, subject, subjectlabel, name, description - example details
+    * tags - list of {facet, label}
+    * questiontext - HTML of the question text
+    * responselines, defaultgrade, minwordlimit, maxwordlimit - response settings
+    * aiprompt, markscheme - plain text
+    * samples - list of {response}, hassamples
+    * generalfeedback, graderinfo - HTML, may be empty
+
+    Example context (json):
+    {
+        "path": "english/future-tense",
+        "subject": "english",
+        "subjectlabel": "English",
+        "name": "The future tense",
+        "description": "One-sentence response checking use of a future form.",
+        "tags": [{"facet": "level", "label": "Esl"}],
+        "questiontext": "<p>Write a sentence about next weekend.</p>",
+        "responselines": 5,
+        "defaultgrade": "3",
+        "minwordlimit": "",
+        "maxwordlimit": "",
+        "aiprompt": "Check the sentence uses the future tense.",
+        "markscheme": "Award marks out of 3.",
+        "samples": [{"response": "Next weekend I will visit my grandparents."}],
+        "hassamples": true,
+        "generalfeedback": "",
+        "graderinfo": ""
+    }
+}}
+<article class="qtype_aitext_examples-preview" data-path="{{path}}" data-subject="{{subject}}" data-subjectlabel="{{subjectlabel}}">
+    <h3 class="h4">{{name}}</h3>
+    <p>{{description}}</p>
+    <p>
+        {{#tags}}
+            <span class="badge bg-secondary text-dark me-1" title="{{facet}}">{{label}}</span>
+        {{/tags}}
+    </p>
+
+    <div class="que aitext mb-3">
+        <div class="content">
+            <div class="formulation clearfix">
+                <div class="qtext">{{{questiontext}}}</div>
+                <label class="visually-hidden sr-only" for="qtype_aitext_examples-response">{{#str}} response, qtype_aitext {{/str}}</label>
+                <textarea id="qtype_aitext_examples-response" class="form-control" rows="{{responselines}}" disabled></textarea>
+            </div>
+        </div>
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-3">{{#str}} defaultmark, question {{/str}}</dt>
+        <dd class="col-sm-9">{{defaultgrade}}</dd>
+        {{#minwordlimit}}
+            <dt class="col-sm-3">{{#str}} minwordlimit, qtype_aitext {{/str}}</dt>
+            <dd class="col-sm-9">{{minwordlimit}}</dd>
+        {{/minwordlimit}}
+        {{#maxwordlimit}}
+            <dt class="col-sm-3">{{#str}} maxwordlimit, qtype_aitext {{/str}}</dt>
+            <dd class="col-sm-9">{{maxwordlimit}}</dd>
+        {{/maxwordlimit}}
+        <dt class="col-sm-3">{{#str}} aiprompt, qtype_aitext {{/str}}</dt>
+        <dd class="col-sm-9 qtype_aitext_examples-text">{{aiprompt}}</dd>
+        <dt class="col-sm-3">{{#str}} markscheme, qtype_aitext {{/str}}</dt>
+        <dd class="col-sm-9 qtype_aitext_examples-text">{{markscheme}}</dd>
+        {{#hassamples}}
+            <dt class="col-sm-3">{{#str}} examplessamples, qtype_aitext {{/str}}</dt>
+            <dd class="col-sm-9">
+                <ul class="ps-3 mb-0">
+                    {{#samples}}<li class="qtype_aitext_examples-text">{{response}}</li>{{/samples}}
+                </ul>
+            </dd>
+        {{/hassamples}}
+        {{#graderinfo}}
+            <dt class="col-sm-3">{{#str}} graderinfo, qtype_aitext {{/str}}</dt>
+            <dd class="col-sm-9">{{{graderinfo}}}</dd>
+        {{/graderinfo}}
+        {{#generalfeedback}}
+            <dt class="col-sm-3">{{#str}} generalfeedback, question {{/str}}</dt>
+            <dd class="col-sm-9">{{{generalfeedback}}}</dd>
+        {{/generalfeedback}}
+    </dl>
+</article>

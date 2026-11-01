@@ -57,3 +57,23 @@
     color: green;
     font-weight: 800;
 }
+
+/* Example question library. */
+.qtype_aitext_examples-item.active {
+    background-color: #0f6cbf;
+    color: #fff;
+}
+.qtype_aitext_examples-item:hover:not(.active) {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+.qtype_aitext_examples-subject summary {
+    cursor: pointer;
+}
+.qtype_aitext_examples-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.qtype_aitext_examples-preview .qtext img {
+    max-width: 100%;
+    height: auto;
+}

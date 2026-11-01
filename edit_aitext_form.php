@@ -42,6 +42,26 @@ class qtype_aitext_edit_form extends question_edit_form {
         $questionid = optional_param('id', 0, PARAM_INT);
         /** @var qtype_aitext $qtype */
         $qtype = question_bank::get_qtype('aitext');
+
+        // Offer the example question library when creating a new question.
+        if (!$questionid) {
+            $libraryparams = [
+                'cmid' => optional_param('cmid', 0, PARAM_INT),
+                'courseid' => optional_param('courseid', 0, PARAM_INT),
+                'returnurl' => optional_param('returnurl', '', PARAM_LOCALURL),
+                'category' => $this->category->id . ',' . $this->category->contextid,
+            ];
+            $libraryurl = new moodle_url('/question/type/aitext/examples.php', array_filter($libraryparams));
+            $librarylink = $mform->createElement(
+                'static',
+                'examplelibrary',
+                get_string('examplelibrary', 'qtype_aitext'),
+                html_writer::link($libraryurl, get_string('examplelibrarybrowse', 'qtype_aitext'))
+            );
+            $mform->insertElementBefore($librarylink, 'category');
+            $mform->addHelpButton('examplelibrary', 'examplelibrary', 'qtype_aitext');
+        }
+
         $mform->removeelement('generalfeedback');
         $mform->removeelement('questiontext');
         $mform->addElement(
