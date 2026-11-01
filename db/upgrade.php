@@ -128,5 +128,17 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026072800, 'qtype', 'aitext');
     }
 
+    if ($oldversion < 2026103100) {
+        // Define field exemplar to be added to qtype_aitext.
+        $table = new xmldb_table('qtype_aitext');
+        $field = new xmldb_field('exemplar', XMLDB_TYPE_TEXT, null, null, null, null, null, 'spellcheck');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2026103100, 'qtype', 'aitext');
+    }
+
     return true;
 }

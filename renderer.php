@@ -215,14 +215,51 @@ class qtype_aitext_renderer extends qtype_renderer {
 
                 // Store the modified feedback in a variable.
                 $feedback = $comment . $showprompt;
-                return $feedback;
+                return $feedback . $this->right_answer($qa, $options);
             }
 
             // Return the comment if it exists, otherwise empty string.
-            return $comment ?? '';
+            return ($comment ?? '') . $this->right_answer($qa, $options);
         }
 
-        return '';
+        return $this->right_answer($qa, $options);
+    }
+
+    /**
+     * Wrap the exemplar response in the standard right answer container,
+     * when the display options allow the right answer to be shown.
+     *
+     * @param question_attempt $qa
+     * @param question_display_options $options
+     * @return string HTML fragment.
+     */
+    protected function right_answer(question_attempt $qa, question_display_options $options): string {
+        if (!$options->rightanswer) {
+            return '';
+        }
+        return html_writer::nonempty_tag('div', $this->correct_response($qa), ['class' => 'rightanswer']);
+    }
+
+    /**
+     * Display the exemplar response as the right answer.
+     *
+     * @param question_attempt $qa
+     * @return string HTML fragment.
+     */
+    protected function correct_response(question_attempt $qa) {
+        $question = $qa->get_question();
+        if ($question->get_correct_response() === null) {
+            return '';
+        }
+        $exemplar = $question->format_text(
+            $question->exemplar,
+            FORMAT_PLAIN,
+            $qa,
+            'question',
+            'exemplar',
+            $question->id
+        );
+        return get_string('exemplarrightanswer', 'qtype_aitext') . $exemplar;
     }
 
     /**

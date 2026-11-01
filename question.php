@@ -126,6 +126,13 @@ class qtype_aitext_question extends question_graded_automatically {
      */
     public $markscheme;
 
+    /**
+     * Exemplar response, used for "Fill in correct responses"
+     * and shown as the right answer in review.
+     * @var string
+     */
+    public $exemplar = '';
+
     /** @var int */
     public $defaultmark;
 
@@ -729,12 +736,19 @@ class qtype_aitext_question extends question_graded_automatically {
     }
 
     /**
-     * There is no one correct response for this quesiton type
-     * so return null.
+     * Return the exemplar response, if one has been set, in the
+     * format expected by the response field. There is no single
+     * correct response, so return null when there is no exemplar.
      * @return array|null
      */
     public function get_correct_response() {
-        return null;
+        if (trim((string) $this->exemplar) === '') {
+            return null;
+        }
+        if (str_contains($this->responseformat, 'editor')) {
+            return ['answer' => text_to_html($this->exemplar), 'answerformat' => FORMAT_HTML];
+        }
+        return ['answer' => $this->exemplar, 'answerformat' => FORMAT_PLAIN];
     }
 
     /**

@@ -561,6 +561,82 @@ final class question_test extends \advanced_testcase {
         $this->assertEquals('x<y', $aitext->summarise_response(['answer' => 'x<y']));
     }
 
+    /**
+     * Test get_correct_response() returns null when there is no exemplar response.
+     *
+     * @covers ::get_correct_response()
+     */
+    public function test_get_correct_response_without_exemplar(): void {
+        $this->resetAfterTest();
+
+        $aitext = qtype_aitext_test_helper::make_aitext_question([]);
+        $this->assertNull($aitext->get_correct_response());
+
+        // Whitespace only counts as no exemplar.
+        $aitext->exemplar = "  \n ";
+        $this->assertNull($aitext->get_correct_response());
+        $this->assertNull($aitext->get_right_answer_summary());
+    }
+
+    /**
+     * Test get_correct_response() returns the exemplar in the format used by the response field.
+     *
+     * @covers ::get_correct_response()
+     */
+    public function test_get_correct_response_with_exemplar(): void {
+        $this->resetAfterTest();
+
+        $aitext = qtype_aitext_test_helper::make_aitext_question([]);
+        $aitext->exemplar = "Frogs are amphibians.\nThey lay eggs in water.";
+
+        // The editor gets the text converted to HTML.
+        $aitext->responseformat = 'editor';
+        $correct = $aitext->get_correct_response();
+        $this->assertEquals(FORMAT_HTML, $correct['answerformat']);
+        $this->assertStringContainsString('Frogs are amphibians.', $correct['answer']);
+        $this->assertStringContainsString('<br', $correct['answer']);
+
+        // Plain text formats get the text as typed.
+        foreach (['plain', 'monospaced'] as $responseformat) {
+            $aitext->responseformat = $responseformat;
+            $this->assertEquals(
+                ['answer' => "Frogs are amphibians.\nThey lay eggs in water.", 'answerformat' => FORMAT_PLAIN],
+                $aitext->get_correct_response()
+            );
+        }
+
+        $this->assertStringContainsString('amphibians', $aitext->get_right_answer_summary());
+    }
+
+    /**
+     * Test the exemplar is saved from the form and loaded into the question instance.
+     *
+     * @covers \qtype_aitext::save_question_options
+     * @covers \qtype_aitext::initialise_question_instance
+     */
+    public function test_exemplar_is_saved_and_loaded(): void {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $cat = $generator->create_question_category([]);
+        $question = $generator->create_question('aitext', 'plain', ['category' => $cat->id]);
+
+        $formdata = \test_question_maker::get_question_form_data('aitext', 'plain');
+        $formdata->id = $question->id;
+        $formdata->context = \context::instance_by_id($cat->contextid);
+        $formdata->exemplar = 'A model answer';
+
+        \question_bank::get_qtype('aitext')->save_question_options($formdata);
+        \question_bank::notify_question_edited($question->id);
+
+        $loaded = \question_bank::load_question($question->id);
+        $this->assertEquals('A model answer', $loaded->exemplar);
+        $this->assertEquals(
+            ['answer' => 'A model answer', 'answerformat' => FORMAT_PLAIN],
+            $loaded->get_correct_response()
+        );
+    }
 
     /**
      * Test aitext is_same_response, used when scrolling beween questions

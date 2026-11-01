@@ -109,6 +109,17 @@ class qtype_aitext_edit_form extends question_edit_form {
         );
         $mform->addElement('html', '</div>');
 
+        $mform->addElement('header', 'exemplarheader', get_string('exemplarheader', 'qtype_aitext'));
+        $mform->setExpanded('exemplarheader');
+        $mform->addElement(
+            'textarea',
+            'exemplar',
+            get_string('exemplar', 'qtype_aitext'),
+            ['maxlen' => 50, 'rows' => 6, 'size' => 30]
+        );
+        $mform->setType('exemplar', PARAM_RAW);
+        $mform->addHelpButton('exemplar', 'exemplar', 'qtype_aitext');
+
         // Add repeated sample answer options along with the field for returned responses.
         $mform->addElement('header', 'responsetest', get_string('responsetester', 'qtype_aitext'));
         $mform->addHelpButton('responsetest', 'responsetesthelp', 'qtype_aitext');
@@ -282,6 +293,8 @@ class qtype_aitext_edit_form extends question_edit_form {
             'text' => $question->options->responsetemplate,
             'format' => $question->options->responsetemplateformat,
         ];
+
+        $question->exemplar = $question->options->exemplar ?? '';
 
         $draftid = file_get_submitted_draft_itemid('graderinfo');
         $question->graderinfo = [];

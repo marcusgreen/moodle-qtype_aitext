@@ -150,6 +150,7 @@ class qtype_aitext extends question_type {
         $options->graderinfoformat = $formdata->graderinfo['format'];
         $options->responsetemplate = $formdata->responsetemplate['text'];
         $options->responsetemplateformat = $formdata->responsetemplate['format'];
+        $options->exemplar = $formdata->exemplar ?? '';
 
         $DB->update_record('qtype_aitext', $options);
         $DB->delete_records('qtype_aitext_sampleresponses', ['question' => $formdata->id]);
@@ -183,6 +184,7 @@ class qtype_aitext extends question_type {
         $question->responsetemplateformat = $questiondata->options->responsetemplateformat;
         $question->aiprompt = $questiondata->options->aiprompt;
         $question->markscheme = $questiondata->options->markscheme;
+        $question->exemplar = $questiondata->options->exemplar ?? '';
         parent::get_question_options($question);
         $question->sampleresponses = $this->get_sampleresponses($question);
 
@@ -313,6 +315,7 @@ class qtype_aitext extends question_type {
             'markscheme',
             'model',
             'spellcheck',
+            'exemplar',
         ];
     }
     /**
