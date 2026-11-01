@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="aitext">
+    <exampledescription>Identify the hazard in an image of a blocked fire exit. The AI prompt describes the image in text because the grader cannot see it.</exampledescription>
+    <name>
+      <text>Workplace hazard identification: fire exit</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p><img src="@@PLUGINFILE@@/blocked_fire_exit.svg" alt="Warehouse corridor with an emergency fire exit door blocked by stacked cardboard boxes and a pallet" width="640" height="420"></p>
+<p>Inspect the workplace scenario shown in the image. Identify the primary OSHA/safety hazard present and state the risk it poses.</p>]]></text>
+      <file name="blocked_fire_exit.svg" path="/" encoding="base64">PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NDAiIGhlaWdodD0iNDIwIiB2aWV3Qm94PSIwIDAgNjQwIDQyMCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJXYXJlaG91c2UgY29ycmlkb3Igd2l0aCBhbiBlbWVyZ2VuY3kgZmlyZSBleGl0IGRvb3IgYmxvY2tlZCBieSBzdGFja2VkIGNhcmRib2FyZCBib3hlcyBhbmQgYSBwYWxsZXQiPgogIDxyZWN0IHdpZHRoPSI2NDAiIGhlaWdodD0iNDIwIiBmaWxsPSIjZDlkZGUyIi8+CiAgPHJlY3QgeT0iMzMwIiB3aWR0aD0iNjQwIiBoZWlnaHQ9IjkwIiBmaWxsPSIjOWE5NjkwIi8+CiAgPGxpbmUgeDE9IjAiIHkxPSIzMzAiIHgyPSI2NDAiIHkyPSIzMzAiIHN0cm9rZT0iIzZiNjg2MyIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgPCEtLSBTaGVsdmluZyBsZWZ0IC0tPgogIDxyZWN0IHg9IjIwIiB5PSIxMjAiIHdpZHRoPSIxNDAiIGhlaWdodD0iMjEwIiBmaWxsPSJub25lIiBzdHJva2U9IiMzYjVhODYiIHN0cm9rZS13aWR0aD0iNiIvPgogIDxsaW5lIHgxPSIyMCIgeTE9IjE5MCIgeDI9IjE2MCIgeTI9IjE5MCIgc3Ryb2tlPSIjZTA4YTFlIiBzdHJva2Utd2lkdGg9IjYiLz4KICA8bGluZSB4MT0iMjAiIHkxPSIyNjAiIHgyPSIxNjAiIHkyPSIyNjAiIHN0cm9rZT0iI2UwOGExZSIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgPHJlY3QgeD0iMzUiIHk9IjE1MCIgd2lkdGg9IjQ1IiBoZWlnaHQ9IjM4IiBmaWxsPSIjYjk4YTU1Ii8+PHJlY3QgeD0iOTAiIHk9IjE1NSIgd2lkdGg9IjUwIiBoZWlnaHQ9IjMzIiBmaWxsPSIjYzY5YTYzIi8+CiAgPHJlY3QgeD0iNDAiIHk9IjIyMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjM2IiBmaWxsPSIjYzY5YTYzIi8+CiAgPCEtLSBFeGl0IHNpZ24gLS0+CiAgPHJlY3QgeD0iMjkwIiB5PSIzOCIgd2lkdGg9IjEyMCIgaGVpZ2h0PSI0NCIgcng9IjQiIGZpbGw9IiMxMThhM2UiLz4KICA8dGV4dCB4PSIzNTAiIHk9IjcwIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjYiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FWElUPC90ZXh0PgogIDwhLS0gRmlyZSBkb29yIC0tPgogIDxyZWN0IHg9IjI3MCIgeT0iOTUiIHdpZHRoPSIxNjAiIGhlaWdodD0iMjM1IiBmaWxsPSIjYjIzYTJlIiBzdHJva2U9IiM1ZTFmMTgiIHN0cm9rZS13aWR0aD0iNSIvPgogIDxyZWN0IHg9IjI4NSIgeT0iMjAwIiB3aWR0aD0iMTMwIiBoZWlnaHQ9IjE0IiByeD0iNCIgZmlsbD0iI2NmY2ZjZiIgc3Ryb2tlPSIjNjY2IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIzNTAiIHk9IjE0NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE1IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+RklSRSBFWElUPC90ZXh0PgogIDx0ZXh0IHg9IjM1MCIgeT0iMTY1IiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPktFRVAgQ0xFQVI8L3RleHQ+CiAgPCEtLSBQYWxsZXQgYW5kIGJveGVzIGJsb2NraW5nIGRvb3IgLS0+CiAgPHJlY3QgeD0iMjM1IiB5PSIzMTUiIHdpZHRoPSIyMzAiIGhlaWdodD0iMTUiIGZpbGw9IiM4YTYyMzkiLz4KICA8cmVjdCB4PSIyNDUiIHk9IjI0NSIgd2lkdGg9IjEwMCIgaGVpZ2h0PSI3MCIgZmlsbD0iI2M2OWE2MyIgc3Ryb2tlPSIjN2Q1YTMyIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cmVjdCB4PSIzNTAiIHk9IjIzNSIgd2lkdGg9IjEwNSIgaGVpZ2h0PSI4MCIgZmlsbD0iI2I5OGE1NSIgc3Ryb2tlPSIjN2Q1YTMyIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cmVjdCB4PSIyNjUiIHk9IjE3NSIgd2lkdGg9Ijg1IiBoZWlnaHQ9IjcwIiBmaWxsPSIjYjk4YTU1IiBzdHJva2U9IiM3ZDVhMzIiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxyZWN0IHg9IjM1NSIgeT0iMTg1IiB3aWR0aD0iODAiIGhlaWdodD0iNTAiIGZpbGw9IiNjNjlhNjMiIHN0cm9rZT0iIzdkNWEzMiIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPGxpbmUgeDE9IjI5NSIgeTE9IjI0NSIgeDI9IjI5NSIgeTI9IjMxNSIgc3Ryb2tlPSIjYTM3YTQ3IiBzdHJva2Utd2lkdGg9IjMiLz4KICA8bGluZSB4MT0iNDAwIiB5MT0iMjM1IiB4Mj0iNDAwIiB5Mj0iMzE1IiBzdHJva2U9IiNhMzdhNDciIHN0cm9rZS13aWR0aD0iMyIvPgogIDwhLS0gRmlyZSBleHRpbmd1aXNoZXIgcmlnaHQgLS0+CiAgPHJlY3QgeD0iNTQwIiB5PSIyMzAiIHdpZHRoPSIyOCIgaGVpZ2h0PSI3MCIgcng9IjEwIiBmaWxsPSIjYzgyNDFiIi8+CiAgPHJlY3QgeD0iNTQ3IiB5PSIyMTgiIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgZmlsbD0iIzMzMyIvPgogIDxyZWN0IHg9IjUyNSIgeT0iMzAwIiB3aWR0aD0iNTgiIGhlaWdodD0iOCIgZmlsbD0iIzU1NSIvPgo8L3N2Zz4K</file>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<p>The emergency fire exit is obstructed by boxes stacked on a pallet. Exit routes must be kept clear at all times (OSHA 29 CFR 1910.37). In a fire or other emergency, workers could be delayed or trapped, leading to injury or death.</p>]]></text>
+    </generalfeedback>
+    <defaultgrade>10</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber>hs-fire-exit-hazard</idnumber>
+    <responseformat>plain</responseformat>
+    <responsefieldlines>5</responsefieldlines>
+    <minwordlimit/>
+    <maxwordlimit>150</maxwordlimit>
+    <graderinfo format="html">
+      <text><![CDATA[<p>Expected answer: blocked/obstructed fire exit (egress obstruction); risk of delayed or prevented evacuation in a fire or emergency.</p>]]></text>
+    </graderinfo>
+    <responsetemplate format="html">
+      <text/>
+    </responsetemplate>
+    <aiprompt>You cannot see the image the student was shown, so use this description of it: a warehouse corridor with a red emergency door marked "FIRE EXIT - KEEP CLEAR" under a green EXIT sign. Cardboard boxes are stacked on a wooden pallet directly in front of the door, blocking it. Shelving is on the left and a wall-mounted fire extinguisher on the right; neither is a hazard. Determine if the student accurately pinpoints the safety hazard shown (the blocked fire exit / obstructed emergency egress) and mentions the risk of restricted or delayed evacuation in an emergency.</aiprompt>
+    <markscheme>10 marks for identifying the specific hazard (blocked or obstructed fire exit) and the safety risk (people cannot evacuate quickly or could be trapped in a fire or emergency). 5 marks if they mention a hazard is present but are vague, for example "boxes are in the way" or "fire hazard" without saying the exit is blocked or what the risk is. 0 marks for incorrect identification, such as naming the shelving or fire extinguisher as the hazard.</markscheme>
+    <model/>
+    <spellcheck>0</spellcheck>
+    <sampleresponse>
+      <response>The fire exit door is blocked by boxes stacked on a pallet. In a fire, workers would not be able to get out quickly and could be trapped.</response>
+    </sampleresponse>
+    <sampleresponse>
+      <response>There are boxes left lying around, which is a hazard.</response>
+    </sampleresponse>
+    <sampleresponse>
+      <response>The fire extinguisher is mounted too low on the wall.</response>
+    </sampleresponse>
+    <tags>
+      <tag><text>subject:health-safety</text></tag>
+      <tag><text>topic:hazard-identification</text></tag>
+      <tag><text>level:professional</text></tag>
+      <tag><text>feature:samples</text></tag>
+      <tag><text>feature:image</text></tag>
+    </tags>
+  </question>
+</quiz>

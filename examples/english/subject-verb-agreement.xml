@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="aitext">
+    <exampledescription>Learner spots and corrects a subject-verb agreement error (don't / doesn't). Shows a prompt that explains grammar in simple language.</exampledescription>
+    <name>
+      <text>Subject verb agreement</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">What is wrong with the following sentence?</p>
+<p dir="ltr" style="text-align: left;">"My sister don't like eating vegetables."</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>4</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber>eng-subject-verb-agreement</idnumber>
+    <responseformat>plain</responseformat>
+    <responsefieldlines>5</responsefieldlines>
+    <minwordlimit/>
+    <maxwordlimit/>
+    <graderinfo format="html">
+      <text/>
+    </graderinfo>
+    <responsetemplate format="html">
+      <text/>
+    </responsetemplate>
+    <aiprompt>Given the sentence "My sister don't like eating vegetables.", comment in simple language on the correctness of the student's analysis. Respond in less than 30 words. Say if the answer given is correct or not.</aiprompt>
+    <markscheme>Give no marks to a nonsense response. Award marks out of 4. Give 2 marks if the student identifies that "don't" is incorrect and should be "doesn't". Give 1 mark if the student explains that the subject "my sister" is third person singular so the verb must agree with it. Give 1 mark if the student writes the corrected sentence "My sister doesn't like eating vegetables." Deduct marks if the student changes parts of the sentence that were already correct.</markscheme>
+    <model/>
+    <spellcheck>0</spellcheck>
+     <sampleresponse>
+      <question>0</question>
+      <response>kkd-0;a</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>"My sister" is third person singular, so the verb should be "doesn't" not "don't". The correct sentence is "My sister doesn't like eating vegetables."</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>It should say "My sister does not likes eating vegetables."</response>
+     </sampleresponse>
+    <tags>
+      <tag><text>subject:english</text></tag>
+      <tag><text>topic:grammar</text></tag>
+      <tag><text>level:esl</text></tag>
+      <tag><text>feature:samples</text></tag>
+    </tags>
+  </question>
+</quiz>

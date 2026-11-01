@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="aitext">
+    <exampledescription>Describe the three stages of the fetch-decode-execute cycle in full sentences.</exampledescription>
+    <name>
+      <text>Fetch decode execute</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Describe the three stages of the fetch-decode-execute cycle. In your answer, explain what happens at each stage and state where the instructions are fetched from. Write your answer in full sentences.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>5</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber>comp-fetch-decode-execute</idnumber>
+    <responseformat>plain</responseformat>
+    <responsefieldlines>15</responsefieldlines>
+    <minwordlimit/>
+    <maxwordlimit/>
+    <graderinfo format="html">
+      <text/>
+    </graderinfo>
+    <responsetemplate format="html">
+      <text/>
+    </responsetemplate>
+    <aiprompt>You are marking an ICT answer written by a 16-year-old student. The question asked them to describe the three stages of the fetch-decode-execute cycle and to state where instructions are fetched from. Mark their answer against the mark scheme provided and give brief, encouraging feedback explaining what they got right and what they missed. Accept informal wording as long as the technical meaning is correct.</aiprompt>
+    <markscheme>Award up to 5 marks as follows:
+
+1 mark — States that instructions are fetched from main memory (RAM).
+
+1 mark — Fetch: the next instruction is copied from memory into the CPU (credit references to the program counter holding the address of the next instruction).
+
+1 mark — Decode: the control unit works out (interprets) what the instruction means / what needs to be done.
+
+1 mark — Execute: the instruction is carried out (for example the ALU performs a calculation, or data is stored/moved).
+
+1 mark — States that the cycle repeats continuously, or that the program counter is incremented to point to the next instruction.
+
+Do not deduct marks for minor spelling errors. Award 0 marks if the answer describes something other than the CPU cycle. Give the mark out of 5</markscheme>
+    <model/>
+    <spellcheck>0</spellcheck>
+     <sampleresponse>
+      <question>0</question>
+      <response>fde/12x</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>In the fetch stage the CPU uses the program counter to find the address of the next instruction and copies that instruction from main memory (RAM) into the CPU. The program counter is then increased by one. In the decode stage the control unit works out what the instruction means and what the CPU needs to do. In the execute stage the instruction is carried out, for example the ALU adds two numbers together. The cycle then repeats for the next instruction.</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>Fetch is when the computer gets the instruction. Decode is when it understands it. Execute is when it does it.</response>
+     </sampleresponse>
+    <tags>
+      <tag><text>subject:computing</text></tag>
+      <tag><text>topic:cpu</text></tag>
+      <tag><text>level:gcse</text></tag>
+      <tag><text>feature:samples</text></tag>
+    </tags>
+  </question>
+</quiz>

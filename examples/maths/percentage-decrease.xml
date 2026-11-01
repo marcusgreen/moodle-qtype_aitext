@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="aitext">
+    <exampledescription>Percentage decrease with working shown. Mark scheme rewards method as well as the final answer.</exampledescription>
+    <name>
+      <text>Percentage decrease</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>A car was bought for £12,000. One year later it is worth £9,000.</p>
+<p>Calculate the percentage decrease in the value of the car. Show your working and explain each step.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>3</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber>maths-percentage-decrease</idnumber>
+    <responseformat>plain</responseformat>
+    <responsefieldlines>10</responsefieldlines>
+    <minwordlimit/>
+    <maxwordlimit/>
+    <graderinfo format="html">
+      <text/>
+    </graderinfo>
+    <responsetemplate format="html">
+      <text/>
+    </responsetemplate>
+    <aiprompt>Given the question {{questiontext}} evaluate the response.
+
+The decrease is £12,000 - £9,000 = £3,000. The percentage decrease is 3,000 / 12,000 x 100 = 25%. A common mistake is dividing by the new value (3,000 / 9,000 = 33.3%) which is wrong because percentage change is calculated from the original value.
+Do not use latex in your response, or give the correct answer.</aiprompt>
+    <markscheme>=== CRITICAL VALIDATION ===
+Before processing, examine the STUDENT RESPONSE. If the response consists of random characters, gibberish, code snippets that do not address the prompt, or does not contain real, coherent words, you MUST immediately halt processing. In this scenario, set the "marks" to 0 and set the "feedback" strictly to: "The response provided does not contain valid text or mathematical reasoning to grade." Do not apply the grading instructions if this condition is met.
+
+Award marks out of 3. Give 1 mark for finding the decrease of £3,000. Give 1 mark for dividing by the original value of £12,000. Give 1 mark for the correct final answer of 25%. If the student divides by £9,000 give a maximum of 1 mark.</markscheme>
+    <model/>
+    <spellcheck>0</spellcheck>
+     <sampleresponse>
+      <question>0</question>
+      <response>t5%%ee1</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>First find how much the value went down: 12000 - 9000 = 3000. Then divide the decrease by the original price: 3000 / 12000 = 0.25. Multiply by 100 to get a percentage, so the decrease is 25%.</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>12000 - 9000 = 3000. 3000 divided by 9000 is 0.333 so it went down by 33%.</response>
+     </sampleresponse>
+    <tags>
+      <tag><text>subject:maths</text></tag>
+      <tag><text>topic:percentages</text></tag>
+      <tag><text>level:gcse</text></tag>
+      <tag><text>feature:samples</text></tag>
+    </tags>
+  </question>
+</quiz>

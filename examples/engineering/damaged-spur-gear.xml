@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="aitext">
+    <exampledescription>Spot a sheared tooth on a spur gear and explain the consequences. The image is described to the AI in the prompt.</exampledescription>
+    <name>
+      <text>Mechanical inspection: damaged spur gear</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p><img src="@@PLUGINFILE@@/sheared_gear_tooth.svg" alt="Steel spur gear on a workbench" width="640" height="440"></p>
+<p>Examine the provided image of the mechanical component. Identify the structural or assembly error visible and explain why it is incorrect.</p>]]></text>
+      <file name="sheared_gear_tooth.svg" path="/" encoding="base64">PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NDAiIGhlaWdodD0iNDQwIiB2aWV3Qm94PSIwIDAgNjQwIDQ0MCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJTdGVlbCBzcHVyIGdlYXIgb24gYSB3b3JrYmVuY2giPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJiZW5jaCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzZmNzM3OCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzU1NTk1ZSIvPjwvbGluZWFyR3JhZGllbnQ+CjxyYWRpYWxHcmFkaWVudCBpZD0ic3RlZWwiIGN4PSI0MCUiIGN5PSIzNSUiIHI9Ijc1JSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZTllY2VmIi8+PHN0b3Agb2Zmc2V0PSIwLjU1IiBzdG9wLWNvbG9yPSIjYjViY2M0Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y4ODkyIi8+PC9yYWRpYWxHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJmcmFjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOWE4Zjg0Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNmU2NTVjIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0ic2hhZG93IiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj48ZmVEcm9wU2hhZG93IGR4PSI2IiBkeT0iOCIgc3RkRGV2aWF0aW9uPSI2IiBmbG9vZC1jb2xvcj0iIzAwMCIgZmxvb2Qtb3BhY2l0eT0iMC40NSIvPjwvZmlsdGVyPgo8L2RlZnM+CjxyZWN0IHdpZHRoPSI2NDAiIGhlaWdodD0iNDQwIiBmaWxsPSJ1cmwoI2JlbmNoKSIvPgo8cGF0aCBkPSJNMzIwLjAsNzIuMCBMMzI3LjAsNzIuMiBMMzMzLjcsNDUuNSBMMzQ2LjUsNDcuMCBMMzQ3LjcsNzQuNiBMMzU4LjMsNzcuMCBMMzY1LjAsNzkuMCBMMzc4LjQsNTUuMCBMMzkwLjMsNTkuOCBMMzg0LjQsODYuOCBMMzk0LjAsOTEuOCBMNDAwLjAsOTUuNSBMNDE5LjEsNzUuOCBMNDI5LjQsODMuNCBMNDE2LjcsMTA4LjAgTDQyNC43LDExNS4zIEw0MjkuNSwxMjAuNCBMNDM1LjcsMTE2LjkgTDQzNS4zLDEyMi41IEw0NDIuNSwxMjEuOCBMNDQxLjEsMTI4LjEgTDQ0Ni43LDEyOS4wIEw0NDMuNiwxMzUuMCBMNDQyLjQsMTM2LjggTDQ0OC4yLDE0Ni4wIEw0NTEuNSwxNTIuMSBMNDc4LjAsMTQ0LjcgTDQ4My4wLDE1Ni40IEw0NTkuOCwxNzEuMyBMNDYzLjAsMTgxLjcgTDQ2NC42LDE4OC41IEw0OTIuMSwxODguMSBMNDkzLjksMjAwLjggTDQ2Ny42LDIwOS4yIEw0NjguMCwyMjAuMCBMNDY3LjgsMjI3LjAgTDQ5NC41LDIzMy43IEw0OTMuMCwyNDYuNSBMNDY1LjQsMjQ3LjcgTDQ2My4wLDI1OC4zIEw0NjEuMCwyNjUuMCBMNDg1LjAsMjc4LjQgTDQ4MC4yLDI5MC4zIEw0NTMuMiwyODQuNCBMNDQ4LjIsMjk0LjAgTDQ0NC41LDMwMC4wIEw0NjQuMiwzMTkuMSBMNDU2LjYsMzI5LjQgTDQzMi4wLDMxNi43IEw0MjQuNywzMjQuNyBMNDE5LjYsMzI5LjUgTDQzMy43LDM1My4xIEw0MjMuNiwzNjEuMCBMNDAzLjIsMzQyLjQgTDM5NC4wLDM0OC4yIEwzODcuOSwzNTEuNSBMMzk1LjMsMzc4LjAgTDM4My42LDM4My4wIEwzNjguNywzNTkuOCBMMzU4LjMsMzYzLjAgTDM1MS41LDM2NC42IEwzNTEuOSwzOTIuMSBMMzM5LjIsMzkzLjkgTDMzMC44LDM2Ny42IEwzMjAuMCwzNjguMCBMMzEzLjAsMzY3LjggTDMwNi4zLDM5NC41IEwyOTMuNSwzOTMuMCBMMjkyLjMsMzY1LjQgTDI4MS43LDM2My4wIEwyNzUuMCwzNjEuMCBMMjYxLjYsMzg1LjAgTDI0OS43LDM4MC4yIEwyNTUuNiwzNTMuMiBMMjQ2LjAsMzQ4LjIgTDI0MC4wLDM0NC41IEwyMjAuOSwzNjQuMiBMMjEwLjYsMzU2LjYgTDIyMy4zLDMzMi4wIEwyMTUuMywzMjQuNyBMMjEwLjUsMzE5LjYgTDE4Ni45LDMzMy43IEwxNzkuMCwzMjMuNiBMMTk3LjYsMzAzLjIgTDE5MS44LDI5NC4wIEwxODguNSwyODcuOSBMMTYyLjAsMjk1LjMgTDE1Ny4wLDI4My42IEwxODAuMiwyNjguNyBMMTc3LjAsMjU4LjMgTDE3NS40LDI1MS41IEwxNDcuOSwyNTEuOSBMMTQ2LjEsMjM5LjIgTDE3Mi40LDIzMC44IEwxNzIuMCwyMjAuMCBMMTcyLjIsMjEzLjAgTDE0NS41LDIwNi4zIEwxNDcuMCwxOTMuNSBMMTc0LjYsMTkyLjMgTDE3Ny4wLDE4MS43IEwxNzkuMCwxNzUuMCBMMTU1LjAsMTYxLjYgTDE1OS44LDE0OS43IEwxODYuOCwxNTUuNiBMMTkxLjgsMTQ2LjAgTDE5NS41LDE0MC4wIEwxNzUuOCwxMjAuOSBMMTgzLjQsMTEwLjYgTDIwOC4wLDEyMy4zIEwyMTUuMywxMTUuMyBMMjIwLjQsMTEwLjUgTDIwNi4zLDg2LjkgTDIxNi40LDc5LjAgTDIzNi44LDk3LjYgTDI0Ni4wLDkxLjggTDI1Mi4xLDg4LjUgTDI0NC43LDYyLjAgTDI1Ni40LDU3LjAgTDI3MS4zLDgwLjIgTDI4MS43LDc3LjAgTDI4OC41LDc1LjQgTDI4OC4xLDQ3LjkgTDMwMC44LDQ2LjEgTDMwOS4yLDcyLjQgWiIgZmlsbD0idXJsKCNzdGVlbCkiIHN0cm9rZT0iIzVkNjU2ZSIgc3Ryb2tlLXdpZHRoPSIyIiBmaWx0ZXI9InVybCgjc2hhZG93KSIvPgo8cGF0aCBkPSJNNDI5LjUsMTIwLjQgTDQzNS43LDExNi45IEw0MzUuMywxMjIuNSBMNDQyLjUsMTIxLjggTDQ0MS4xLDEyOC4xIEw0NDYuNywxMjkuMCBMNDQzLjYsMTM1LjAgTDQ0Mi40LDEzNi44IiBmaWxsPSJub25lIiBzdHJva2U9IiM3YTZhNWEiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVqb2luPSJiZXZlbCIvPgo8Y2lyY2xlIGN4PSIzMjAiIGN5PSIyMjAiIHI9IjEzNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOGQ5NTllIiBzdHJva2Utd2lkdGg9IjIiLz4KPGNpcmNsZSBjeD0iNDEyLjAiIGN5PSIyMjAuMCIgcj0iMjAiIGZpbGw9IiM1YjYwNjYiIHN0cm9rZT0iIzNhM2U0MyIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMzY2LjAiIGN5PSIyOTkuNyIgcj0iMjAiIGZpbGw9IiM1YjYwNjYiIHN0cm9rZT0iIzNhM2U0MyIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMjc0LjAiIGN5PSIyOTkuNyIgcj0iMjAiIGZpbGw9IiM1YjYwNjYiIHN0cm9rZT0iIzNhM2U0MyIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMjI4LjAiIGN5PSIyMjAuMCIgcj0iMjAiIGZpbGw9IiM1YjYwNjYiIHN0cm9rZT0iIzNhM2U0MyIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMjc0LjAiIGN5PSIxNDAuMyIgcj0iMjAiIGZpbGw9IiM1YjYwNjYiIHN0cm9rZT0iIzNhM2U0MyIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMzY2LjAiIGN5PSIxNDAuMyIgcj0iMjAiIGZpbGw9IiM1YjYwNjYiIHN0cm9rZT0iIzNhM2U0MyIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxjaXJjbGUgY3g9IjMyMCIgY3k9IjIyMCIgcj0iNDgiIGZpbGw9IiNjN2NkZDMiIHN0cm9rZT0iIzZiNzM3YiIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxjaXJjbGUgY3g9IjMyMCIgY3k9IjIyMCIgcj0iMjYiIGZpbGw9IiMzZDQyNDciLz4KPHJlY3QgeD0iMzE0IiB5PSIxODYiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgZmlsbD0iIzNkNDI0NyIvPgo8cGF0aCBkPSJNNTQ0LDM5NSBMNTUwLDM2NyBMNTcwLDM2NyBMNTc3LDM5NSBMNTY5LDM5MSBMNTYzLDM5NyBMNTU2LDM5MCBMNTUwLDM5NiBaIiBmaWxsPSJ1cmwoI3N0ZWVsKSIgc3Ryb2tlPSIjNWQ2NTZlIiBzdHJva2Utd2lkdGg9IjEuNSIgZmlsdGVyPSJ1cmwoI3NoYWRvdykiLz4KPHBhdGggZD0iTTU0NCwzOTUgTDU1MCwzOTYgTDU1NiwzOTAgTDU2MywzOTcgTDU2OSwzOTEgTDU3NywzOTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdhNmE1YSIgc3Ryb2tlLXdpZHRoPSIyLjUiLz4KPC9zdmc+</file>
+    </questiontext>
+    <generalfeedback format="html">
+      <text><![CDATA[<p>One tooth of the spur gear has sheared off at the root (the broken fragment is lying on the bench). Each revolution the mating gear meets a gap, so drive is momentarily lost and then re-engaged with an impact. This causes shock loading, noise and vibration, and overloads the neighbouring teeth, which can lead to progressive failure of the gear train. The gear must be replaced.</p>]]></text>
+    </generalfeedback>
+    <defaultgrade>10</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber>engin-damaged-spur-gear</idnumber>
+    <responseformat>plain</responseformat>
+    <responsefieldlines>6</responsefieldlines>
+    <minwordlimit/>
+    <maxwordlimit>200</maxwordlimit>
+    <graderinfo format="html">
+      <text><![CDATA[<p>Expected answer: a broken / sheared / missing gear tooth (fractured at the root). Consequence: loss of mesh once per revolution, impact/shock loading, noise and vibration, overload of adjacent teeth leading to further failure.</p>]]></text>
+    </graderinfo>
+    <responsetemplate format="html">
+      <text/>
+    </responsetemplate>
+    <aiprompt>You cannot see the image the student was shown, so use this description of it: a steel spur gear with 24 teeth lying on a workbench. One tooth near the top right of the gear has sheared off at its root, leaving a jagged fracture stub; the broken tooth fragment lies on the bench beside the gear. The hub, keyway and lightening holes are undamaged and are not the fault.
+Check if the student correctly identifies that a gear tooth is broken, sheared off or stripped. They must name the faulty component (the gear tooth) and explain the mechanical consequence, for example loss of engagement with the mating gear once per revolution, shock or impact loading, noise and vibration, or overloading of adjacent teeth leading to further failure.</aiprompt>
+    <markscheme>Award 10 marks if they correctly spot the broken/sheared gear tooth and explain the mechanical failure it causes. Award 0 marks if they miss the error.</markscheme>
+    <model/>
+    <spellcheck>0</spellcheck>
+    <sampleresponse>
+      <response>One of the gear teeth has sheared off at the root. When the gear turns, the mating gear will hit the gap, causing a shock load, vibration and noise every revolution, and the extra load on the neighbouring teeth will make them fail too.</response>
+    </sampleresponse>
+    <sampleresponse>
+      <response>A tooth is broken on the gear.</response>
+    </sampleresponse>
+    <sampleresponse>
+      <response>The keyway in the centre is too small so the gear will slip on the shaft.</response>
+    </sampleresponse>
+    <tags>
+      <tag><text>subject:engineering</text></tag>
+      <tag><text>topic:gears</text></tag>
+      <tag><text>level:professional</text></tag>
+      <tag><text>feature:samples</text></tag>
+      <tag><text>feature:image</text></tag>
+    </tags>
+  </question>
+</quiz>

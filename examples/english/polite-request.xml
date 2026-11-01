@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="aitext">
+    <exampledescription>Learner writes a polite request to a teacher. Marks register and politeness strategies rather than a single correct answer.</exampledescription>
+    <name>
+      <text>Polite request</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">Write a polite question asking your teacher if you can hand in your homework one day late.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>3</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber>eng-polite-request</idnumber>
+    <responseformat>editor</responseformat>
+    <responsefieldlines>10</responsefieldlines>
+    <minwordlimit/>
+    <maxwordlimit/>
+    <graderinfo format="html">
+      <text/>
+    </graderinfo>
+    <responsetemplate format="html">
+      <text/>
+    </responsetemplate>
+    <aiprompt>Evaluate the grammar of the text and confirm whether it is a polite question asking a teacher for permission to hand in homework one day late. Polite forms include "Could I", "May I", "Would it be possible" and the use of "please". Explain any grammar errors. Stop processing if it is nonsense.</aiprompt>
+    <markscheme>Award marks out of 3. Give 1 mark if the text is a question asking to hand in homework one day late. Give 1 mark if the text uses a polite form. Give 1 mark if the text is grammatically correct and ends with a question mark. Comment on why any mark was not given. Give no marks if the response is nonsense. Do html formatting of the content. Emphasise the marks part.</markscheme>
+    <model/>
+    <spellcheck>0</spellcheck>
+     <sampleresponse>
+      <question>0</question>
+      <response>p0o9i8u7</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>Could I please hand in my homework tomorrow instead of today?</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>I want give homework late one day</response>
+     </sampleresponse>
+    <tags>
+      <tag><text>subject:english</text></tag>
+      <tag><text>topic:functional-language</text></tag>
+      <tag><text>level:esl</text></tag>
+      <tag><text>feature:samples</text></tag>
+    </tags>
+  </question>
+</quiz>

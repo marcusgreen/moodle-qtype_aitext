@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="aitext">
+    <exampledescription>Compare HDD and SSD storage, with required advantages of each. Structured comparison marked against named points.</exampledescription>
+    <name>
+      <text>Secondary storage</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Compare a magnetic hard disk drive (HDD) with a solid state drive (SSD). In your answer, describe how each one stores data, and give two advantages of an SSD and one advantage of an HDD. Write your answer in full sentences.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>5</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber>comp-secondary-storage</idnumber>
+    <responseformat>plain</responseformat>
+    <responsefieldlines>15</responsefieldlines>
+    <minwordlimit/>
+    <maxwordlimit/>
+    <graderinfo format="html">
+      <text/>
+    </graderinfo>
+    <responsetemplate format="html">
+      <text/>
+    </responsetemplate>
+    <aiprompt>You are marking an ICT answer written by a 16-year-old student. The question asked them to compare an HDD with an SSD, describe how each stores data, give two advantages of an SSD and one advantage of an HDD. Mark their answer against the mark scheme provided and give brief, encouraging feedback explaining what they got right and what they missed. Accept informal wording as long as the technical meaning is correct.</aiprompt>
+    <markscheme>Award up to 5 marks as follows:
+
+1 mark — States that an HDD stores data magnetically on spinning platters (disks) read by a moving read/write head.
+
+1 mark — States that an SSD stores data in flash memory (electronic circuits / chips) with no moving parts.
+
+2 marks — Two valid advantages of an SSD (1 mark each), for example: faster access/read/write speeds, more durable/robust because there are no moving parts, silent, uses less power, lighter/smaller.
+
+1 mark — One valid advantage of an HDD, for example: cheaper per gigabyte, available in larger capacities.
+
+Do not deduct marks for minor spelling errors. Give 0 marks if the answer confuses secondary storage with RAM. Give the mark out of 5</markscheme>
+    <model/>
+    <spellcheck>0</spellcheck>
+     <sampleresponse>
+      <question>0</question>
+      <response>h/d?d55</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>A hard disk drive stores data magnetically on spinning metal platters, and a read/write head moves across the disk to access the data. A solid state drive stores data in flash memory chips and has no moving parts. One advantage of an SSD is that it is much faster at loading programs and files. Another advantage is that it is more durable, so it is less likely to break if a laptop is dropped. An advantage of an HDD is that it is cheaper for the same amount of storage, so you can get a larger capacity for less money.</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>An HDD has a disk inside that spins. An SSD is faster and is used in new laptops. HDDs are cheaper.</response>
+     </sampleresponse>
+    <tags>
+      <tag><text>subject:computing</text></tag>
+      <tag><text>topic:hardware</text></tag>
+      <tag><text>level:gcse</text></tag>
+      <tag><text>feature:samples</text></tag>
+    </tags>
+  </question>
+</quiz>

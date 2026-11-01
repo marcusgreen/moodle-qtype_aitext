@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="aitext">
+    <exampledescription>Extended description of blood flow through the heart and the double pump. Mark scheme credits correct sequence of chambers and vessels.</exampledescription>
+    <name>
+      <text>The heart</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Describe the path blood takes through the heart, starting from when deoxygenated blood returns from the body. Explain why the heart is called a double pump.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>6</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber>bio-the-heart</idnumber>
+    <responseformat>plain</responseformat>
+    <responsefieldlines>15</responsefieldlines>
+    <minwordlimit/>
+    <maxwordlimit/>
+    <graderinfo format="html">
+      <text/>
+    </graderinfo>
+    <responsetemplate format="html">
+      <text/>
+    </responsetemplate>
+    <aiprompt>Evaluate whether the student has described the path of blood through the heart in the correct order: vena cava, right atrium, right ventricle, pulmonary artery to the lungs, pulmonary vein back to the left atrium, left ventricle, aorta to the body. Check whether they explain that the heart is a double pump because blood passes through it twice in one complete circuit (once to the lungs, once to the body). Accept simplified language appropriate for GCSE level. Flag any scientific inaccuracies such as confusing arteries and veins. Refer to the student as you.</aiprompt>
+    <markscheme>Dont be too harsh. Award marks out of 6. Give 1 mark for blood entering the right atrium (via the vena cava). Give 1 mark for blood passing to the right ventricle and being pumped to the lungs (via the pulmonary artery). Give 1 mark for blood being oxygenated in the lungs. Give 1 mark for blood returning to the left atrium (via the pulmonary vein). Give 1 mark for blood passing to the left ventricle and being pumped to the body (via the aorta). Give 1 mark for explaining that it is a double pump because the right side pumps blood to the lungs and the left side pumps blood to the body. Do not penalise spelling errors if the meaning is clear. Give 0 marks if the answer is not about the human heart.</markscheme>
+    <model/>
+    <spellcheck>0</spellcheck>
+     <sampleresponse>
+      <question>0</question>
+      <response>44a=ff0</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>Deoxygenated blood comes back from the body through the vena cava into the right atrium. It then goes into the right ventricle which pumps it through the pulmonary artery to the lungs, where it picks up oxygen. The oxygenated blood comes back through the pulmonary vein into the left atrium, then into the left ventricle, which pumps it out through the aorta to the rest of the body. The heart is a double pump because the right side pumps blood to the lungs and the left side pumps blood to the body, so blood goes through the heart twice in each circuit.</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>Blood comes into the heart and goes to the lungs to get oxygen. Then it comes back and gets pumped round the body by the left side. It is a double pump because it has two sides.</response>
+     </sampleresponse>
+    <tags>
+      <tag><text>subject:biology</text></tag>
+      <tag><text>topic:circulatory-system</text></tag>
+      <tag><text>level:gcse</text></tag>
+      <tag><text>feature:samples</text></tag>
+    </tags>
+  </question>
+</quiz>

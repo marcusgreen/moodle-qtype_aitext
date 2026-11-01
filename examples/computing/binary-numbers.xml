@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="aitext">
+    <exampledescription>Convert denary 45 to 8-bit binary with working, and explain why computers use binary.</exampledescription>
+    <name>
+      <text>Binary numbers</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Convert the denary (decimal) number 45 into an 8-bit binary number. Show your working, and explain why computers use binary to represent data.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>4</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber>comp-binary-numbers</idnumber>
+    <responseformat>plain</responseformat>
+    <responsefieldlines>10</responsefieldlines>
+    <minwordlimit/>
+    <maxwordlimit/>
+    <graderinfo format="html">
+      <text/>
+    </graderinfo>
+    <responsetemplate format="html">
+      <text/>
+    </responsetemplate>
+    <aiprompt>You are marking an ICT answer written by a 16-year-old student. The correct 8-bit binary for denary 45 is 00101101 (32 + 8 + 4 + 1). Check the student's conversion and working, and their explanation of why computers use binary (computers are made of switches/transistors that have two states, on and off, which map to 1 and 0). Give brief, encouraging feedback. Do not use latex in your response, or give the correct answer.</aiprompt>
+    <markscheme>=== CRITICAL VALIDATION ===
+Before processing, examine the STUDENT RESPONSE. If the response consists of random characters, gibberish, code snippets that do not address the prompt, or does not contain real, coherent words, you MUST immediately halt processing. In this scenario, set the "marks" to 0 and set the "feedback" strictly to: "The response provided does not contain valid text or mathematical reasoning to grade." Do not apply the grading instructions if this condition is met.
+
+Award up to 4 marks as follows:
+
+1 mark — Correct answer 00101101 (accept 101101 without leading zeros for this mark).
+
+1 mark — Working shown, such as place values (128, 64, 32, 16, 8, 4, 2, 1) or repeated division by 2.
+
+1 mark — Answer written as a full 8 bits with leading zeros.
+
+1 mark — Explains that computers use binary because their circuits are made of switches/transistors with only two states (on/off).
+
+Give the mark out of 4</markscheme>
+    <model/>
+    <spellcheck>0</spellcheck>
+     <sampleresponse>
+      <question>0</question>
+      <response>0101101x;</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>Using place values 128, 64, 32, 16, 8, 4, 2, 1: 45 = 32 + 8 + 4 + 1, so the binary number is 00101101. Computers use binary because they are made of billions of transistors that act like switches, which can only be on or off, so 1 and 0 can represent these two states.</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>45 is 101011 in binary. Computers use binary because it is easier.</response>
+     </sampleresponse>
+    <tags>
+      <tag><text>subject:computing</text></tag>
+      <tag><text>topic:data-representation</text></tag>
+      <tag><text>level:gcse</text></tag>
+      <tag><text>feature:samples</text></tag>
+    </tags>
+  </question>
+</quiz>

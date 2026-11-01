@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="aitext">
+    <exampledescription>Calculate mode and range from a small data set and explain what each tells you. Combines a numeric answer with a written interpretation.</exampledescription>
+    <name>
+      <text>Range and mode</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>The shoe sizes of eight students are: 5, 7, 6, 9, 6, 4, 6, 8.</p>
+<p>Find the mode and the range of the data. Explain what each one tells you about the shoe sizes.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>4</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber>maths-range-and-mode</idnumber>
+    <responseformat>plain</responseformat>
+    <responsefieldlines>10</responsefieldlines>
+    <minwordlimit/>
+    <maxwordlimit/>
+    <graderinfo format="html">
+      <text/>
+    </graderinfo>
+    <responsetemplate format="html">
+      <text/>
+    </responsetemplate>
+    <aiprompt>You are marking a GCSE maths question. The data is 5, 7, 6, 9, 6, 4, 6, 8. The mode is 6 (it appears three times). The range is 9 - 4 = 5. Assess whether the student has found the correct values and explained that the mode is the most common value and the range measures how spread out the data is. Accept informal language if the mathematical understanding is sound. Do not use latex in your response.</aiprompt>
+    <markscheme>=== CRITICAL VALIDATION ===
+Before processing, examine the STUDENT RESPONSE. If the response consists of random characters, gibberish, code snippets that do not address the prompt, or does not contain real, coherent words, you MUST immediately halt processing. In this scenario, set the "marks" to 0 and set the "feedback" strictly to: "The response provided does not contain valid text or mathematical reasoning to grade." Do not apply the grading instructions if this condition is met.
+
+Award marks out of 4. Give 1 mark for the correct mode of 6. Give 1 mark for the correct range of 5. Give 1 mark for explaining that the mode is the most common (most frequent) value. Give 1 mark for explaining that the range shows how spread out the data is (the difference between the largest and smallest values). A range given as "4 to 9" without calculating 5 does not get the range mark.</markscheme>
+    <model/>
+    <spellcheck>0</spellcheck>
+     <sampleresponse>
+      <question>0</question>
+      <response>6;;r#8</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>The mode is 6 because it appears the most times (three times), so 6 is the most common shoe size. The range is 9 - 4 = 5, which tells you how spread out the shoe sizes are.</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>The mode is 6 because there are lots of them. The range is 4 to 9.</response>
+     </sampleresponse>
+    <tags>
+      <tag><text>subject:maths</text></tag>
+      <tag><text>topic:statistics</text></tag>
+      <tag><text>level:gcse</text></tag>
+      <tag><text>feature:samples</text></tag>
+    </tags>
+  </question>
+</quiz>

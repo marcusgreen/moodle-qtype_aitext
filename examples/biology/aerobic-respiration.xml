@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="aitext">
+    <exampledescription>Recall the word equation for aerobic respiration and explain why cells respire.</exampledescription>
+    <name>
+      <text>Aerobic respiration</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>State the word equation for aerobic respiration and explain why living cells need to respire.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>5</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber>bio-aerobic-respiration</idnumber>
+    <responseformat>plain</responseformat>
+    <responsefieldlines>10</responsefieldlines>
+    <minwordlimit/>
+    <maxwordlimit/>
+    <graderinfo format="html">
+      <text/>
+    </graderinfo>
+    <responsetemplate format="html">
+      <text/>
+    </responsetemplate>
+    <aiprompt>Check whether the student has given the correct word equation for aerobic respiration (glucose + oxygen -&gt; carbon dioxide + water) and explained that respiration releases energy that cells need. Accept reasonable alternative wording such as "sugar" for glucose, "O2" for oxygen and "CO2" for carbon dioxide. Ignore spelling mistakes as long as the meaning is clear. Flag it if the student confuses respiration with breathing or with photosynthesis.</aiprompt>
+    <markscheme>Award marks out of 5. Give 1 mark for glucose as a reactant. Give 1 mark for oxygen as a reactant. Give 1 mark for carbon dioxide and water as products. Give 1 mark for stating that respiration releases (transfers) energy. Give 1 mark for a valid use of that energy, such as movement, keeping warm, growth or building molecules. Do not award the energy mark if the student says respiration "makes" or "creates" energy. Give 0 marks if the student writes the photosynthesis equation.</markscheme>
+    <model/>
+    <spellcheck>0</spellcheck>
+     <sampleresponse>
+      <question>0</question>
+      <response>8u@!2s</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>Glucose + oxygen -&gt; carbon dioxide + water. Cells need to respire because respiration releases energy from glucose. The energy is used for things like muscle contraction, keeping our body temperature constant and building new molecules for growth.</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>Respiration is breathing in oxygen and breathing out carbon dioxide. Cells need it to make energy.</response>
+     </sampleresponse>
+    <tags>
+      <tag><text>subject:biology</text></tag>
+      <tag><text>topic:respiration</text></tag>
+      <tag><text>level:gcse</text></tag>
+      <tag><text>feature:samples</text></tag>
+    </tags>
+  </question>
+</quiz>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="aitext">
+    <exampledescription>One-sentence response checking use of a future form (will / going to) to describe a plan. Short mark scheme with one mark each for tense, context and accuracy.</exampledescription>
+    <name>
+      <text>The future tense</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Write a single English sentence describing something you will do next weekend. Use the future tense.</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text/>
+    </generalfeedback>
+    <defaultgrade>3</defaultgrade>
+    <penalty>0</penalty>
+    <hidden>0</hidden>
+    <idnumber>eng-future-tense</idnumber>
+    <responseformat>plain</responseformat>
+    <responsefieldlines>5</responsefieldlines>
+    <minwordlimit/>
+    <maxwordlimit/>
+    <graderinfo format="html">
+      <text/>
+    </graderinfo>
+    <responsetemplate format="html">
+      <text/>
+    </responsetemplate>
+    <aiprompt>Check whether the sentence is written in the future tense (for example using "will" or "going to" plus the base verb) and that it describes something happening next weekend. Explain any grammar or spelling errors in simple language. Stop processing if it is nonsense.</aiprompt>
+    <markscheme>Award marks out of 3. Give 1 mark if the sentence uses a correct future form ("will" + verb, "going to" + verb, or present continuous for a future plan). Give 1 mark if the sentence refers to next weekend. Give 1 mark if the sentence has no spelling or grammar mistakes. Comment on why any mark was not given. Give no marks if the response is nonsense. Do html formatting of the content. Emphasise the marks part.</markscheme>
+    <model/>
+    <spellcheck>0</spellcheck>
+     <sampleresponse>
+      <question>0</question>
+      <response>zx9!qpl</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>Next weekend I will visit my grandparents in Manchester.</response>
+     </sampleresponse>
+     <sampleresponse>
+      <question>0</question>
+      <response>Next weekend I go to see footbal match.</response>
+     </sampleresponse>
+    <tags>
+      <tag><text>subject:english</text></tag>
+      <tag><text>topic:grammar</text></tag>
+      <tag><text>level:esl</text></tag>
+      <tag><text>feature:samples</text></tag>
+    </tags>
+  </question>
+</quiz>
