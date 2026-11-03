@@ -68,6 +68,10 @@
 }
 .qtype_aitext_examples-subject summary {
     cursor: pointer;
+    min-height: 24px;
+}
+.qtype_aitext_examples-item {
+    min-height: 24px;
 }
 .qtype_aitext_examples-text {
     white-space: pre-wrap;
