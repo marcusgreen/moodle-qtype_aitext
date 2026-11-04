@@ -21,6 +21,7 @@
 
     Context variables required for this template:
     * path, subject, subjectlabel, name, description - example details
+    * fromcategory - whether the example is from the site's example category
     * tags - list of {facet, label}
     * questiontext - HTML of the question text
     * responselines, defaultgrade, minwordlimit, maxwordlimit - response settings
@@ -32,6 +33,7 @@
     Example context (json):
     {
         "path": "english/future-tense",
+        "fromcategory": false,
         "subject": "english",
         "subjectlabel": "English",
         "name": "The future tense",
@@ -53,8 +55,9 @@
 }}
 <article class="qtype_aitext_examples-preview" data-path="{{path}}" data-subject="{{subject}}" data-subjectlabel="{{subjectlabel}}"
         data-canprefill="{{#canprefill}}1{{/canprefill}}{{^canprefill}}0{{/canprefill}}">
-    <h3 class="h4">{{name}}</h3>
-    <p>{{description}}</p>
+    <h3 class="h4">{{name}}{{#fromcategory}}
+        <span class="badge bg-info text-dark ms-1 fs-6" title="{{#str}} examplecategorybadgetitle, qtype_aitext {{/str}}">{{#str}} examplecategorybadge, qtype_aitext {{/str}}</span>{{/fromcategory}}</h3>
+    {{#description}}<p>{{description}}</p>{{/description}}
     <p>
         {{#tags}}
             <span class="badge bg-secondary text-dark me-1" title="{{facet}}">{{label}}</span>

@@ -67,6 +67,10 @@ final class examples_test extends \advanced_testcase {
         $root = dirname(__DIR__) . '/examples';
         $this->assertNotEmpty(glob($root . '/*/*.xml'));
         $this->assertEmpty(glob($root . '/*.xml'), 'Example files must be inside a subject folder');
+        $this->assertDirectoryDoesNotExist(
+            $root . '/' . \qtype_aitext\local\example_library::BANK_PREFIX,
+            'This folder name is used for the paths of examples from the example category'
+        );
     }
 
     /**

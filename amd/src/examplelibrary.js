@@ -77,10 +77,90 @@ const showPreview = async(root, link) => {
         Templates.replaceNodeContents(region, html, js);
         markSelected(root, link);
         updateForm(root, path);
-        window.history.replaceState(null, '', link.href);
+        // Keep the tag filter in the URL along with the chosen example.
+        const url = new URL(link.href);
+        chosenKeys(root).forEach((key) => url.searchParams.append('filter', key));
+        window.history.replaceState(null, '', url);
     } catch (error) {
         Notification.exception(error);
     }
+};
+
+/**
+ * Set whether a filter button is chosen.
+ *
+ * @param {HTMLElement} button filter button
+ * @param {boolean} pressed
+ */
+const setPressed = (button, pressed) => {
+    button.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+    button.classList.toggle('active', pressed);
+};
+
+/**
+ * The facet:value keys chosen in the tag filter.
+ *
+ * @param {HTMLElement} root library region
+ * @returns {string[]}
+ */
+const chosenKeys = (root) => [...root.querySelectorAll('[data-action="filter"][aria-pressed="true"]')]
+    .map((button) => button.dataset.key);
+
+/**
+ * Show only the examples matching the tag filter, and update the subject counts.
+ *
+ * Within a facet any chosen value matches; an example must match every facet that has a chosen value.
+ * The chosen filter is kept in the page URL so it survives a reload.
+ *
+ * @param {HTMLElement} root library region
+ */
+const applyFilter = (root) => {
+    const keys = chosenKeys(root);
+    const byFacet = {};
+    keys.forEach((key) => {
+        const facet = key.split(':')[0];
+        (byFacet[facet] = byFacet[facet] || []).push(key);
+    });
+    const facets = Object.values(byFacet);
+
+    let total = 0;
+    root.querySelectorAll('[data-subject]').forEach((subject) => {
+        let count = 0;
+        subject.querySelectorAll('[data-facets]').forEach((item) => {
+            const itemKeys = JSON.parse(item.dataset.facets);
+            const match = facets.every((facetKeys) => facetKeys.some((key) => itemKeys.includes(key)));
+            item.hidden = !match;
+            count += match ? 1 : 0;
+        });
+        subject.hidden = count === 0;
+        subject.querySelector('[data-region="count"]').textContent = count;
+        total += count;
+    });
+    root.querySelector('[data-region="nomatch"]').hidden = total > 0;
+    root.querySelector('[data-action="clearfilters"]').hidden = keys.length === 0;
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete('filter');
+    keys.forEach((key) => url.searchParams.append('filter', key));
+    window.history.replaceState(null, '', url);
+};
+
+/**
+ * Show the tag filter, with any filter from the page URL chosen.
+ *
+ * @param {HTMLElement} root library region
+ */
+const initFilter = (root) => {
+    const filters = root.querySelector('[data-region="filters"]');
+    if (!filters) {
+        return;
+    }
+    const fromUrl = new URL(window.location.href).searchParams.getAll('filter');
+    filters.querySelectorAll('[data-action="filter"]').forEach((button) => {
+        setPressed(button, fromUrl.includes(button.dataset.key));
+    });
+    filters.hidden = false;
+    applyFilter(root);
 };
 
 /**
@@ -91,7 +171,19 @@ export const init = () => {
     if (!root) {
         return;
     }
+    initFilter(root);
     root.addEventListener('click', (e) => {
+        const filter = e.target.closest('[data-action="filter"]');
+        if (filter) {
+            setPressed(filter, filter.getAttribute('aria-pressed') !== 'true');
+            applyFilter(root);
+            return;
+        }
+        if (e.target.closest('[data-action="clearfilters"]')) {
+            root.querySelectorAll('[data-action="filter"]').forEach((button) => setPressed(button, false));
+            applyFilter(root);
+            return;
+        }
         const link = e.target.closest('[data-action="preview"]');
         if (!link) {
             return;

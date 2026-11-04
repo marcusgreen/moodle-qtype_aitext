@@ -119,4 +119,49 @@ if ($ADMIN->fulltree) {
         new lang_string('translatepostfix_text', 'qtype_aitext') . ' ' . get_string('deprecated', 'qtype_aitext'),
         1
     ));
+
+    $settings->add(new admin_setting_heading(
+        'qtype_aitext/examplelibraryheading',
+        new lang_string('examplelibrary', 'qtype_aitext'),
+        ''
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'qtype_aitext/enableexamplelibrary',
+        new lang_string('enableexamplelibrary', 'qtype_aitext'),
+        new lang_string('enableexamplelibrary_setting', 'qtype_aitext'),
+        1
+    ));
+    $settings->add(new admin_setting_configselect_autocomplete(
+        'qtype_aitext/examplecategory',
+        new lang_string('examplecategory', 'qtype_aitext'),
+        get_string('examplecategory_setting', 'qtype_aitext') . \qtype_aitext\local\example_library::get_category_links(),
+        0,
+        fn() => \qtype_aitext\local\example_library::get_category_choices()
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'qtype_aitext/examplebuiltin',
+        new lang_string('examplebuiltin', 'qtype_aitext'),
+        new lang_string('examplebuiltin_setting', 'qtype_aitext'),
+        1
+    ));
+    $subjects = [];
+    foreach (\qtype_aitext\local\example_library::get_builtin_subjects() as $subject) {
+        $subjects[$subject] = \qtype_aitext\local\example_library::label($subject);
+    }
+    $settings->add(new admin_setting_configmulticheckbox(
+        'qtype_aitext/examplehiddensubjects',
+        new lang_string('examplehiddensubjects', 'qtype_aitext'),
+        new lang_string('examplehiddensubjects_setting', 'qtype_aitext'),
+        [],
+        $subjects
+    ));
+    $settings->add(new admin_setting_description(
+        'qtype_aitext/examplecopy',
+        new lang_string('examplecopy', 'qtype_aitext'),
+        new lang_string(
+            'examplecopy_setting',
+            'qtype_aitext',
+            (new moodle_url('/question/type/aitext/copyexamples.php'))->out()
+        )
+    ));
 }

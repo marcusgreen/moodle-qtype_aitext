@@ -129,10 +129,17 @@ if ($results) {
     }
 }
 
+if (!example_library::has_examples()) {
+    echo $OUTPUT->notification(get_string('examplesnone', 'qtype_aitext'), \core\output\notification::NOTIFY_INFO);
+    echo $OUTPUT->footer();
+    die();
+}
+
 echo html_writer::tag('p', get_string('examplelibraryintro', 'qtype_aitext'));
 echo $OUTPUT->render_from_template('qtype_aitext/examplelibrary', [
     'contextid' => $context->id,
     'subjects' => example_library::get_tree($baseurl, $selected ?: null),
+    'filters' => example_library::get_facet_filters(),
     'importform' => $form->render(),
     'preview' => $selected
         ? $OUTPUT->render_from_template('qtype_aitext/examplepreview', example_library::get_preview($selected))

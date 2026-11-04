@@ -46,8 +46,8 @@ class qtype_aitext_edit_form extends question_edit_form {
         /** @var qtype_aitext $qtype */
         $qtype = question_bank::get_qtype('aitext');
 
-        // Offer the example question library when creating a new question.
-        if (!$questionid) {
+        // Offer the example question library when creating a new question, if it has anything to show.
+        if (!$questionid && \qtype_aitext\local\example_library::has_examples()) {
             $libraryparams = [
                 'cmid' => optional_param('cmid', 0, PARAM_INT),
                 'courseid' => optional_param('courseid', 0, PARAM_INT),

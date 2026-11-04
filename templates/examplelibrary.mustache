@@ -20,16 +20,21 @@
     Browse the example questions by subject, preview one and import it.
 
     Each example is a link to the page with an example param, so the page works without
-    JavaScript. With JavaScript the preview is loaded in place.
+    JavaScript. With JavaScript the preview is loaded in place, and the tag filter is shown.
 
     Data attributes required for JS:
     * data-region="examplelibrary" with data-contextid
     * data-action="preview" with data-path on each example link
     * data-region="preview"
+    * data-region="filters", with data-action="filter" and data-key on each filter button and
+      data-action="clearfilters"
+    * data-region="nomatch"
+    * data-facets (JSON list of facet:value keys) on each example item, data-region="count" on each subject
 
     Context variables required for this template:
     * contextid - context for loading previews
     * subjects - subjects with their examples
+    * filters - facets with their values, for the tag filter
     * importform - HTML of the import form
     * preview - HTML of the selected example preview, or empty
 
@@ -43,9 +48,15 @@
                 "count": 1,
                 "expanded": true,
                 "examples": [
-                    {"path": "english/future-tense", "name": "The future tense", "url": "#", "selected": true}
+                    {"path": "english/future-tense", "name": "The future tense", "url": "#", "selected": true,
+                     "fromcategory": false, "facets": "[\"level:esl\"]"},
+                    {"path": "bank/12", "name": "Reported speech", "url": "#", "selected": false,
+                     "fromcategory": true, "facets": "[\"level:esl\"]"}
                 ]
             }
+        ],
+        "filters": [
+            {"facet": "level", "label": "Level", "values": [{"key": "level:esl", "label": "Esl"}]}
         ],
         "importform": "<form></form>",
         "preview": ""
@@ -54,16 +65,35 @@
 <div class="qtype_aitext_examples row" data-region="examplelibrary" data-contextid="{{contextid}}">
     <nav class="col-lg-4 mb-3" aria-label="{{#str}} examplesbysubject, qtype_aitext {{/str}}">
         <h3 class="h5">{{#str}} examplesbysubject, qtype_aitext {{/str}}</h3>
+        {{#filters.0}}
+        <div class="qtype_aitext_examples-filters mb-3" data-region="filters" role="group"
+             aria-label="{{#str}} examplesfilter, qtype_aitext {{/str}}" hidden>
+            {{#filters}}
+                <div class="mb-1" role="group" aria-label="{{label}}">
+                    <span class="small text-muted me-1">{{label}}</span>
+                    {{#values}}
+                        <button type="button" class="btn btn-sm btn-outline-secondary mb-1" aria-pressed="false"
+                                data-action="filter" data-key="{{key}}">{{label}}</button>
+                    {{/values}}
+                </div>
+            {{/filters}}
+            <button type="button" class="btn btn-link btn-sm px-0" data-action="clearfilters" hidden>
+                {{#str}} examplesfilterclear, qtype_aitext {{/str}}
+            </button>
+        </div>
+        {{/filters.0}}
+        <p class="text-muted" data-region="nomatch" hidden>{{#str}} examplesnomatch, qtype_aitext {{/str}}</p>
         {{#subjects}}
             <details class="qtype_aitext_examples-subject mb-1" data-subject="{{subject}}" {{#expanded}}open{{/expanded}}>
                 <summary class="fw-bold">
-                    {{label}} <span class="badge bg-secondary text-dark">{{count}}</span>
+                    {{label}} <span class="badge bg-secondary text-dark" data-region="count">{{count}}</span>
                 </summary>
                 <ul class="list-unstyled ms-3 mb-2">
                     {{#examples}}
-                        <li>
+                        <li data-facets="{{facets}}">
                             <a href="{{url}}" class="qtype_aitext_examples-item d-block px-2 py-1 rounded{{#selected}} active{{/selected}}"
-                               data-action="preview" data-path="{{path}}" {{#selected}}aria-current="true"{{/selected}}>{{name}}</a>
+                               data-action="preview" data-path="{{path}}" {{#selected}}aria-current="true"{{/selected}}>{{name}}{{#fromcategory}}
+                                <span class="badge bg-info text-dark ms-1" title="{{#str}} examplecategorybadgetitle, qtype_aitext {{/str}}">{{#str}} examplecategorybadge, qtype_aitext {{/str}}</span>{{/fromcategory}}</a>
                         </li>
                     {{/examples}}
                 </ul>
