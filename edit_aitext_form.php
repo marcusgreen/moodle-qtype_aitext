@@ -109,16 +109,21 @@ class qtype_aitext_edit_form extends question_edit_form {
         );
         $mform->addElement('html', '</div>');
 
-        $mform->addElement('header', 'exemplarheader', get_string('exemplarheader', 'qtype_aitext'));
-        $mform->setExpanded('exemplarheader');
-        $mform->addElement(
-            'textarea',
-            'exemplar',
-            get_string('exemplar', 'qtype_aitext'),
-            ['maxlen' => 50, 'rows' => 6, 'size' => 30]
-        );
+        if (get_config('qtype_aitext', 'enable_exemplar')) {
+            $mform->addElement('header', 'exemplarheader', get_string('exemplarheader', 'qtype_aitext'));
+            $mform->setExpanded('exemplarheader');
+            $mform->addElement(
+                'textarea',
+                'exemplar',
+                get_string('exemplar', 'qtype_aitext'),
+                ['maxlen' => 50, 'rows' => 6, 'size' => 30]
+            );
+            $mform->addHelpButton('exemplar', 'exemplar', 'qtype_aitext');
+        } else {
+            // Keep any existing exemplar so saving does not discard it.
+            $mform->addElement('hidden', 'exemplar');
+        }
         $mform->setType('exemplar', PARAM_RAW);
-        $mform->addHelpButton('exemplar', 'exemplar', 'qtype_aitext');
 
         // Add repeated sample answer options along with the field for returned responses.
         $mform->addElement('header', 'responsetest', get_string('responsetester', 'qtype_aitext'));

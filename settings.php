@@ -49,6 +49,12 @@ if ($ADMIN->fulltree) {
         new lang_string('enable_expertmode_setting', 'qtype_aitext'),
         0
     ));
+    $settings->add(new admin_setting_configcheckbox(
+        'qtype_aitext/enable_exemplar',
+        new lang_string('enable_exemplar', 'qtype_aitext'),
+        new lang_string('enable_exemplar_setting', 'qtype_aitext'),
+        1
+    ));
 
     $settings->add(new admin_setting_configtextarea(
         'qtype_aitext/jsonprompt',

@@ -738,11 +738,12 @@ class qtype_aitext_question extends question_graded_automatically {
     /**
      * Return the exemplar response, if one has been set, in the
      * format expected by the response field. There is no single
-     * correct response, so return null when there is no exemplar.
+     * correct response, so return null when there is no exemplar
+     * or the exemplar feature is disabled.
      * @return array|null
      */
     public function get_correct_response() {
-        if (trim((string) $this->exemplar) === '') {
+        if (!get_config('qtype_aitext', 'enable_exemplar') || trim((string) $this->exemplar) === '') {
             return null;
         }
         if (str_contains($this->responseformat, 'editor')) {

@@ -609,6 +609,22 @@ final class question_test extends \advanced_testcase {
     }
 
     /**
+     * Test get_correct_response() returns null when the exemplar feature is disabled.
+     *
+     * @covers ::get_correct_response
+     */
+    public function test_get_correct_response_exemplar_disabled(): void {
+        $this->resetAfterTest();
+
+        $aitext = qtype_aitext_test_helper::make_aitext_question([]);
+        $aitext->exemplar = 'Frogs are amphibians.';
+        $this->assertNotNull($aitext->get_correct_response());
+
+        set_config('enable_exemplar', 0, 'qtype_aitext');
+        $this->assertNull($aitext->get_correct_response());
+    }
+
+    /**
      * Test the exemplar is saved from the form and loaded into the question instance.
      *
      * @covers \qtype_aitext::save_question_options
