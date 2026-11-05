@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 
+use qtype_aitext\task\grade_response;
 
 /**
  * Represents an aitext question.
@@ -36,6 +37,13 @@ require_once($CFG->dirroot . '/question/type/questionbase.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_aitext_question extends question_graded_automatically {
+    /**
+     * Regrade types
+     */
+    private const REGRADE_NONE = 0;
+    private const REGRADE_DRY_RUN = 1;
+    private const REGRADE_COMMIT = 2;
+
     /**
      * Plain text or html
      * @var string
@@ -126,6 +134,13 @@ class qtype_aitext_question extends question_graded_automatically {
      */
     public $markscheme;
 
+    /**
+     * Question attempt step
+     *
+     * @var mixed
+     */
+    public $step;
+
     /** @var int */
     public $defaultmark;
 
@@ -208,6 +223,7 @@ class qtype_aitext_question extends question_graded_automatically {
      * @return void
      */
     public function apply_attempt_state(question_attempt_step $step) {
+        $this->step = $step;
         $this->lastaicomment = null;
         $this->lastaiprompt = null;
         $this->lastspellcheckresponse = null;
@@ -324,26 +340,30 @@ class qtype_aitext_question extends question_graded_automatically {
     /**
      * Get the spellchecking response.
      *
-     * @param array $response
+     * @param string $answer
      * @return string
      * @throws coding_exception
-     * @throws dml_exception
      * @throws moodle_exception
      */
-    private function get_spellchecking(array $response): string {
-        $fullaiprompt = $this->build_full_ai_spellchecking_prompt($response['answer']);
-        $response = $this->perform_request($fullaiprompt, 'feedback');
-        return $response;
+    public function get_spellchecking(string $answer): string {
+        $fullaiprompt = $this->build_full_ai_spellchecking_prompt($answer);
+        return $this->perform_request($fullaiprompt, 'feedback');
     }
 
     /**
-     * Grade response by making a call to external
-     * large language model such as ChatGPT
+     * Grade response by queueing an adhoc task for asynchronous
+     * AI evaluation. Returns a placeholder grade immediately.
+     * In preview mode, grading is done synchronously.
      *
      * @param array $response
-     * @return void
+     * @return array
+     * @throws coding_exception
+     * @throws \core\exception\coding_exception
+     * @throws dml_exception
      */
     public function grade_response(array $response): array {
+        global $DB;
+
         // Clear from any previous call.
         $this->lastaicomment = null;
         $this->lastaiprompt = null;
@@ -353,10 +373,91 @@ class qtype_aitext_question extends question_graded_automatically {
             return [0, question_state::$needsgrading];
         }
 
+        // In preview mode, or when async grading is disabled, grade synchronously.
+        if ($this->is_preview_context() || !get_config('qtype_aitext', 'asyncgrading')) {
+            return $this->grade_response_sync($response);
+        }
+
+        // Cache the result during dry-run so the
+        // commit phase can reuse it without a second AI call. Outside a dry-run/commit
+        // pair the cache is never read, preventing stale results.
+        $regradetype = $this->regrade_type();
+
+        if ($regradetype !== self::REGRADE_NONE) {
+            $cache = \cache::make('qtype_aitext', 'regrade');
+            $cachekey = (string) $this->step->get_id();
+
+            if ($regradetype === self::REGRADE_DRY_RUN) {
+                $result = $this->grade_response_sync($response);
+                $cache->set($cachekey, [
+                    'result' => $result,
+                    'lastaicomment' => $this->lastaicomment,
+                    'lastaiprompt' => $this->lastaiprompt,
+                    'lastspellcheckresponse' => $this->lastspellcheckresponse,
+                ]);
+                return $result;
+            }
+
+            // Actual regrade: consume cached dry-run result if present, then clear it.
+            if (($cached = $cache->get($cachekey)) !== false) {
+                $cache->delete($cachekey);
+                $this->lastaicomment = $cached['lastaicomment'];
+                $this->lastaiprompt = $cached['lastaiprompt'];
+                $this->lastspellcheckresponse = $cached['lastspellcheckresponse'];
+                return $cached['result'];
+            }
+
+            return $this->grade_response_sync($response);
+        }
+
+        $stepid = $this->step->get_id();
+        $questionattemptid = $DB->get_field('question_attempt_steps', 'questionattemptid', ['id' => $stepid]);
+
+        // Queue the async grading task.
+        $task = new grade_response();
+        $task->set_custom_data([
+            'attemptstepid' => $stepid,
+            'response' => (string)$response['answer'],
+            'questionid' => $this->id,
+            'questionattemptid' => $questionattemptid,
+            'defaultmark' => $this->defaultmark,
+            'aiprompt' => $this->aiprompt,
+            'markscheme' => $this->markscheme,
+            'spellcheck' => $this->spellcheck,
+            'contextid' => $this->get_contextid_for_ai_request(),
+        ]);
+        $task->set_userid($this->step->get_user_id());
+
+        // Queue first so the task gets a DB ID, then set it back on the task so the
+        // progress bar idnumber includes it, then initialise the progress bar.
+        $taskid = \core\task\manager::queue_adhoc_task($task);
+        $task->set_id($taskid);
+        $task->initialise_stored_progress();
+        $task->set_initial_progress();
+
+        // Store the progress bar idnumber so the renderer can display it.
+        $progressidnumber = \core\output\stored_progress_bar::convert_to_idnumber(
+            grade_response::class,
+            $task->get_id()
+        );
+        $this->insert_attempt_step_data('_aiprogressidnumber', $progressidnumber);
+        $this->insert_attempt_step_data('_aigraded', '0');
+
+        // Return "needs grading" — the actual grade will be written by the adhoc task.
+        return [0.0, question_state::$needsgrading];
+    }
+
+    /**
+     * Grade response synchronously (used in preview mode).
+     *
+     * @param array $response
+     * @return array
+     */
+    private function grade_response_sync(array $response): array {
         // If spellcheck is enabled, perform spellchecking and cache the response. Spellcheck failure is non-fatal.
         if ($this->spellcheck) {
             try {
-                $this->lastspellcheckresponse = $this->get_spellchecking($response);
+                $this->lastspellcheckresponse = $this->get_spellchecking($response['answer']);
             } catch (\moodle_exception $e) {
                 // Spellcheck failure is non-fatal — keep going without it.
                 $this->lastspellcheckresponse = null;
@@ -391,6 +492,45 @@ class qtype_aitext_question extends question_graded_automatically {
             $fraction = min(max(0.0, (float) $contentobject->marks / $this->defaultmark), 1.0);
         }
         return [$fraction, question_state::graded_state_for_fraction($fraction)];
+    }
+
+    /**
+     * Check if the current context is a question preview.
+     *
+     * @return bool
+     */
+    private function is_preview_context(): bool {
+        global $PAGE;
+        try {
+            return str_contains($PAGE->pagetype, 'question-bank-previewquestion');
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Determine whether we are in a regrade context, and if so whether it is a dry run.
+     *
+     * @return int REGRADE_NONE, REGRADE_DRY_RUN, or REGRADE_COMMIT
+     */
+    private function regrade_type(): int {
+        $isregrade = false;
+        $dryflag = false;
+
+        foreach (debug_backtrace(0, 10) as $frame) {
+            if (($frame['function'] ?? '') === 'regrade' && ($frame['class'] ?? '') === 'question_attempt') {
+                $isregrade = true;
+            }
+            if (($frame['function'] ?? '') === 'regrade_attempt') {
+                $dryflag = !empty($frame['args'][1] ?? false);
+            }
+        }
+
+        if (!$isregrade) {
+            return self::REGRADE_NONE;
+        }
+
+        return $dryflag ? self::REGRADE_DRY_RUN : self::REGRADE_COMMIT;
     }
 
     /**
@@ -667,6 +807,95 @@ class qtype_aitext_question extends question_graded_automatically {
             $cache->set(current_language() . '_' . $text, $translation);
         }
         return $translation;
+    }
+
+    /**
+     * Persist a cached qt var (name must start with '_') onto the current attempt step,
+     * using the question engine's own step/data-mapper API rather than hand-rolled SQL.
+     *
+     * @param string $name the qt var name, must start with '_'.
+     * @param string $value the value to set.
+     * @return void
+     * @throws coding_exception
+     */
+    protected function insert_attempt_step_data(string $name, string $value): void {
+        $newstep = self::persist_step_vars(
+            $this->step->get_id(),
+            [],
+            [$name => $value],
+            $this->get_contextid_for_ai_request(),
+            knownstep: $this->step
+        );
+
+        // $this->step is a read-only wrapper, so mirror the new data onto it via reflection to
+        // keep it in sync for any further insert_attempt_step_data() calls in this request.
+        $reflector = new \ReflectionProperty(\question_attempt_step::class, 'data');
+        $reflector->setAccessible(true);
+        $reflector->setValue($this->step, $newstep->get_all_data());
+    }
+
+    /**
+     * Persist cached behaviour/qt variables, and optionally a new fraction/state, onto an
+     * attempt step via the question engine's own step/data-mapper API.
+     *
+     * Shared by both the synchronous grading path (insert_attempt_step_data() above) and the
+     * asynchronous grading adhoc task (qtype_aitext\task\grade_response).
+     *
+     * @param int $stepid the attempt step to update.
+     * @param array $behaviourvars name => value to set via set_behaviour_var() (name must start with '_').
+     * @param array $qtvars name => value to set via set_qt_var() (name must start with '_').
+     * @param int $contextid the context the step's question usage belongs to.
+     * @param float|null $fraction new fraction to set, or null to leave the existing one unchanged.
+     * @param question_state|null $state new state to set, or null to leave the existing one unchanged.
+     * @param question_attempt_step|null $knownstep an already-loaded step to use as the base
+     *      instead of re-loading $stepid from the database.
+     * @return question_attempt_step the new, mutable step that was persisted, so callers holding
+     *      their own (read-only) copy of this step can mirror the new data onto it if needed.
+     * @throws dml_exception
+     * @throws coding_exception
+     */
+    public static function persist_step_vars(
+        int $stepid,
+        array $behaviourvars,
+        array $qtvars,
+        int $contextid,
+        ?float $fraction = null,
+        ?question_state $state = null,
+        ?question_attempt_step $knownstep = null
+    ): question_attempt_step {
+        global $DB;
+
+        $dm = new question_engine_data_mapper();
+        $existing = $knownstep ?? $dm->load_question_attempt_step($stepid);
+
+        $step = new question_attempt_step(
+            $existing->get_all_data(),
+            $existing->get_timecreated(),
+            $existing->get_user_id(),
+            $stepid
+        );
+        $step->set_state($state ?? $existing->get_state());
+        $step->set_fraction($fraction ?? $existing->get_fraction());
+
+        foreach ($behaviourvars as $name => $value) {
+            $step->set_behaviour_var($name, $value);
+        }
+        foreach ($qtvars as $name => $value) {
+            $step->set_qt_var($name, $value);
+        }
+
+        $record = $DB->get_record('question_attempt_steps', ['id' => $stepid],
+            'questionattemptid, sequencenumber', MUST_EXIST);
+
+        $rows = $dm->update_question_attempt_step(
+            $step,
+            $record->questionattemptid,
+            $record->sequencenumber,
+            context::instance_by_id($contextid)
+        );
+        $dm->insert_all_step_data($rows);
+
+        return $step;
     }
 
     /**

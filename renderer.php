@@ -130,8 +130,8 @@ class qtype_aitext_renderer extends qtype_renderer {
             );
         }
 
-        // Add the spellcheck feedback, only in readonly mode and depending on the display options just like manualcomment .
-        if ($question->spellcheck && $options->readonly && $options->manualcomment != question_display_options::HIDDEN) {
+        // Add the spellcheck feedback, only in readonly mode and depending on the display options just like manualcomment.
+        if ($question->spellcheck && $options->readonly && $options->manualcomment != question_display_options::HIDDEN && $qa->get_last_qt_var('_aigraded') !== '0') {
             $result .= $this->add_spellchecked_response_container($qa, $options->context, $uniqid);
         }
 
@@ -196,6 +196,43 @@ class qtype_aitext_renderer extends qtype_renderer {
         // Get data written in the question.php grade_response method.
         $comment = $qa->get_last_behaviour_var('_comment');
 
+        // Check if async grading is still in progress. '_aigraded' and '_aiprogressidnumber' are
+        // cached qt vars (see question.php::insert_attempt_step_data()), read with
+        // get_last_qt_var() to match how they were written via set_qt_var().
+        $aigraded = $qa->get_last_qt_var('_aigraded');
+
+        if ($aigraded === '0') {
+            // AI grading is still pending. Show a progress bar.
+            $output = '';
+            $progressidnumber = $qa->get_last_qt_var('_aiprogressidnumber');
+            if (!empty($progressidnumber)) {
+                $progressbar = \core\output\stored_progress_bar::get_by_idnumber($progressidnumber);
+                if ($progressbar) {
+                    $output .= html_writer::div(
+                        $progressbar->get_content(),
+                        'qtype_aitext-async-progress'
+                    );
+                    $this->page->requires->js_call_amd('qtype_aitext/asyncprogress', 'init');
+                }
+            }
+            // Fallback message if the progress bar is not available.
+            if (empty($output)) {
+                $output = html_writer::div(
+                    get_string('async_grading_placeholder', 'qtype_aitext'),
+                    'qtype_aitext-async-pending alert alert-info'
+                );
+            }
+            return $output;
+        }
+
+        if ($aigraded === 'error') {
+            // AI grading failed. Show an error message.
+            return html_writer::div(
+                get_string('async_grading_failed', 'qtype_aitext'),
+                'qtype_aitext-async-error alert alert-warning'
+            );
+        }
+
         if ($this->page->pagetype === 'question-bank-previewquestion-preview') {
             // Ensure $comment is an array and has content.
             if (!empty($comment)) {
@@ -209,7 +246,7 @@ class qtype_aitext_renderer extends qtype_renderer {
                     'noclean' => false,
                 ]);
 
-                $showprompt  = '<br /><button id="showprompt" class="rounded">';
+                $showprompt  = '<br /><button id="showprompt" class="btn btn-outline-primary my-3">';
                 $showprompt .= get_string('showprompt', 'qtype_aitext') . '</button>';
                 $showprompt .= '<div id="fullprompt" class="hidden">' . $prompt . '</div>';
 
@@ -295,7 +332,7 @@ class qtype_aitext_renderer extends qtype_renderer {
         context $context,
         string $uniqid
     ) {
-        global $USER;
+        global $USER, $CFG;
         $htmlfragment = "";
         $spellcheckareaid = 'aitext_spellcheck_area_' . $uniqid;
         $spellcheckeditbuttonid = 'aitext_spellcheckedit_' . $uniqid;
@@ -322,15 +359,18 @@ class qtype_aitext_renderer extends qtype_renderer {
             ['class' => 'expanded-icon icon-no-margin'],
         );
 
+        // Set data-toggle based on Bootstrap version.
+        $toggleattribute = ((int) $CFG->branch) < 500 ? 'data-toggle' : 'data-bs-toggle';
+
         $togglelink = html_writer::link(
             '#' . $collapseid,
             $expandedicon . $collapsedicon . get_string('spellchecktoggle', 'qtype_aitext'),
             [
-                'data-bs-toggle' => 'collapse',
+                $toggleattribute => 'collapse',
                 'aria-expanded' => 'true',
                 'aria-controls' => $collapseid,
                 'role' => 'button',
-                'class' => 'btn-outline-primary icons-collapse-expand my-3',
+                'class' => 'btn btn-outline-primary icons-collapse-expand my-3',
             ]
         );
 
