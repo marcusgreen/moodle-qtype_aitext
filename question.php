@@ -546,7 +546,15 @@ class qtype_aitext_question extends question_graded_automatically {
             $contentobject->marks = null;
         }
         $disclaimer = get_config('qtype_aitext', 'disclaimer');
-        $contentobject->feedback .= ' ' . $this->llm_translate($disclaimer);
+        if (!$disclaimer) {
+            $disclaimer = '';
+        } else {
+            $disclaimer = trim($disclaimer);
+        }
+        if ($disclaimer === '') {
+            $disclaimer = get_string('disclaimer_standard', 'qtype_aitext');
+        }
+        $contentobject->feedback .= ' ' . $disclaimer;
 
         return $contentobject;
     }
@@ -604,32 +612,6 @@ class qtype_aitext_question extends question_graded_automatically {
             return $decoded;
         }
         return null;
-    }
-
-    /**
-     * Translate into the current language and
-     * store in a cache
-     *
-     * @param string $text
-     * @return string
-     */
-    protected function llm_translate(string $text): string {
-        if (current_language() == 'en') {
-            return $text;
-        }
-        if (get_config('qtype_aitext', 'translatepostfix') == 0) {
-            return $text;
-        }
-
-        $cache = cache::make('qtype_aitext', 'stringdata');
-        if (($translation = $cache->get(current_language() . '_' . $text)) === false) {
-            $prompt = 'translate "' . $text . '" into ' . current_language() .
-                    'Only return the exact text, do not wrap it in other text.';
-            $translation = $this->perform_request($prompt, 'translate');
-            $translation = trim($translation, '"');
-            $cache->set(current_language() . '_' . $text, $translation);
-        }
-        return $translation;
     }
 
     /**

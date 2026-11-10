@@ -489,6 +489,67 @@ final class question_test extends \advanced_testcase {
     }
 
     /**
+     * Verify which disclaimer process_feedback() appends depending on the admin setting.
+     *
+     * The disclaimer is never translated by the LLM. A configured value is appended unchanged,
+     * an unset, empty or whitespace-only value falls back to the language string disclaimer_standard.
+     *
+     * @covers ::process_feedback()
+     * @dataProvider process_feedback_disclaimer_provider
+     * @param bool $setconfig Whether the disclaimer setting is stored at all.
+     * @param string $configvalue The stored disclaimer setting.
+     * @param bool $expectstandard Whether the language string disclaimer_standard is expected.
+     */
+    public function test_process_feedback_disclaimer(bool $setconfig, string $configvalue, bool $expectstandard): void {
+        $this->resetAfterTest();
+        if ($setconfig) {
+            set_config('disclaimer', $configvalue, 'qtype_aitext');
+        } else {
+            unset_config('disclaimer', 'qtype_aitext');
+        }
+
+        $aitext = qtype_aitext_test_helper::make_aitext_question([]);
+        $processedfeedback = $aitext->process_feedback('{"feedback": "Good answer.", "marks": 1}');
+
+        if ($expectstandard) {
+            $expecteddisclaimer = get_string('disclaimer_standard', 'qtype_aitext');
+        } else {
+            $expecteddisclaimer = $configvalue;
+        }
+        $this->assertSame('Good answer. ' . $expecteddisclaimer, $processedfeedback->feedback);
+    }
+
+    /**
+     * Data provider for test_process_feedback_disclaimer().
+     *
+     * @return array of test cases
+     */
+    public static function process_feedback_disclaimer_provider(): array {
+        return [
+            'setting never stored' => [
+                'setconfig' => false,
+                'configvalue' => '',
+                'expectstandard' => true,
+            ],
+            'setting empty' => [
+                'setconfig' => true,
+                'configvalue' => '',
+                'expectstandard' => true,
+            ],
+            'setting only whitespace' => [
+                'setconfig' => true,
+                'configvalue' => '   ',
+                'expectstandard' => true,
+            ],
+            'setting with custom text' => [
+                'setconfig' => true,
+                'configvalue' => '(Custom disclaimer)',
+                'expectstandard' => false,
+            ],
+        ];
+    }
+
+    /**
      * Test summarise_response() when teachers view quiz attempts and then
      * review them to see what has been saved in the response history table.
      *

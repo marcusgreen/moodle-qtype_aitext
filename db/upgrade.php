@@ -128,5 +128,16 @@ function xmldb_qtype_aitext_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026072800, 'qtype', 'aitext');
     }
 
+    if ($oldversion < 2026111000) {
+        $currentdisclaimer = get_config('qtype_aitext', 'disclaimer');
+        $olddefault = '(Response provided by an AI System)';
+        if ($currentdisclaimer === $olddefault) {
+            set_config('disclaimer', '', 'qtype_aitext');
+        }
+
+        // Aitext savepoint reached.
+        upgrade_plugin_savepoint(true, 2026111000, 'qtype', 'aitext');
+    }
+
     return true;
 }

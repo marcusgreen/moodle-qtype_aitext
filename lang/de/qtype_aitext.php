@@ -39,7 +39,6 @@ $string['automatic_spellcheck'] = 'Automatische Rechtschreibprüfung';
 $string['automatic_spellcheck_help'] = 'Wenn aktiviert, gibt die KI die Antwort der Lernenden wortgetreu wieder und korrigiert nur die Rechtschreibung; die Unterschiede werden der Lehrkraft angezeigt.
 
 Die Rechtschreibprüfung zielt auf Fließtext. Code wird unverändert übernommen, sofern er erkannt werden kann (in HTML-Antworten); in reinen Textantworten lässt sich Code jedoch nicht von Fließtext unterscheiden. Wenn Sie erwarten, dass die Lernenden mit Code antworten, deaktivieren Sie diese Option gegebenenfalls.';
-$string['cachedef_stringdata'] = 'Cachedef stringdata';
 $string['defaultmarksscheme'] = 'Markierungsschema';
 $string['defaultmarksscheme_setting'] = 'Dies wird das Standard-Bewertungsschema für neue Fragen sein. Fragenautoren sollten dieses Schema an die jeweilige Frage anpassen.';
 $string['defaultprompt'] = 'AI-Aufforderung';
@@ -64,7 +63,8 @@ Antworte in der Sprache "{{language}}".';
 $string['defaultroleprompt'] = 'Du bist ein erfahrener Lehrer, der Schülerantworten fair und konstruktiv bewertet. Gib hilfreiches Feedback, das dem Schüler beim Lernen hilft. Gib Formeln in LATEX Notation aus. Verwende als Delimiter \(..\) .';
 $string['deprecated'] = '(Veraltet - verwenden Sie stattdessen die Prompt-Vorlage)';
 $string['disclaimer'] = 'Haftungsausschluss';
-$string['disclaimer_setting'] = 'Text, der an jede Antwort angehängt wird und angibt, dass das Feedback von einem Large Language Model und nicht von einem Menschen stammt';
+$string['disclaimer_setting'] = 'Text, der an jede Antwort angehängt wird und angibt, dass das Feedback von einem Large Language Model und nicht von einem Menschen stammt. Dieser Text wird nicht übersetzt. Wenn er leer ist, wird ein mehrsprachiger Standardtext verwendet.';
+$string['disclaimer_standard'] = '(Diese Antwort wurde von einem KI-System generiert)';
 $string['enable_expertmode'] = 'Expertenmodus aktivieren';
 $string['enable_expertmode_setting'] = 'Wenn aktiviert, wird der Button "Expertenmodus-Vorlage verwenden" im Frage-Bearbeitungsformular angezeigt.';
 $string['err_airesponsefailed'] = 'Fehler: {$a}';

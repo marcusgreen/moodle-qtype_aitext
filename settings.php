@@ -41,7 +41,7 @@ if ($ADMIN->fulltree) {
         'qtype_aitext/disclaimer',
         new lang_string('disclaimer', 'qtype_aitext'),
         new lang_string('disclaimer_setting', 'qtype_aitext'),
-        '(Response provided by an AI System)'
+        ''
     ));
     $settings->add(new admin_setting_configcheckbox(
         'qtype_aitext/enable_expertmode',

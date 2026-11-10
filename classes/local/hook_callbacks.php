@@ -40,10 +40,5 @@ class hook_callbacks {
             'qtype_aitext',
             get_string('purposeplacedescription_feedback', 'qtype_aitext')
         );
-        $hook->add_purpose_usage_description(
-            'translate',
-            'qtype_aitext',
-            get_string('purposeplacedescription_translate', 'qtype_aitext')
-        );
     }
 }
