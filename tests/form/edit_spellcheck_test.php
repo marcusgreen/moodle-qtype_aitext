@@ -26,7 +26,6 @@ namespace qtype_aitext\form;
  * @covers     \qtype_aitext\form\edit_spellcheck
  */
 final class edit_spellcheck_test extends \advanced_testcase {
-    #[\PHPUnit\Framework\Attributes\Group('baseline')]
     /**
      * Markup in the student answer must not reach the modal as HTML.
      */
@@ -37,7 +36,6 @@ final class edit_spellcheck_test extends \advanced_testcase {
         $this->assertStringContainsString('&lt;img src=x onerror=alert(1)&gt;', $html);
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('baseline')]
     /**
      * A regular student answer is still shown in the modal.
      */
@@ -48,12 +46,24 @@ final class edit_spellcheck_test extends \advanced_testcase {
     }
 
     /**
+     * The modal shows the spellcheck-normalised answer text, not raw formatted HTML rendering.
+     */
+    public function test_student_answer_uses_response_formatter_for_html_input(): void {
+        $html = $this->render_form_for_answer('<p><strong>FETT</strong> und <em>kursiv</em>.</p>', FORMAT_HTML);
+
+        $this->assertStringContainsString('FETT und kursiv.', $html);
+        $this->assertStringNotContainsString('<strong>FETT</strong>', $html);
+        $this->assertStringNotContainsString('<em>kursiv</em>', $html);
+    }
+
+    /**
      * Save a plain text answer in a question preview and render the spellcheck form for it.
      *
      * @param string $answer Student answer
+     * @param int $answerformat One of the FORMAT_* constants
      * @return string Rendered form HTML
      */
-    private function render_form_for_answer(string $answer): string {
+    private function render_form_for_answer(string $answer, int $answerformat = FORMAT_PLAIN): string {
         global $PAGE, $USER;
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -70,7 +80,7 @@ final class edit_spellcheck_test extends \advanced_testcase {
         $quba->set_preferred_behaviour('deferredfeedback');
         $slot = $quba->add_question(\question_bank::load_question($questionrecord->id), 1);
         $quba->start_all_questions();
-        $quba->process_action($slot, ['answer' => $answer, 'answerformat' => FORMAT_PLAIN]);
+        $quba->process_action($slot, ['answer' => $answer, 'answerformat' => $answerformat]);
         \question_engine::save_questions_usage_by_activity($quba);
         $questionattemptid = $quba->get_question_attempt($slot)->get_database_id();
 
