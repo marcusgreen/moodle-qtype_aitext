@@ -36,6 +36,19 @@ final class response_formatter_test extends \advanced_testcase {
     }
 
     /**
+     * Non-Latin and non-BMP characters survive the HTML parsing unchanged, with and without markup.
+     */
+    public function test_non_ascii_text_is_preserved(): void {
+        $texts = ['中文测试 你好', 'مرحبا بالعالم', '日本語 ñ € 😀', 'नमस्ते दुनिया'];
+        foreach ($texts as $text) {
+            foreach ([$text, '<p>' . $text . '</p>'] as $answer) {
+                $this->assertSame($text, response_formatter::to_feedback_text($answer, FORMAT_HTML));
+                $this->assertSame($text, response_formatter::to_spellcheck_text($answer, FORMAT_HTML));
+            }
+        }
+    }
+
+    /**
      * Line breaks (<br> and <br />) are converted to newlines so words do not run together.
      */
     public function test_html_line_breaks_become_newlines(): void {
