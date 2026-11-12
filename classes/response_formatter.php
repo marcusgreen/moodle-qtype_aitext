@@ -136,9 +136,11 @@ class response_formatter {
         $dom = new \DOMDocument();
         $previous = libxml_use_internal_errors(true);
         // The leading XML declaration forces UTF-8 interpretation of the fragment; the flags keep
-        // libxml from injecting an implied <html>/<body> wrapper and a DOCTYPE.
+        // libxml from injecting an implied <html>/<body> wrapper and a DOCTYPE. The fragment is wrapped
+        // in a <div> because newer libxml versions (2.13+) silently drop top-level text that is not
+        // inside an element, which would lose responses without any markup.
         $dom->loadHTML(
-            '<?xml encoding="UTF-8">' . $html,
+            '<?xml encoding="UTF-8"><div>' . $html . '</div>',
             LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOERROR | LIBXML_NOWARNING
         );
         libxml_use_internal_errors($previous);
