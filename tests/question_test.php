@@ -401,6 +401,27 @@ final class question_test extends \advanced_testcase {
                 'expectedmathjaxapplied' => false,
                 'expectedmarks' => 0,
             ],
+            'valid_json_without_marks' => [
+                'json' => '{"feedback": "Good job"}',
+                'exceptionexpected' => false,
+                'expectedfeedback' => 'Good job',
+                'expectedmathjaxapplied' => false,
+                'expectedmarks' => null,
+            ],
+            'valid_json_without_feedback_key' => [
+                'json' => '{"comment": "Good job", "marks": 2}',
+                'exceptionexpected' => false,
+                'expectedfeedback' => '{"comment": "Good job", "marks": 2}',
+                'expectedmathjaxapplied' => false,
+                'expectedmarks' => null,
+            ],
+            'valid_json_non_numeric_marks' => [
+                'json' => '{"feedback": "Good job", "marks": "3/5"}',
+                'exceptionexpected' => false,
+                'expectedfeedback' => 'Good job',
+                'expectedmathjaxapplied' => false,
+                'expectedmarks' => null,
+            ],
             'valid_json_markdown_formatted' => [
                 // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
                 'json' => '```json{"feedback": "Good job", "marks": 1}```',
