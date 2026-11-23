@@ -132,7 +132,7 @@ final class response_formatter_test extends \advanced_testcase {
         ];
         foreach ($results as $result) {
             $this->assertStringContainsString('See below:', $result);
-            // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
+            // phpcs:ignore moodle.Strings.ForbiddenStrings.Found
             $this->assertStringContainsString("```\ndef f():\n    return 1\n```", $result);
         }
     }
@@ -142,17 +142,17 @@ final class response_formatter_test extends \advanced_testcase {
      */
     public function test_inline_code_is_fenced(): void {
         $answer = '<p>use the <code>&lt;br&gt;</code> tag here</p>';
-        // @codingStandardsIgnoreStart moodle.Strings.ForbiddenStrings.Found
+        // phpcs:disable moodle.Strings.ForbiddenStrings.Found
         $this->assertSame('use the `<br>` tag here', response_formatter::to_feedback_text($answer, FORMAT_HTML));
         $this->assertSame('use the `<br>` tag here', response_formatter::to_spellcheck_text($answer, FORMAT_HTML));
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
     }
 
     /**
      * Markdown fenced and inline code are preserved (normalised to <pre><code>/<code>, re-fenced).
      */
     public function test_markdown_code_is_fenced(): void {
-        // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
+        // phpcs:ignore moodle.Strings.ForbiddenStrings.Found
         $answer = "Some text\n\n```\ncode here\n```\n\nand `inline` too";
 
         $results = [
@@ -162,7 +162,7 @@ final class response_formatter_test extends \advanced_testcase {
         foreach ($results as $result) {
             $this->assertStringContainsString('Some text', $result);
             $this->assertStringContainsString('code here', $result);
-            // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
+            // phpcs:ignore moodle.Strings.ForbiddenStrings.Found
             $this->assertStringContainsString('`inline`', $result);
             $this->assertStringContainsString('too', $result);
         }
@@ -173,13 +173,13 @@ final class response_formatter_test extends \advanced_testcase {
      * the block early (CommonMark rule), keeping the content intact.
      */
     public function test_uses_longer_fence_for_backticks_in_code(): void {
-        // @codingStandardsIgnoreStart moodle.Strings.ForbiddenStrings.Found
+        // phpcs:disable moodle.Strings.ForbiddenStrings.Found
         $answer = "<pre><code>a ``` b</code></pre>";
         $result = response_formatter::to_feedback_text($answer, FORMAT_HTML);
 
         $this->assertStringContainsString('a ``` b', $result);
         $this->assertMatchesRegularExpression('/````+\na ``` b\n````+/', $result);
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
     }
 
     /**
@@ -213,7 +213,7 @@ final class response_formatter_test extends \advanced_testcase {
         $answer = '<pre><code>a&lt;sup&gt;2&lt;/sup&gt;</code></pre>';
         $result = response_formatter::to_feedback_text($answer, FORMAT_HTML);
 
-        // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
+        // phpcs:ignore moodle.Strings.ForbiddenStrings.Found
         $this->assertStringContainsString("```\na<sup>2</sup>\n```", $result);
         $this->assertStringNotContainsString('^', $result);
     }
