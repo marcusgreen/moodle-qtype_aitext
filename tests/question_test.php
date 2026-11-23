@@ -137,6 +137,35 @@ final class question_test extends \advanced_testcase {
         $this->assertEquals('8', $response);
     }
 
+    /**
+     * Grade a correct and an incorrect answer against the live LLM and check
+     * the JSON round trip produces usable marks and feedback.
+     * Skipped unless TEST_LLM_APIKEY is set in config.php or the environment.
+     *
+     * @covers \qtype_aitext_question::grade_response
+     * @covers \qtype_aitext_question::perform_request
+     * @covers \qtype_aitext_question::process_feedback
+     * @return void
+     */
+    public function test_perform_request_grade_round_trip(): void {
+        qtype_aitext_test_helper::require_live_llm($this);
+        $aitext = qtype_aitext_test_helper::make_aitext_question([
+            'questiontext' => 'What is the capital of France?',
+            'aiprompt' => 'Check whether the student names the capital of France.',
+            'markscheme' => 'Award 1 mark if the answer is Paris, otherwise 0.',
+        ]);
+
+        [$rightfraction, $rightstate] = $aitext->grade_response(['answer' => 'Paris']);
+        $this->assertNotEmpty($aitext->lastaicomment);
+        $this->assertNotEmpty($aitext->modelused);
+        $this->assertEquals(1.0, $rightfraction);
+        $this->assertEquals(\question_state::$gradedright, $rightstate);
+
+        [$wrongfraction, $wrongstate] = $aitext->grade_response(['answer' => 'Berlin']);
+        $this->assertEquals(0.0, $wrongfraction);
+        $this->assertEquals(\question_state::$gradedwrong, $wrongstate);
+    }
+
 
     /**
      * Tests the call to the quesitonbase summary code
@@ -402,7 +431,7 @@ final class question_test extends \advanced_testcase {
                 'expectedmarks' => 0,
             ],
             'valid_json_markdown_formatted' => [
-                // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
+                // phpcs:ignore moodle.Strings.ForbiddenStrings.Found
                 'json' => '```json{"feedback": "Good job", "marks": 1}```',
                 'exceptionexpected' => false,
                 'expectedfeedback' => 'Good job',
@@ -450,7 +479,7 @@ final class question_test extends \advanced_testcase {
             // backslash when parsing the JSON. Then it will substitute each backslash with a double backslash, before sending it
             // through format_text which again will strip one backslash.
             // Overall, the following test cases should represent properly what happens.
-            // @codingStandardsIgnoreStart moodle.Strings.ForbiddenStrings.Found
+            // phpcs:disable moodle.Strings.ForbiddenStrings.Found,moodle.Files.LineLength.TooLong
             'json_with_backslashes' => [
                 // This JSON is real answer from an LLM with Markdown code block delimiters.
                 'json' => '```json { "feedback": "Die Antwort des Schülers zeigt ein grundlegendes Verständnis für das ' .
@@ -517,7 +546,7 @@ final class question_test extends \advanced_testcase {
                 'expectedmathjaxapplied' => true,
                 'expectedmarks' => 1,
             ],
-            // @codingStandardsIgnoreEnd
+            // phpcs:enable
         ];
     }
 
