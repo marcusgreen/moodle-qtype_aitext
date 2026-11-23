@@ -430,7 +430,7 @@ final class question_test extends \advanced_testcase {
                 'expectedmarks' => 0,
             ],
             'valid_json_markdown_formatted' => [
-                // @codingStandardsIgnoreLine moodle.Strings.ForbiddenStrings.Found
+                // phpcs:ignore moodle.Strings.ForbiddenStrings.Found
                 'json' => '```json{"feedback": "Good job", "marks": 1}```',
                 'exceptionexpected' => false,
                 'expectedfeedback' => 'Good job',
@@ -478,7 +478,7 @@ final class question_test extends \advanced_testcase {
             // backslash when parsing the JSON. Then it will substitute each backslash with a double backslash, before sending it
             // through format_text which again will strip one backslash.
             // Overall, the following test cases should represent properly what happens.
-            // @codingStandardsIgnoreStart moodle.Strings.ForbiddenStrings.Found
+            // phpcs:disable moodle.Strings.ForbiddenStrings.Found,moodle.Files.LineLength.TooLong
             'json_with_backslashes' => [
                 // This JSON is real answer from an LLM with Markdown code block delimiters.
                 'json' => '```json { "feedback": "Die Antwort des Schülers zeigt ein grundlegendes Verständnis für das ' .
@@ -545,7 +545,7 @@ final class question_test extends \advanced_testcase {
                 'expectedmathjaxapplied' => true,
                 'expectedmarks' => 1,
             ],
-            // @codingStandardsIgnoreEnd
+            // phpcs:enable
         ];
     }
 

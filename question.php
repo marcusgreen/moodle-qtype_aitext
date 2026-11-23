@@ -23,7 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/questionbase.php');
@@ -706,7 +705,7 @@ class qtype_aitext_question extends question_graded_automatically {
     public function summarise_response(array $response) {
         $output = null;
         if (isset($response['answer'])) {
-            $defaultformat = str_contains($this->responseformat, 'editor') ? FORMAT_HTML : FORMAT_PLAIN;
+            $defaultformat = str_contains((string) $this->responseformat, 'editor') ? FORMAT_HTML : FORMAT_PLAIN;
             $output .= question_utils::to_plain_text(
                 $response['answer'],
                 $response['answerformat'] ?? $defaultformat,
@@ -728,7 +727,7 @@ class qtype_aitext_question extends question_graded_automatically {
             return [];
         }
 
-        if (str_contains($this->responseformat, 'editor')) {
+        if (str_contains((string) $this->responseformat, 'editor')) {
             return ['answer' => text_to_html($summary), 'answerformat' => FORMAT_HTML];
         } else {
             return ['answer' => $summary, 'answerformat' => FORMAT_PLAIN];
@@ -746,7 +745,7 @@ class qtype_aitext_question extends question_graded_automatically {
         if (!get_config('qtype_aitext', 'enable_exemplar') || trim((string) $this->exemplar) === '') {
             return null;
         }
-        if (str_contains($this->responseformat, 'editor')) {
+        if (str_contains((string) $this->responseformat, 'editor')) {
             return ['answer' => text_to_html($this->exemplar), 'answerformat' => FORMAT_HTML];
         }
         return ['answer' => $this->exemplar, 'answerformat' => FORMAT_PLAIN];
