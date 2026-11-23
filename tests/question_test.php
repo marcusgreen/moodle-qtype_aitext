@@ -137,6 +137,39 @@ final class question_test extends \advanced_testcase {
         $this->assertEquals('8', $response);
     }
 
+    /**
+     * Grade a correct and an incorrect answer against the live LLM and check
+     * the JSON round trip produces usable marks and feedback.
+     * Skipped unless TEST_LLM_APIKEY is set in config.php or the environment.
+     *
+     * @covers \qtype_aitext_question::grade_response
+     * @covers \qtype_aitext_question::perform_request
+     * @covers \qtype_aitext_question::process_feedback
+     * @return void
+     */
+    public function test_perform_request_grade_round_trip(): void {
+        qtype_aitext_test_helper::require_live_llm($this);
+        // Keep it to one LLM call per grade: no disclaimer translation.
+        set_config('disclaimer', '', 'qtype_aitext');
+
+        $aitext = qtype_aitext_test_helper::make_aitext_question([
+            'questiontext' => 'What is the capital of France?',
+            'aiprompt' => 'Check whether the student names the capital of France.',
+            'markscheme' => 'Award 1 mark if the answer is Paris, otherwise 0.',
+        ]);
+        $aitext->defaultmark = 1;
+
+        [$rightfraction, $rightstate] = $aitext->grade_response(['answer' => 'Paris']);
+        $this->assertNotEmpty($aitext->lastaicomment);
+        $this->assertNotEmpty($aitext->modelused);
+        $this->assertEquals(1.0, $rightfraction);
+        $this->assertEquals(\question_state::$gradedright, $rightstate);
+
+        [$wrongfraction, $wrongstate] = $aitext->grade_response(['answer' => 'Berlin']);
+        $this->assertEquals(0.0, $wrongfraction);
+        $this->assertEquals(\question_state::$gradedwrong, $wrongstate);
+    }
+
 
     /**
      * Tests the call to the quesitonbase summary code
