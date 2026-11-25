@@ -433,7 +433,7 @@ class qtype_aitext_question extends question_graded_automatically {
             $roleprompt = get_string('defaultroleprompt', 'qtype_aitext');
         }
 
-        $jsonprompt = get_config('qtype_aitext', 'jsonprompt') ?? '';
+        $jsonprompt = (string) get_config('qtype_aitext', 'jsonprompt');
 
         $language = $this->determine_output_language($aiprompt);
 
@@ -563,8 +563,12 @@ class qtype_aitext_question extends question_graded_automatically {
             return $contentobject;
         }
         $contentobject = $this->extract_single_json_object($feedback);
-        if (!is_null($contentobject)) {
+        if (!is_null($contentobject) && isset($contentobject->feedback) && is_string($contentobject->feedback)) {
             $contentobject->feedback = trim($contentobject->feedback);
+            // A missing or non-numeric mark (e.g. "3/5") leaves the question for manual grading.
+            if (!isset($contentobject->marks) || !is_numeric($contentobject->marks)) {
+                $contentobject->marks = null;
+            }
         } else {
             $contentobject = new \stdClass();
             $contentobject->feedback = $feedback;

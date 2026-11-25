@@ -55,9 +55,7 @@ if ($ADMIN->fulltree) {
         'qtype_aitext/jsonprompt',
         new lang_string('jsonprompt', 'qtype_aitext'),
         new lang_string('jsonprompt_setting', 'qtype_aitext'),
-        'Return only a JSON object with exactly 2 elements, in this format: {"feedback":"string","marks":number} ' .
-            'where marks is a single number summing all marks. Put double quotes around every key and every string. ' .
-            'Also show the marks as part of the feedback.',
+        \qtype_aitext\local\defaults::JSONPROMPT,
         PARAM_RAW,
         80,
         6

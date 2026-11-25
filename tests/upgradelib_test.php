@@ -21,6 +21,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/aitext/db/upgradelib.php');
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
+require_once($CFG->dirroot . '/question/type/aitext/tests/helper.php');
 
 /**
  * Unit tests for the legacy expert mode prompt migration.
@@ -31,6 +32,7 @@ require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     ::qtype_aitext_migrate_legacy_expert_prompt
  * @covers     ::qtype_aitext_upgrade_migrate_legacy_prompts
+ * @covers     ::qtype_aitext_upgrade_reset_old_jsonprompt
  */
 final class upgradelib_test extends \advanced_testcase {
     /**
@@ -134,6 +136,41 @@ final class upgradelib_test extends \advanced_testcase {
 
         // Second migration should be idempotent (0 records).
         $this->assertEquals(0, qtype_aitext_upgrade_migrate_legacy_prompts());
+    }
+
+    /**
+     * The old malformed default jsonprompt is replaced; a customised prompt is not.
+     *
+     * @covers ::qtype_aitext_upgrade_reset_old_jsonprompt
+     */
+    public function test_upgrade_reset_old_jsonprompt(): void {
+        $this->resetAfterTest();
+
+        // The old default as stored by settings.php, with its tabs and line breaks.
+        $olddefault = "Return only a JSON object which enumerates a set of 2 elements.The JSON object should be in\n" .
+            "\tthis format: {feedback\":\"string\",\"marks\":\"number\"} where marks is a single number summing all marks.\n" .
+            "   \tAlso show the marks as part of the feedback.";
+        set_config('jsonprompt', $olddefault, 'qtype_aitext');
+        $this->assertTrue(qtype_aitext_upgrade_reset_old_jsonprompt());
+        $this->assertEquals(local\defaults::JSONPROMPT, get_config('qtype_aitext', 'jsonprompt'));
+
+        // The prompt sent to the model still has the output format section.
+        $question = \qtype_aitext_test_helper::make_aitext_question([]);
+        $prompt = $question->build_full_ai_prompt(
+            ['answer' => 'An answer', 'answerformat' => FORMAT_HTML],
+            'Grade it',
+            1,
+            'One mark'
+        );
+        $this->assertStringContainsString("=== OUTPUT FORMAT ===\n" . local\defaults::JSONPROMPT, $prompt);
+
+        // Running again does nothing.
+        $this->assertFalse(qtype_aitext_upgrade_reset_old_jsonprompt());
+
+        // A customised prompt is left alone.
+        set_config('jsonprompt', 'My own JSON instructions', 'qtype_aitext');
+        $this->assertFalse(qtype_aitext_upgrade_reset_old_jsonprompt());
+        $this->assertEquals('My own JSON instructions', get_config('qtype_aitext', 'jsonprompt'));
     }
 
     /**

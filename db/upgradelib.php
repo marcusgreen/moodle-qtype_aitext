@@ -123,3 +123,36 @@ function qtype_aitext_upgrade_migrate_countback_attempts(): int {
 
     return count($attemptids);
 }
+
+/**
+ * Replace the old malformed default jsonprompt with the corrected default.
+ *
+ * Before 2026-10 the default example was {feedback":"string",...} (missing a quote), which
+ * models copied, producing replies that json_decode() rejects. The setting is only replaced
+ * when it still equals one of the old defaults (ignoring whitespace), so customised prompts
+ * are left alone. set_config() is used rather than unset_config() so the setting is never
+ * left empty after a web upgrade.
+ *
+ * @return bool true if the setting was replaced.
+ */
+function qtype_aitext_upgrade_reset_old_jsonprompt(): bool {
+    $olddefaults = [
+        'Return only a JSON object which enumerates a set of 2 elements.The JSON object should be in ' .
+            'this format: {feedback":"string","marks":"number"} where marks is a single value summing all marks.',
+        'Return only a JSON object which enumerates a set of 2 elements.The JSON object should be in ' .
+            'this format: {feedback":"string","marks":"number"} where marks is a single number summing all marks.',
+        'Return only a JSON object which enumerates a set of 2 elements.The JSON object should be in ' .
+            'this format: {feedback":"string","marks":"number"} where marks is a single number summing all marks. ' .
+            'Also show the marks as part of the feedback.',
+    ];
+    $current = get_config('qtype_aitext', 'jsonprompt');
+    if ($current === false) {
+        return false;
+    }
+    $normalised = preg_replace('/\s+/', ' ', trim($current));
+    if (!in_array($normalised, $olddefaults, true)) {
+        return false;
+    }
+    set_config('jsonprompt', \qtype_aitext\local\defaults::JSONPROMPT, 'qtype_aitext');
+    return true;
+}
